@@ -1,0 +1,1 @@
+for ((i=0;i<${#COMPREPLY[*]};i++)) do echo ${COMPREPLY[i]}; done
