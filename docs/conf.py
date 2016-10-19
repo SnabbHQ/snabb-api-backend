@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# runn documentation build configuration file, created by
+# snabb documentation build configuration file, created by
 # sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -45,7 +45,7 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = 'runn'
+project = 'snabb'
 copyright = """2016, Nicolas Lara"""
 
 # The version info for the project you're documenting, acts as replacement for
@@ -189,8 +189,8 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index',
-     'runn.tex',
-     'runn Documentation',
+     'snabb.tex',
+     'snabb Documentation',
      """Nicolas Lara""", 'manual'),
 ]
 
@@ -220,7 +220,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'runn', 'runn Documentation',
+    ('index', 'snabb', 'snabb Documentation',
      ["""Nicolas Lara"""], 1)
 ]
 
@@ -234,9 +234,9 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    ('index', 'runn', 'runn Documentation',
-     """Nicolas Lara""", 'runn',
-     """runn!""", 'Miscellaneous'),
+    ('index', 'snabb', 'snabb Documentation',
+     """Nicolas Lara""", 'snabb',
+     """snabb!""", 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

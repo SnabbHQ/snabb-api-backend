@@ -39,7 +39,7 @@ Restart the postgres server:
 
 Create the database:
 
-    $ createdb runn
+    $ createdb snabb
 
 ### Installing the dependencies
 
