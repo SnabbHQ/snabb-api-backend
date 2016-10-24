@@ -10,13 +10,14 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework import routers
 
-from snabb.deliveries.views import DeliveriesViewSet
+from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
 from snabb.users.views import UserViewSet, GroupViewSet
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'deliveries', DeliveriesViewSet)
+router.register(r'deliveries/quotes', QuotesViewSet)
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
