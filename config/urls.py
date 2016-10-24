@@ -17,7 +17,7 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'deliveries', DeliveriesViewSet)
-router.register(r'deliveries/quotes', QuotesViewSet)
+router.register(r'quotes', QuotesViewSet)
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),

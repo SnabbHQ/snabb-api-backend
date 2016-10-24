@@ -26,13 +26,20 @@ class Delivery(models.Model):
 
 class Quote(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    quote_id = models.CharField(max_length=20, default=_create_hash, unique=True)
+    quote_id = models.CharField(max_length=20, unique=True)
     currency_code = models.CharField(max_length=100, blank=True, default='SEK')
     pickup_eta = models.IntegerField(default=0)
     delivery_eta = models.TextField(default=0)
 
     class Meta:
         ordering = ('created',)
+
+    def save(self, *args, **kwargs):
+        """
+        Use the create_hash to generate a unique identifier for the order
+        """
+        self.quote_id = _create_hash()
+        super(Quote, self).save(*args, **kwargs)
 
 
 class Location(models.Model):
