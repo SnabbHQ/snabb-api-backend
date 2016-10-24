@@ -6,9 +6,12 @@ from django.db import models
 
 class Delivery(models.Model):
     created = models.DateTimeField(auto_now_add=True)
+    quote_id = models.CharField(max_length=100, blank=True, default='')
     currency_code = models.CharField(max_length=100, blank=True, default='SEK')
     owner = models.ForeignKey('auth.User', related_name='deliveries', default='')
     tracking_url = models.TextField(default='')
 
     class Meta:
         ordering = ('created',)
+
+
