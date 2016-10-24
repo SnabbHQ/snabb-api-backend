@@ -6,16 +6,17 @@ from django.conf.urls import include, url
 from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic import TemplateView
 from django.views import defaults as default_views
-
+from django.views.generic import TemplateView
 from rest_framework import routers
 
-from snabb.users import views
+from snabb.deliveries.views import DeliveriesViewSet
+from snabb.users.views import UserViewSet, GroupViewSet
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
+router.register(r'deliveries', DeliveriesViewSet)
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
