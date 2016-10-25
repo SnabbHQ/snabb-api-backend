@@ -30,8 +30,7 @@ DJANGO_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Useful template tags:
-    # 'django.contrib.humanize',
+    'django.contrib.gis',
 
     # Admin
     'django.contrib.admin',
@@ -105,9 +104,10 @@ MANAGERS = ADMINS
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     'default': env.db('DATABASE_URL', default='postgres:///snabb'),
+
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
-
+DATABASES['default']['engine'] = 'django.contrib.gis.db.backends.postgis'
 
 # GENERAL CONFIGURATION
 # ------------------------------------------------------------------------------

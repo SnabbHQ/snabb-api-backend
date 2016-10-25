@@ -32,6 +32,9 @@ Create a virtualenv:
 Install postgres:
 
     $ brew install postgres
+    $ brew install postgis
+    $ brew install gdal
+    $ brew install libgeoip
 
 Restart the postgres server:
 
@@ -40,6 +43,8 @@ Restart the postgres server:
 Create the database:
 
     $ createdb snabb
+    $ psql snabb
+    > CREATE_EXTENSION postgis;
 
 ### Installing the dependencies
 
