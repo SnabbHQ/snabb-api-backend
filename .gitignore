@@ -75,6 +75,6 @@ docs/_build/*
 
 
 .idea
-runn_env
+snabb_env
 **.min.css
 **.min.js

@@ -11,11 +11,8 @@ from django.views import defaults as default_views
 
 from rest_framework import routers
 
-from runn.users import views
-
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
