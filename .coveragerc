@@ -1,5 +1,5 @@
 [run]
-include = runn/*
+include = snabb/*
 omit = *migrations*, *tests*
 plugins =
     django_coverage_plugin

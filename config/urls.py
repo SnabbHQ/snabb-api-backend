@@ -11,7 +11,7 @@ from django.views import defaults as default_views
 
 from rest_framework import routers
 
-from runn.users import views
+from snabb.users import views
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
