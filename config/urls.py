@@ -21,6 +21,7 @@ router.register(r'quotes', QuotesViewSet)
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
+    url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
     url(r'^accounts/', include('allauth.urls')),
 
     # Django Admin, use {% url 'admin:index' %}
