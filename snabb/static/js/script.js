@@ -20,7 +20,7 @@ function fadedEls(el, shift) {
     }).scroll(function() {
         if (!el.hasClass('ani-processed')) {
             if ($(window).scrollTop() >= el.eq(0).data('scrollPos')) {
-                el.addClass('ani-processed');
+                //el.addClass('ani-processed');
                 el.each(function(idx) {
                     $(this).delay(idx * 200).animate({
                         opacity : 1
@@ -39,22 +39,22 @@ if (/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)) {
 
 (function($) {
     $(function() {
-       
+
         // Focus state for append/prepend inputs
         $('.input-prepend, .input-append').on('focus', 'input', function() {
             $(this).closest('.control-group, form').addClass('focus');
         }).on('blur', 'input', function() {
             $(this).closest('.control-group, form').removeClass('focus');
         });
- 
-       
+
+
 
         // features ani
         fadedEls($('.features').parent().find('h3'), 'h');
         $('.features > *').each(function() {
             fadedEls($(this), 150);
-        });     
-        
+        });
+
 
         // responsive
         $(window).resize(function() {
