@@ -976,6 +976,10 @@ section * {
 }
 
 /** Customizations **/
+.header-2 .navbar .brand {
+  padding-top: 20px;
+  font-size: 30px;
+}
 .header-2-sub {
   padding-top: 260px;
   padding-bottom: 116px;
@@ -983,6 +987,8 @@ section * {
 
 .header-2-sub .hero-unit h1 {
   font-weight: 500;
+  line-height: 52px;
+  font-size: 50px;
 }
 
 .background {
