@@ -836,7 +836,7 @@ section * {
   width: 100%;
 }
 .header-21 .navbar {
-  margin-top: 107px;
+  margin-top: 100px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .header-21 .navbar.navbar-fixed-top {
@@ -863,26 +863,26 @@ section * {
   box-sizing: border-box;
   padding: 7px 26px 8px;
   background: none;
-  border: 2px solid #e74c3c;
-  color: #e74c3c;
+  border: 2px solid #ffce48;
+  color: #ffce48;
 }
 .header-21 .navbar .btn:hover,
 .header-21 .navbar .btn:focus {
-  background: #e74c3c;
+  background: #ffce48;
   color: white;
 }
 .header-21 .navbar .btn:active,
 .header-21 .navbar .btn.active {
-  border-color: #c44133;
-  background: #c44133;
+  border-color: #ffda74;
+  background: #ffda74;
   color: white;
 }
 .header-21 .navbar .brand {
-  padding-top: 18px;
+  padding-top: 13px;
   padding-bottom: 0;
-  font-size: 25px;
+  font-size: 33px;
   font-weight: normal;
-  color: #e74c3c;
+  color: #ffce48;
   font-weight: 800;
 }
 .header-21 .navbar .brand img:first-child {
@@ -914,15 +914,15 @@ section * {
 .header-21 .navbar .nav > li > a:hover,
 .header-21 .navbar .nav > li > a:focus,
 .header-21 .navbar .nav > li > a.active {
-  color: #e74c3c;
+  color: #ffce48;
 }
 .header-21 .navbar .nav > li.active > a {
-  color: #e74c3c;
+  color: #ffce48;
 }
 .header-21 .navbar .nav > li.active > a:hover,
 .header-21 .navbar .nav > li.active > a:focus,
 .header-21 .navbar .nav > li.active > a.active {
-  color: #e74c3c;
+  color: #ffce48;
 }
 .header-21 .navbar .navbar-toggle {
   background-image: url("../../../common-files/icons/menu-icon-header-21.png");
@@ -1046,7 +1046,17 @@ section * {
   }
 }
 .header-21-sub .lead {
-  color: #bdc3c7;
+  color: #ffffff;
+}
+
+/** Customizations **/
+.header-21-sub h3 {
+  color: #ffce48;
+}
+
+.background {
+  background-image: linear-gradient( rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55) ), url('https://images.unsplash.com/photo-1464274771514-c57f7d74fd20?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&s=5457bda893ad75e8c1aefcf257929cc4');
+  opacity: 10;
 }
 
 /* content */
