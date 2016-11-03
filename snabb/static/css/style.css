@@ -1310,6 +1310,11 @@ body section.content-24 {
   }
 }
 
+/** Customizations **/
+.content-24 img.image {
+  top: 8%;
+}
+
 /* footer */
 /**
  * Footer 12 stylesheet
