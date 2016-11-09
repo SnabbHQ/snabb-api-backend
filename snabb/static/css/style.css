@@ -1,3 +1,7 @@
+.content-33 .lead {
+  text-align: center;
+}
+
 /** Header 2 - Customizations **/
 .header-2 .navbar .nav > li > a:hover,
 .header-2 .navbar .nav > li > a:focus,
@@ -46,12 +50,12 @@
 /** Content 9 Customization**/
 .content-9 {
   padding-top: 130px;
-  padding-bottom: 0;
+  padding-bottom: 130px;
 }
 @media (max-width: 767px) {
   .content-9 {
     padding-top: 105px;
-    padding-bottom: 0;
+    padding-bottom: 105px;
   }
   .content-9 .hidden-phone {
     margin-top: 40px;
