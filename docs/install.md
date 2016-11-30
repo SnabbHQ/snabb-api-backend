@@ -24,8 +24,8 @@ Make sure python 3.5 is installed:
 
 Create a virtualenv:
 
-    $ python3 -m venv runn_env
-    $ source runn_env/bin/activate
+    $ python3 -m venv snabb_env
+    $ source snabb_env/bin/activate
 
 ### Create the Database
 
