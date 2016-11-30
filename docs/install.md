@@ -44,7 +44,7 @@ Create the database:
 
     $ createdb snabb
     $ psql snabb
-    > CREATE_EXTENSION postgis;
+    > CREATE EXTENSION postgis;
 
 ### Installing the dependencies
 
