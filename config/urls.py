@@ -12,12 +12,15 @@ from rest_framework import routers
 
 from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
 from snabb.users.views import UserViewSet, GroupViewSet
+from snabb.users.views import RegisterUser
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 router.register(r'deliveries', DeliveriesViewSet)
 router.register(r'quotes', QuotesViewSet)
+
+admin.autodiscover()
 
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
@@ -32,7 +35,8 @@ urlpatterns = i18n_patterns(
 # REST Framework
 urlpatterns += [
     url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/v1/user/register', RegisterUser.as_view(), name='register_user')
 ]
 
 if settings.DEBUG:
