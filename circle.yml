@@ -4,7 +4,9 @@ machine:
 
 test:
   override:
-    - export PYTHONPATH=`pwd`; python manage.py test
+    - coverage run manage.py test
+  post:
+    - coverage html -d $CIRCLE_ARTIFACTS
 
 dependencies:
   override:
