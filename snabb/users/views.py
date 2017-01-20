@@ -11,6 +11,24 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
 import uuid
+import re
+
+
+def _check_email(email):
+    """This function parse if email is valid."""
+    EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
+    return EMAIL_REGEX.match(email)
+
+
+def _check_password(password):
+    """This function parse if password is valid. At least 6 characters long ."""
+    # We add this inside a function, because we
+    # can add more checks for this field in the future.
+    if len(password) >= 6:
+        return True
+    else:
+        return False
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -53,14 +71,36 @@ class RegisterUser(APIView):
             current_user = self.get_object(
                 received['email'].lower()
             )
+
+            if not _check_email(received['email'].lower()):
+                return Response(
+                    data={
+                        'code': 400101,
+                        'message': 'Invalid email.',
+                        'key': 'EMAIL_WRONG'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if not _check_password(received['password']):
+                return Response(
+                    data={
+                        'code': 400102,
+                        'message': 'Password must be at least 6 chars long.',
+                        'key': 'PASSWROD_WRONG'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             if current_user is False:
                 user = Profile()
                 user.email = received['email'].lower().replace(" ", "")
                 user.password = received['password']
                 user.phone = received['phone']
+                user.company_name = received['company_name']
 
-                if 'company_name' in received.keys():
-                    user.company_name = received['company_name']
+                if 'user_lang' in received.keys():
+                    user.user_lang = received['user_lang']
 
                 # Generate Hash for activation
                 user.profile_activation_key = "%s" % (uuid.uuid4(),)
@@ -85,7 +125,7 @@ class RegisterUser(APIView):
             else:
                 return Response(
                     data={
-                        'code': 400105,
+                        'code': 400103,
                         'message': 'Email already exists',
                         'key': 'EMAIL_ALREADY_EXISTS'
                     },
@@ -94,7 +134,7 @@ class RegisterUser(APIView):
         else:
             return Response(
                 data={
-                    'code': 400106,
+                    'code': 400104,
                     'message': 'Company Name, Email, phone and password required',
                     'key': 'EMAIL_AND_PASSWORD_REQUIRED'
                 },
