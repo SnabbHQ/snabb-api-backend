@@ -12,7 +12,7 @@ from rest_framework import routers
 
 from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
 from snabb.users.views import UserViewSet, GroupViewSet
-from snabb.users.views import RegisterUser
+from snabb.users.views import RegisterUser, VerifyUser
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -25,7 +25,6 @@ admin.autodiscover()
 urlpatterns = i18n_patterns(
     url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
     url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
-    url(r'^accounts/', include('allauth.urls')),
 
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, include(admin.site.urls)),
@@ -36,7 +35,8 @@ urlpatterns = i18n_patterns(
 urlpatterns += [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/v1/user/register', RegisterUser.as_view(), name='register_user')
+    url(r'^api/v1/user/register', RegisterUser.as_view(), name='register_user'),
+    url(r'^api/v1/user/verifyUser', VerifyUser.as_view(), name='verify_user')
 ]
 
 if settings.DEBUG:

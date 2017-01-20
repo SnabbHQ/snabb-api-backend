@@ -1,21 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
-from allauth.account.adapter import DefaultAccountAdapter
-from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.contrib.auth.models import Group, User
 from datetime import datetime
 from django.utils.dateformat import format
-
-
-class AccountAdapter(DefaultAccountAdapter):
-    def is_open_for_signup(self, request):
-        return getattr(settings, 'ACCOUNT_ALLOW_REGISTRATION', True)
-
-
-class SocialAccountAdapter(DefaultSocialAccountAdapter):
-    def is_open_for_signup(self, request, sociallogin):
-        return getattr(settings, 'ACCOUNT_ALLOW_REGISTRATION', True)
 
 
 class Profile(models.Model):

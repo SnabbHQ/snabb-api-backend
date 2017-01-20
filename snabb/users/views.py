@@ -140,3 +140,67 @@ class RegisterUser(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class VerifyUser(APIView):
+
+    """
+    API endpoint that allows to verify user email.
+    """
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format=None):
+        received = request.data
+
+        if ('hash' in received.keys()):
+            key = received['hash']
+        else:
+            return Response(
+                data={
+                    'code': 400105,
+                    'message': 'User hash required',
+                    'key': 'HASH_REQUIRED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = Profile.objects.get(profile_activation_key=key)
+        except Profile.DoesNotExist:
+            return Response(
+                data={
+                    'code': 400106,
+                    'message': 'Hash not exists',
+                    'key': 'HASH_NOT_EXISTS'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if user.verified:
+            return Response(
+                data={
+                    'code': 400107,
+                    'message': 'This user is already verified',
+                    'key': 'ALREADY_VERIFIED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if user.profile_activation_key == key and user.verified is False:
+            user.verified = True
+            user.save()
+            return Response(
+                data={
+                    'code': 200101,
+                    'message': 'Email verified',
+                    'key': 'VERIFY_OK'
+                },
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                data={
+                    'code': 400108,
+                    'message': 'An error has occurred',
+                    'key': 'VERIFY_ERROR'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
