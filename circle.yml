@@ -6,4 +6,10 @@ dependencies:
   cache_directories:
     - /home/ubuntu/.cache/pip
   pre:
-    - pip3 install -r requirements/local.txt
+    - pip3 install -r requirements/test.txt
+
+test:
+  override:
+    - coverage run manage.py test --settings=config.settings.test
+  post:
+    - coverage html -d $CIRCLE_ARTIFACTS

@@ -7,7 +7,7 @@ Snabb!
 
 Install Instructions
 --------
-In order to get your development environment up and running please follow the instructions here: [Install Guide](docs/install.rst)
+In order to get your development environment up and running please follow the instructions here: [Install Guide](docs/install.md)
 
 
 Settings
