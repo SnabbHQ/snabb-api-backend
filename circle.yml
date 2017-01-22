@@ -8,6 +8,12 @@ dependencies:
   pre:
     - pip3 install -r requirements/test.txt
 
+database:
+  override:
+    - createuser -s -d snabb
+    - createdb snabb
+    - npm run migrate:latest
+
 test:
   override:
     - pytest snabb
