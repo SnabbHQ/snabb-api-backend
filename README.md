@@ -45,7 +45,11 @@ coverage report:
 
 #### Running tests with py.test
 
-    $ py.test
+    $ pytest snabb 
+    
+If you want to use pytest and coverage at the same time.
+
+    $ pytest snabb --cov=snabb --cov-report html
 
 ### Live reloading and Sass CSS compilation
 
