@@ -6,7 +6,6 @@ dependencies:
   cache_directories:
     - /home/ubuntu/.cache/pip
   pre:
-    - pip3 install pytest
     - pip3 install -r requirements/test.txt
 
 test:
