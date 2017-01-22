@@ -16,7 +16,7 @@ database:
 
 test:
   override:
-    # - pytest snabb
-    - coverage run manage.py test --settings=config.settings.test
-  post:
-    - coverage html -d $CIRCLE_ARTIFACTS
+    - pytest snabb --cov=snabb --cov-report html:$CIRCLE_ARTIFACTS
+    # - coverage run manage.py test --settings=config.settings.test
+  #post:
+    #- coverage html -d $CIRCLE_ARTIFACTS
