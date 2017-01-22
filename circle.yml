@@ -2,15 +2,10 @@ machine:
   python:
     version: 3.5.0
 
-test:
-  override:
-    - coverage run manage.py test
-  post:
-    - coverage html -d $CIRCLE_ARTIFACTS
-
 dependencies:
   override:
-    - pip install coverage
+    - sudoe sudo pip install django --upgrade
+    # - pip install coverage
     - sudo apt-get update -qq
     - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
     - sudo apt-get install -qq libtiff4-dev libjpeg8-dev libfreetype6-dev liblcms1-dev libwebp-dev
