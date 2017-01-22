@@ -11,7 +11,7 @@ dependencies:
 
 test:
   override:
-    - pytest
+    - pytest snabb
     # - coverage run manage.py test --settings=config.settings.test
   post:
     - coverage html -d $CIRCLE_ARTIFACTS
