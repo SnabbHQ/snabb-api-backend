@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - sudoe sudo pip install django --upgrade
+    - sudo sudo pip install django --upgrade
     # - pip install coverage
     - sudo apt-get update -qq
     - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
