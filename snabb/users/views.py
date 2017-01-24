@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from .models import Profile
-from .serializers import UserSerializer, GroupSerializer, ProfileSerializer
+from .serializers import ProfileSerializer
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -28,22 +28,6 @@ def _check_password(password):
         return True
     else:
         return False
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
 
 
 class RegisterUser(APIView):
@@ -204,3 +188,34 @@ class VerifyUser(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class ProfileViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows Profile to be viewed or edited.
+    """
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+
+    def list(self, request):
+        try:
+            profile = Profile.objects.get(profile_apiuser=self.request.user)
+        except Profile.DoesNotExist:
+            profile = Profile.objects.none()
+
+        serializer = ProfileSerializer(profile, many=False)
+        return Response(serializer.data)
+
+    def get_object(self):
+        try:
+            profile = Profile.objects.get(profile_apiuser=self.request.user)
+        except Profile.DoesNotExist:
+            profile = Profile.objects.none()
+        return profile
+
+    def get_queryset(self):
+        user = self.request.user
+        return Profile.objects.filter(profile_apiuser=self.request.user)
+
+    def create(self, request):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

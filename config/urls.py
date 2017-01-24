@@ -11,32 +11,26 @@ from django.views.generic import TemplateView
 from rest_framework import routers
 
 from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
-from snabb.users.views import UserViewSet, GroupViewSet
-from snabb.users.views import RegisterUser, VerifyUser
+from snabb.users.views import RegisterUser, VerifyUser, ProfileViewSet
 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'groups', GroupViewSet)
 router.register(r'deliveries', DeliveriesViewSet)
 router.register(r'quotes', QuotesViewSet)
-
+router.register(r'api/user/profile', ProfileViewSet)
 admin.autodiscover()
 
 urlpatterns = i18n_patterns(
-    url(r'^$', TemplateView.as_view(template_name='pages/home.html'), name='home'),
-    url(r'^about/$', TemplateView.as_view(template_name='pages/about.html'), name='about'),
-
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, include(admin.site.urls)),
-
 )
 
 # REST Framework
 urlpatterns += [
-    url(r'^api/', include(router.urls)),
+    url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/v1/user/register', RegisterUser.as_view(), name='register_user'),
-    url(r'^api/v1/user/verifyUser', VerifyUser.as_view(), name='verify_user')
+    url(r'^api/user/register', RegisterUser.as_view(), name='register_user'),
+    url(r'^api/user/verifyUser', VerifyUser.as_view(), name='verify_user'),
+    url(r'^api/o/', include('oauth2_provider.urls', namespace='oauth2_provider'))
 ]
 
 if settings.DEBUG:

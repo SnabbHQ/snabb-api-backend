@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils.dateformat import format
 
@@ -9,7 +9,7 @@ from django.utils.dateformat import format
 class Profile(models.Model):
     profile_apiuser = models.OneToOneField(
         User, related_name='Profile_User', null=True, blank=True,
-        editable=False, on_delete=models.SET_NULL)
+        editable=False, on_delete=models.CASCADE)
     profile_id = models.AutoField(
         primary_key=True, blank=True, editable=False)
     company_name = models.CharField(
@@ -36,7 +36,7 @@ class Profile(models.Model):
     user_lang = models.CharField(
         max_length=3, null=True, blank=True, editable=True)
     profile_activation_key = models.CharField(
-        max_length=200, null=True, blank=True, editable=False)
+        max_length=200, null=True, blank=True, editable=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
@@ -78,7 +78,7 @@ class Profile(models.Model):
             if ((self.password != "" or
                  self.email != orig.email)):
 
-                user = User.objects.get(username=orig.consumer_email)
+                user = User.objects.get(username=orig.email)
                 if self.password != "":
                     user.set_password(self.password)
                     self.password = ""
