@@ -18,6 +18,8 @@ ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/common.py - 3 = 
 APPS_DIR = ROOT_DIR.path('snabb')
 
 env = environ.Env()
+env.read_env(ROOT_DIR('.env'))
+
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
 DJANGO_APPS = (

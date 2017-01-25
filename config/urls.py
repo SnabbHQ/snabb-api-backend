@@ -9,14 +9,22 @@ from django.contrib import admin
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework import routers
+from .hybridrouter import HybridRouter
 
 from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
-from snabb.users.views import RegisterUser, VerifyUser, ProfileViewSet
+from snabb.users.views import RegisterUser, VerifyUser, ProfileViewSet, SendVerifyEmail
 
-router = routers.DefaultRouter()
+router = HybridRouter()
 router.register(r'deliveries', DeliveriesViewSet)
 router.register(r'quotes', QuotesViewSet)
 router.register(r'api/user/profile', ProfileViewSet)
+router.add_api_view("api/user/register", url(r'^api/user/register',
+                    RegisterUser.as_view(), name='register_user')),
+router.add_api_view("api/user/verifyUser", url(r'^api/user/verifyUser',
+                    VerifyUser.as_view(), name='verify_user')),
+router.add_api_view("api/user/sendVerifyEmail", url(r'^api/user/sendVerifyEmail',
+                    SendVerifyEmail.as_view(), name='send_verify_email'))
+
 admin.autodiscover()
 
 urlpatterns = i18n_patterns(
@@ -28,8 +36,6 @@ urlpatterns = i18n_patterns(
 urlpatterns += [
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/user/register', RegisterUser.as_view(), name='register_user'),
-    url(r'^api/user/verifyUser', VerifyUser.as_view(), name='verify_user'),
     url(r'^api/o/', include('oauth2_provider.urls', namespace='oauth2_provider'))
 ]
 

@@ -12,6 +12,8 @@ from rest_framework import status
 from django.http import Http404, HttpResponse
 import uuid
 import re
+# Imports for welcome email.
+from snabb.email_utils.views import send_mail_template
 
 
 def _check_email(email):
@@ -90,17 +92,15 @@ class RegisterUser(APIView):
                 user.profile_activation_key = "%s" % (uuid.uuid4(),)
                 user.save()
 
-                # Generate activation link
-                # Pending to define frontend url to redirect form email.
-                url_validate = 'activate/' + user.profile_activation_key
+                # Substitutions for Sendgrid mail
+                substitutions = {}
+                substitutions['%user_link%'] = 'activate/' + user.profile_activation_key
+                substitutions['%name%'] = user.company_name
+                template = '55345630-06db-4987-863d-9189b0e97b57'
 
-                # Send email activacion
-                '''
-                email_instance = Email()
-                email_instance.sendemail_activate_account(
-                    user.email, url_validate
-                )
-                '''
+                # Send email welcome with activation link
+                send_mail_template(user, template, substitutions)
+
                 serializer = ProfileSerializer(
                     user, context={'request': request}, partial=True)
 
@@ -187,6 +187,67 @@ class VerifyUser(APIView):
                     'key': 'VERIFY_ERROR'
                 },
                 status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class SendVerifyEmail(APIView):
+
+    """
+    API endpoint that allows to resend verify user email.
+    """
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format=None):
+        received = request.data
+
+        if ('email' in received.keys()):
+            email = received['email']
+        else:
+            return Response(
+                data={
+                    'code': 400109,
+                    'message': 'Email required',
+                    'key': 'EMAIL_REQUIRED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = Profile.objects.get(email=email)
+        except Profile.DoesNotExist:
+            return Response(
+                data={
+                    'code': 400110,
+                    'message': 'Email not exists',
+                    'key': 'EMAIL_NOT_EXISTS'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if user.verified:
+            return Response(
+                data={
+                    'code': 400111,
+                    'message': 'This user is already verified',
+                    'key': 'ALREADY_VERIFIED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        else:
+            substitutions = {}
+            substitutions['%user_link%'] = 'activate/' + user.profile_activation_key
+            substitutions['%name%'] = user.company_name
+            template = '55345630-06db-4987-863d-9189b0e97b57'
+
+            # Send email welcome with activation link
+            send_mail_template(user, template, substitutions)
+            return Response(
+                data={
+                    'code': 200102,
+                    'message': 'Email Sended',
+                    'key': 'SEND_EMAIL_OK'
+                },
+                status=status.HTTP_200_OK
             )
 
 
