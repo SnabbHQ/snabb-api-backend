@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from .models import Profile
 from .serializers import ProfileSerializer
 from rest_framework import viewsets
@@ -73,7 +74,7 @@ class RegisterUser(APIView):
                     data={
                         'code': 400102,
                         'message': 'Password must be at least 6 chars long.',
-                        'key': 'PASSWROD_WRONG'
+                        'key': 'PASSWORD_WRONG'
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
@@ -249,6 +250,65 @@ class SendVerifyEmail(APIView):
                 },
                 status=status.HTTP_200_OK
             )
+
+
+class UpdatePassword(APIView):
+
+    """
+    API endpoint that allows to update user password.
+    """
+
+    def post(self, request, format=None):
+        received = request.data
+        user = request.user
+
+        if ('current_password' in received.keys() and
+                'new_password' in received.keys()):
+            user = authenticate(
+                username=user.username, password=received['current_password']
+            )
+            new_password = received['new_password']
+            if user is not None:
+                # the password verified for the user.
+                if not _check_password(new_password):
+                    return Response(
+                        data={
+                            'code': 400102,
+                            'message': 'Password must be at least 6 chars long.',
+                            'key': 'PASSWORD_WRONG'
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                else:
+                    user.set_password(new_password)
+                    user.save()
+                    return Response(
+                        data={
+                            'code': 200103,
+                            'message': 'Password Updated',
+                            'key': 'PASSWORD_UPDATE_OK'
+                        },
+                        status=status.HTTP_200_OK
+                    )
+            else:
+                # Invalid current password.
+                return Response(
+                    data={
+                        'code': 400112,
+                        'message': 'Wrong current password.',
+                        'key': 'CURRENT_PASSWORD_WRONG'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+                return Response(
+                    data={
+                        'code': 400113,
+                        'message': 'current_password and new_password required.',
+                        'key': 'REQUIRED_FIELDS'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

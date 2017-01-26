@@ -12,7 +12,13 @@ from rest_framework import routers
 from .hybridrouter import HybridRouter
 
 from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
-from snabb.users.views import RegisterUser, VerifyUser, ProfileViewSet, SendVerifyEmail
+from snabb.users.views import (
+    RegisterUser,
+    VerifyUser,
+    ProfileViewSet,
+    SendVerifyEmail,
+    UpdatePassword
+    )
 
 router = HybridRouter()
 router.register(r'deliveries', DeliveriesViewSet)
@@ -24,6 +30,8 @@ router.add_api_view("api/user/verifyUser", url(r'^api/user/verifyUser',
                     VerifyUser.as_view(), name='verify_user')),
 router.add_api_view("api/user/sendVerifyEmail", url(r'^api/user/sendVerifyEmail',
                     SendVerifyEmail.as_view(), name='send_verify_email'))
+router.add_api_view("api/user/updatePassword", url(r'^api/user/updatePassword',
+                    UpdatePassword.as_view(), name='update_password'))
 
 admin.autodiscover()
 
