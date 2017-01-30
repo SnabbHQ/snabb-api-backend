@@ -39,6 +39,7 @@ THIRD_PARTY_APPS = (
     'crispy_forms',  # Form layouts
     'oauth2_provider',
     'rest_framework',
+    'corsheaders',
     'rest_framework.authtoken',
 )
 

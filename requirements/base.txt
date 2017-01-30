@@ -41,6 +41,7 @@ redis>=2.10.0
 
 # Rest Framework
 djangorestframework==3.4.7
+django-cors-headers==2.0.1
 Markdown==2.6.6
 django-filter==0.15
 
