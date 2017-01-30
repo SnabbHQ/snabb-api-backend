@@ -44,7 +44,9 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     # custom users app. Your stuff: custom apps go here
     'snabb.users.apps.UsersConfig',
-    'snabb.deliveries.apps.DeliveriesConfig'
+    'snabb.deliveries.apps.DeliveriesConfig',
+    'snabb.location.apps.LocationConfig',
+    'snabb.currency.apps.CurrencyConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
