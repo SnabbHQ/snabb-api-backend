@@ -1,0 +1,19 @@
+machine:
+  python:
+    version: 3.5.1
+
+dependencies:
+  cache_directories:
+    - /home/ubuntu/.cache/pip
+  pre:
+    - pip3 install -r requirements/test.txt
+
+database:
+  override:
+    - createuser -s -d snabb
+    - createdb snabb
+    - python3 manage.py migrate
+
+test:
+  override:
+    - pytest snabb --cov=snabb --cov-report html:$CIRCLE_ARTIFACTS
