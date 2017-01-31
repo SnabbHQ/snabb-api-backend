@@ -117,7 +117,7 @@ class Country(models.Model):
     )
     iso_code = models.CharField(
         verbose_name=u'Iso Code',
-        max_length=150,
+        max_length=2,
         null=True, blank=True
     )
     active = models.BooleanField(default=False)
@@ -141,3 +141,48 @@ class Country(models.Model):
             self.updated_at = int(format(datetime.now(), u'U'))
 
         super(Country, self).save(*args, **kwargs)
+
+
+class Address(models.Model):
+    address_id = models.AutoField(
+        primary_key=True, blank=True, editable=False
+    )
+    address_zip_code = models.ForeignKey(
+        'location.Zipcode', related_name='Address_Zipcode',
+        null=True, blank=True
+    )
+    address = models.CharField(
+        verbose_name='Address',
+        max_length=300, null=True, blank=True
+    )
+    latitude = models.DecimalField(
+        verbose_name=u'Latitude',
+        max_digits=11, decimal_places=8,
+        blank=True, null=True
+    )
+    longitude = models.DecimalField(
+        verbose_name=u'Longitude',
+        max_digits=11, decimal_places=8,
+        blank=True, null=True
+    )
+    active = models.BooleanField(default=False)
+    updated_at = models.IntegerField(default=0, editable=False)
+    created_at = models.IntegerField(default=0, editable=False, blank=True)
+
+    def __str__(self):
+        return str(self.address_id)
+
+    class Meta:
+        verbose_name = u'Address',
+        verbose_name_plural = u'Addresses'
+
+    def save(self, *args, **kwargs):
+        self.updated_at = int(format(datetime.now(), u'U'))
+
+        if not self.address_id:
+            self.created_at = int(format(datetime.now(), u'U'))
+
+        else:
+            self.updated_at = int(format(datetime.now(), u'U'))
+
+        super(Address, self).save(*args, **kwargs)
