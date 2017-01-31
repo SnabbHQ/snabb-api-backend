@@ -70,7 +70,7 @@ class QuotePrice(models.Model):
     updated_at = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
-        return str(self.quote_point_id)
+        return str(self.quote_price_id)
 
     class Meta:
         verbose_name = u'Quote Price'
@@ -79,10 +79,10 @@ class QuotePrice(models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.quote_point_id:
+        if not self.quote_price_id:
             self.created_at = int(format(datetime.now(), u'U'))
 
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        super(QuotePoint, self).save(*args, **kwargs)
+        super(QuotePrice, self).save(*args, **kwargs)
