@@ -7,7 +7,6 @@ def send_mail_template(user, template, substitutions):
     """This function sends email via sendgrid."""
 
     mail = EmailMultiAlternatives(
-      subject=" ",
       body=" ",
       from_email="Snabb Team <no-reply@snabb.io>",
       to=[user.email, ],

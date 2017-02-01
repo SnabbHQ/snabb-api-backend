@@ -89,8 +89,6 @@ class RegisterUser(APIView):
                 if 'user_lang' in received.keys():
                     user.user_lang = received['user_lang']
 
-                # Generate Hash for activation
-                user.profile_activation_key = "%s" % (uuid.uuid4(),)
                 user.save()
 
                 # Substitutions for Sendgrid mail
