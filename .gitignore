@@ -78,3 +78,9 @@ docs/_build/*
 snabb_env
 **.min.css
 **.min.js
+
+snabb/users/migrations/*
+snabb/location/migrations/*
+snabb/currency/migrations/*
+snabb/quote/migrations/*
+snabb/size/migrations/*
