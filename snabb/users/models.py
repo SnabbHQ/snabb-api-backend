@@ -55,8 +55,8 @@ class Profile(models.Model):
                 self.first_name, self.last_name, self.email)
 
     class Meta:
-        verbose_name = u'User'
-        verbose_name_plural = u'Users'
+        verbose_name = u'Profile'
+        verbose_name_plural = u'Profiles'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
