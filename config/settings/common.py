@@ -47,7 +47,11 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     # custom users app. Your stuff: custom apps go here
     'snabb.users.apps.UsersConfig',
-    'snabb.deliveries.apps.DeliveriesConfig'
+    'snabb.deliveries.apps.DeliveriesConfig',
+    'snabb.location.apps.LocationConfig',
+    'snabb.currency.apps.CurrencyConfig',
+    'snabb.quote.apps.QuoteConfig',
+    'snabb.size.apps.SizeConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -87,7 +91,10 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_BACKEND = env(
+    'DJANGO_EMAIL_BACKEND',
+    default='django.core.mail.backends.smtp.EmailBackend'
+)
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
