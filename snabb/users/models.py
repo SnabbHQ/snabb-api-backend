@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils.dateformat import format
+import uuid
 
 
 class Profile(models.Model):
@@ -86,5 +87,8 @@ class Profile(models.Model):
                     user.username = self.email
                     user.email = self.email
                 user.save()
+
+        if not self.profile_activation_key:
+            self.profile_activation_key = "%s" % (uuid.uuid4(),)
 
         super(Profile, self).save(*args, **kwargs)
