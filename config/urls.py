@@ -10,19 +10,17 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework import routers
 from .hybridrouter import HybridRouter
-
-from snabb.deliveries.views import DeliveriesViewSet, QuotesViewSet
 from snabb.users.views import (
     RegisterUser,
     VerifyUser,
     ProfileViewSet,
     SendVerifyEmail,
-    UpdatePassword
+    UpdatePassword,
+    ForgotPassword,
+    ResetPassword
     )
 
-router = HybridRouter()
-router.register(r'deliveries', DeliveriesViewSet)
-router.register(r'quotes', QuotesViewSet)
+router = HybridRouter(trailing_slash=False)
 router.register(r'api/user/profile', ProfileViewSet)
 router.add_api_view("api/user/register", url(r'^api/user/register',
                     RegisterUser.as_view(), name='register_user')),
@@ -32,7 +30,10 @@ router.add_api_view("api/user/sendVerifyEmail", url(r'^api/user/sendVerifyEmail'
                     SendVerifyEmail.as_view(), name='send_verify_email'))
 router.add_api_view("api/user/updatePassword", url(r'^api/user/updatePassword',
                     UpdatePassword.as_view(), name='update_password'))
-
+router.add_api_view("api/user/forgotPassword", url(r'^api/user/forgotPassword',
+                    ForgotPassword.as_view(), name='forgot_password'))
+router.add_api_view("api/user/resetPassword", url(r'^api/user/resetPassword',
+                    ResetPassword.as_view(), name='reset_password'))
 admin.autodiscover()
 
 urlpatterns = i18n_patterns(

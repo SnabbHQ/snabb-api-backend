@@ -15,6 +15,7 @@ import uuid
 import re
 # Imports for welcome email.
 from snabb.email_utils.views import send_mail_template
+from django.conf import settings
 
 
 def _check_email(email):
@@ -93,7 +94,7 @@ class RegisterUser(APIView):
 
                 # Substitutions for Sendgrid mail
                 substitutions = {}
-                substitutions['%user_link%'] = 'activate/' + user.profile_activation_key
+                substitutions['%user_link%'] = settings.FRONTEND_URL+'activate/' + user.profile_activation_key
                 substitutions['%name%'] = user.company_name
                 template = '55345630-06db-4987-863d-9189b0e97b57'
 
@@ -234,7 +235,7 @@ class SendVerifyEmail(APIView):
             )
         else:
             substitutions = {}
-            substitutions['%user_link%'] = 'activate/' + user.profile_activation_key
+            substitutions['%user_link%'] = settings.FRONTEND_URL+'activate/' + user.profile_activation_key
             substitutions['%name%'] = user.company_name
             template = '55345630-06db-4987-863d-9189b0e97b57'
 
@@ -307,6 +308,109 @@ class UpdatePassword(APIView):
                     },
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+
+class ForgotPassword(APIView):
+
+    """
+    API endpoint that allows to send email for reset password.
+    """
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format=None):
+        received = request.data
+
+        if ('email' in received.keys()):
+            email = received['email']
+        else:
+            return Response(
+                data={
+                    'code': 400109,
+                    'message': 'Email required',
+                    'key': 'EMAIL_REQUIRED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = Profile.objects.get(email=email)
+        except Profile.DoesNotExist:
+            return Response(
+                data={
+                    'code': 400110,
+                    'message': 'Email not exists',
+                    'key': 'EMAIL_NOT_EXISTS'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        #Create new hash for user:
+        user.reset_password_key = "%s" % (uuid.uuid4(),)
+        user.save()
+
+        substitutions = {}
+        substitutions['%user_link%'] = settings.FRONTEND_URL+'resetPassword/' + user.reset_password_key
+        substitutions['%name%'] = user.company_name
+        template = '50f0db97-ee40-4b23-859d-9e33f460eefd'
+        print(substitutions['%user_link%'])
+        send_mail_template(user, template, substitutions)
+        return Response(
+            data={
+                'code': 200102,
+                'message': 'Email Sended',
+                'key': 'SEND_EMAIL_OK'
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+class ResetPassword(APIView):
+
+    """
+    API endpoint that allows to reset ther password.
+    """
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format=None):
+        received = request.data
+
+        if ('hash' in received.keys() and 'password' in received.keys()):
+            key = received['hash']
+            password = received['password']
+        else:
+            return Response(
+                data={
+                    'code': 400114,
+                    'message': 'User hash and password required',
+                    'key': 'HASH_PASSWORD_REQUIRED'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = Profile.objects.get(reset_password_key=key)
+        except Profile.DoesNotExist:
+            return Response(
+                data={
+                    'code': 400106,
+                    'message': 'Hash not exists',
+                    'key': 'HASH_NOT_EXISTS'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.password = password
+        user.reset_password_key = ''
+        user.save()
+
+        return Response(
+            data={
+                'code': 200104,
+                'message': 'Password reset',
+                'key': 'RESET_OK'
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

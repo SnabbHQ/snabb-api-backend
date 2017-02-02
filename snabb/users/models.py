@@ -4,13 +4,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.utils.dateformat import format
+from django.db.models.signals import pre_delete
 import uuid
 
 
 class Profile(models.Model):
     profile_apiuser = models.OneToOneField(
         User, related_name='Profile_User', null=True, blank=True,
-        editable=False, on_delete=models.CASCADE)
+        editable=True, on_delete=models.SET_NULL)
     profile_id = models.AutoField(
         primary_key=True, blank=True, editable=False)
     company_name = models.CharField(
@@ -37,6 +38,8 @@ class Profile(models.Model):
     user_lang = models.CharField(
         max_length=3, null=True, blank=True, editable=True)
     profile_activation_key = models.CharField(
+        max_length=200, null=True, blank=True, editable=True)
+    reset_password_key = models.CharField(
         max_length=200, null=True, blank=True, editable=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
@@ -92,3 +95,18 @@ class Profile(models.Model):
             self.profile_activation_key = "%s" % (uuid.uuid4(),)
 
         super(Profile, self).save(*args, **kwargs)
+
+
+def delete_user(sender, instance, **kwargs):
+    print('TESTS 1')
+    try:
+        print('TESTS 2')
+        instance.profile_apiuser.delete()
+
+    except:
+        print('TESTS 3')
+        pass
+
+
+pre_delete.connect(
+    delete_user, sender=Profile, dispatch_uid="delete_user")
