@@ -40,16 +40,14 @@ THIRD_PARTY_APPS = (
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
-    'rest_framework.authtoken',
 )
 
 # Apps specific for this project go here.
 LOCAL_APPS = (
     # custom users app. Your stuff: custom apps go here
     'snabb.users.apps.UsersConfig',
-    'snabb.deliveries.apps.DeliveriesConfig',
-    'snabb.location.apps.LocationConfig',
     'snabb.currency.apps.CurrencyConfig',
+    'snabb.location.apps.LocationConfig',
     'snabb.quote.apps.QuoteConfig',
     'snabb.size.apps.SizeConfig'
 )
@@ -91,10 +89,7 @@ FIXTURE_DIRS = (
 
 # EMAIL CONFIGURATION
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = env(
-    'DJANGO_EMAIL_BACKEND',
-    default='django.core.mail.backends.smtp.EmailBackend'
-)
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 # MANAGER CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#admins
