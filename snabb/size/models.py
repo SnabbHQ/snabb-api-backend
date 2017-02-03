@@ -15,17 +15,24 @@ class Size(models.Model):
         primary_key=True, blank=True, editable=False
     )
     size = models.CharField(
-        verbose_name="Quantity Type",
+        verbose_name="Size type",
         max_length=50,
         null=True, blank=True,
         choices=SizeChoices
     )
+    size_city = models.ForeignKey(
+        'location.City', related_name='Quote',
+        null=True, blank=True
+    )
+    size_price = models.DecimalField(
+        verbose_name="Price/meter",max_digits=50, decimal_places=2, default=0.00,
+        blank=True)
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
-        return str(self.size_id)
+        return str(self.get_size_display())+' '+self.size_city.name+' '+str(self.size_price)
 
     class Meta:
         verbose_name = u'Size'
