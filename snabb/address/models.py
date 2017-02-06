@@ -49,3 +49,36 @@ class Address(models.Model):
             self.updated_at = int(format(datetime.now(), u'U'))
 
         super(Address, self).save(*args, **kwargs)
+
+
+class AddressBook(models.Model):
+    address_book_id = models.AutoField(
+        primary_key=True, blank=True, editable=False
+    )
+    user = models.ForeignKey(
+        'users.Profile', related_name='AddressBook_User',
+        null=True, blank=True
+    )
+    addresses = models.ManyToManyField(Address)
+
+    active = models.BooleanField(default=True)
+    updated_at = models.IntegerField(default=0, editable=False)
+    created_at = models.IntegerField(default=0, editable=False, blank=True)
+
+    def __str__(self):
+        return str(self.address_book_id)
+
+    class Meta:
+        verbose_name = u'AddressBook',
+        verbose_name_plural = u'AddressesBook'
+
+    def save(self, *args, **kwargs):
+        self.updated_at = int(format(datetime.now(), u'U'))
+
+        if not self.address_book_id:
+            self.created_at = int(format(datetime.now(), u'U'))
+
+        else:
+            self.updated_at = int(format(datetime.now(), u'U'))
+
+        super(AddressBook, self).save(*args, **kwargs)
