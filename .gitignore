@@ -84,3 +84,4 @@ snabb/location/migrations/*
 snabb/currency/migrations/*
 snabb/quote/migrations/*
 snabb/size/migrations/*
+sanbb/deliveries/migrations/*
