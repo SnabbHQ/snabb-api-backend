@@ -3,7 +3,6 @@ from django.conf import settings
 from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
-from snabb.users.models import Profile
 
 
 class Quote(models.Model):
@@ -11,7 +10,7 @@ class Quote(models.Model):
         primary_key=True, blank=True, editable=False
     )
     quote_user = models.ForeignKey(
-        Profile, related_name='Quote_User',
+        'users.Profile', related_name='Quote_User',
         null=True, blank=True
     )
     active = models.BooleanField(default=True)
@@ -26,12 +25,14 @@ class Quote(models.Model):
     @property
     def pickups(self):
         'returns pickups'
-        return {}
+        pickups = Pickup.objects.filter(pickup_quote=self)
+        return pickups
 
     @property
     def dropoffs(self):
         'returns dropoffs'
-        return {}
+        dropoffs = DropOff.objects.filter(dropoff_quote=self)
+        return dropoffs
 
     def __str__(self):
         return str(self.quote_id)
