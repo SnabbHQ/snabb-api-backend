@@ -18,7 +18,7 @@ class Quote(models.Model):
     )
     # FK to pickup
     # FK to dropoff
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
@@ -65,7 +65,7 @@ class QuotePrice(models.Model):
     eta = models.IntegerField(
         default=0, blank=True, null=True
     )
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 

@@ -43,7 +43,7 @@ class City(models.Model):
         primary_key=True, blank=True, editable=False
     )
     name = models.CharField(
-        verbose_name=u'Nombre de la ciudad [ES]',
+        verbose_name=u'City Name',
         max_length=300
     )
     city_region = models.ForeignKey(
@@ -118,6 +118,10 @@ class Country(models.Model):
     iso_code = models.CharField(
         verbose_name=u'Iso Code',
         max_length=2,
+        null=True, blank=True
+    )
+    country_currency = models.ForeignKey(
+        'currency.Currency', related_name='country_currency',
         null=True, blank=True
     )
     active = models.BooleanField(default=False)

@@ -19,6 +19,11 @@ class Currency(models.Model):
         max_length=10,
         null=True, blank=True
     )
+    iso_code = models.CharField(
+        verbose_name=u'Iso Code',
+        max_length=3,
+        null=True, blank=True
+    )
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
