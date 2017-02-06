@@ -100,6 +100,9 @@ class ProfileTests(APITestCase):
         self.assertEqual(response.data['key'], 'ALREADY_VERIFIED')
 
     def test_send_verify_email(self):
+        """
+        Ensure we can send email to user with a verify_user hash.
+        """
         url = reverse('send_verify_email')
         url_verify = reverse('verify_user')
 
@@ -132,3 +135,60 @@ class ProfileTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['key'], 'ALREADY_VERIFIED')
+
+    def test_forgot_password(self):
+        """
+        Ensure we can send email to user with a reset_password hash.
+        """
+        url = reverse('forgot_password')
+        profile = self.create_profile()
+
+        # Without email
+        data = {}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['key'], 'EMAIL_REQUIRED')
+
+        # With non-existent email
+        data = {'email': 'my-example@my-domain.com'}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['key'], 'EMAIL_NOT_EXISTS')
+
+        # With right email
+        data = {'email': profile.email}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['key'], 'SEND_EMAIL_OK')
+
+    def test_reset_password(self):
+        """
+        Ensure we can reset user password.
+        """
+        url = reverse('reset_password')
+
+        profile = self.create_profile()
+
+        # Without hash
+        data = {"password": "p4ssw0rd"}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['key'], 'HASH_PASSWORD_REQUIRED')
+
+        # Without password
+        data = {"hash": "sfsdf9s6df9s6df"}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['key'], 'HASH_PASSWORD_REQUIRED')
+
+        # With non-existent hash
+        data = {'hash': 'fdsdfserwasdasd', "password": "p4ssw0rd"}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['key'], 'HASH_NOT_EXISTS')
+
+        # With right hash and password
+        data = {'hash': profile.reset_password_key, "password": "p4ssw0rd"}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['key'], 'RESET_OK')
