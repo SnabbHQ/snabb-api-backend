@@ -4,8 +4,6 @@ from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
 from snabb.users.models import Profile
-from snabb.location.models import Address, Zipcode
-from snabb.size.models import Size
 
 
 class Quote(models.Model):
@@ -16,16 +14,24 @@ class Quote(models.Model):
         Profile, related_name='Quote_User',
         null=True, blank=True
     )
-    # FK to pickup
-    # FK to dropoff
     active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
     @property
-    def quote_prices(self):
-        q = QuotePrice.objects.filter(quote=self)
-        return q
+    def prices(self):
+        'returns dictionary of size/prices'
+        return {}
+
+    @property
+    def pickups(self):
+        'returns pickups'
+        return {}
+
+    @property
+    def dropoffs(self):
+        'returns dropoffs'
+        return {}
 
     def __str__(self):
         return str(self.quote_id)
@@ -46,43 +52,71 @@ class Quote(models.Model):
         super(Quote, self).save(*args, **kwargs)
 
 
-class QuotePrice(models.Model):
-    quote_price_id = models.AutoField(
+class Pickup(models.Model):
+    pickup_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    quote = models.ForeignKey(
-        'quote.Quote', related_name='Quote',
+    pickup_quote = models.ForeignKey(
+        'quote.Quote', related_name='pickup_quote',
         null=True, blank=True
     )
-    size = models.ForeignKey(
-        Size, related_name='Size',
+    pickup_address = models.ForeignKey(
+        'address.Address', related_name='pickup_address',
         null=True, blank=True
-    )
-    price = models.FloatField(
-        verbose_name='Price',
-        default=0, blank=True, null=True
-    )
-    eta = models.IntegerField(
-        default=0, blank=True, null=True
     )
     active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
-        return str(self.quote_price_id)
+        return str(self.pickup_id)
 
     class Meta:
-        verbose_name = u'Quote Price'
-        verbose_name_plural = u'Quote Prices'
+        verbose_name = u'Pickup'
+        verbose_name_plural = u'PickUps'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.quote_price_id:
+        if not self.pickup_id:
             self.created_at = int(format(datetime.now(), u'U'))
 
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        super(QuotePrice, self).save(*args, **kwargs)
+        super(Pickup, self).save(*args, **kwargs)
+
+
+class DropOff(models.Model):
+    dropoff_id = models.AutoField(
+        primary_key=True, blank=True, editable=False
+    )
+    dropoff_quote = models.ForeignKey(
+        'quote.Quote', related_name='dropoff_quote',
+        null=True, blank=True
+    )
+    dropoff_address = models.ForeignKey(
+        'address.Address', related_name='dropoff_address',
+        null=True, blank=True
+    )
+    active = models.BooleanField(default=True)
+    created_at = models.IntegerField(default=0, editable=False, blank=True)
+    updated_at = models.IntegerField(default=0, editable=False)
+
+    def __str__(self):
+        return str(self.dropoff_id)
+
+    class Meta:
+        verbose_name = u'Dropoff'
+        verbose_name_plural = u'Dropoffs'
+
+    def save(self, *args, **kwargs):
+        self.updated_at = int(format(datetime.now(), u'U'))
+
+        if not self.dropoff_id:
+            self.created_at = int(format(datetime.now(), u'U'))
+
+        else:
+            self.updated_at = int(format(datetime.now(), u'U'))
+
+        super(DropOff, self).save(*args, **kwargs)
