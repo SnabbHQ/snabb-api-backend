@@ -13,6 +13,11 @@ database:
     - createuser -s -d snabb
     - createdb snabb
     - python3 manage.py makemigrations users
+    - python3 manage.py makemigrations quote
+    - python3 manage.py makemigrations size
+    - python3 manage.py makemigrations address
+    - python3 manage.py makemigrations currency
+    - python3 manage.py makemigrations location
     - python3 manage.py migrate
 
 test:
