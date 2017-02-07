@@ -86,4 +86,5 @@ snabb/quote/migrations/*
 snabb/size/migrations/*
 snabb/deliveries/migrations/*
 snabb/address/migrations/*
+snabb/contact/migrations/*
 .cache/*

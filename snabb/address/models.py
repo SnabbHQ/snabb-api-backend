@@ -4,6 +4,7 @@ from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
 from snabb.location.models import Zipcode
+from django.contrib.auth.models import User
 
 
 class Address(models.Model):
@@ -56,7 +57,7 @@ class AddressBook(models.Model):
         primary_key=True, blank=True, editable=False
     )
     user = models.ForeignKey(
-        'users.Profile', related_name='AddressBook_User',
+        User, related_name='addressbook_user',
         null=True, blank=True
     )
     addresses = models.ManyToManyField(Address)

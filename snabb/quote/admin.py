@@ -20,3 +20,5 @@ class QuoteAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Quote, QuoteAdmin)
+admin.site.register(DropOff)
+admin.site.register(Pickup)
