@@ -49,7 +49,8 @@ LOCAL_APPS = (
     'snabb.currency.apps.CurrencyConfig',
     'snabb.location.apps.LocationConfig',
     'snabb.quote.apps.QuoteConfig',
-    'snabb.size.apps.SizeConfig'
+    'snabb.size.apps.SizeConfig',
+    'snabb.address.apps.AddressConfig'
 )
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

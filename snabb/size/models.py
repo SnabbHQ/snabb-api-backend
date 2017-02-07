@@ -20,13 +20,19 @@ class Size(models.Model):
         null=True, blank=True,
         choices=SizeChoices
     )
+    size_quote = models.ForeignKey(
+        'quote.Quote', related_name='Quote',
+        null=True, blank=True
+    )
     size_city = models.ForeignKey(
-        'location.City', related_name='Quote',
+        'location.City', related_name='City',
         null=True, blank=True
     )
     size_price = models.DecimalField(
-        verbose_name="Price/meter",max_digits=50, decimal_places=2, default=0.00,
-        blank=True)
+        verbose_name="Price/meter",
+        max_digits=50, decimal_places=2, default=0.00,
+        blank=True
+    )
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
