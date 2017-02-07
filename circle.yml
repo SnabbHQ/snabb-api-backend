@@ -12,6 +12,7 @@ database:
   override:
     - createuser -s -d snabb
     - createdb snabb
+    - python3 manage.py makemigrations
     - python3 manage.py migrate
 
 test:
