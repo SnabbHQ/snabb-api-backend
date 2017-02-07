@@ -4,6 +4,7 @@ from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
 from snabb.location.models import Zipcode
+from django.contrib.auth.models import User
 
 
 class Address(models.Model):
@@ -33,7 +34,9 @@ class Address(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.address_id)
+        if not self.address_zip_code and not self.address:
+            return '%s' % (self.address_id)
+        return '%s %s' % (self.address_zip_code, self.address)
 
     class Meta:
         verbose_name = u'Address',
@@ -56,7 +59,7 @@ class AddressBook(models.Model):
         primary_key=True, blank=True, editable=False
     )
     user = models.ForeignKey(
-        'users.Profile', related_name='AddressBook_User',
+        User, related_name='addressbook_user',
         null=True, blank=True
     )
     addresses = models.ManyToManyField(Address)

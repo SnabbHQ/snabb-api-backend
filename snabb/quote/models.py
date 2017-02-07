@@ -3,6 +3,7 @@ from django.conf import settings
 from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
+from django.contrib.auth.models import User
 
 
 class Quote(models.Model):
@@ -10,7 +11,7 @@ class Quote(models.Model):
         primary_key=True, blank=True, editable=False
     )
     quote_user = models.ForeignKey(
-        'users.Profile', related_name='Quote_User',
+        User, related_name='quote_user',
         null=True, blank=True
     )
     active = models.BooleanField(default=True)
@@ -65,6 +66,10 @@ class Pickup(models.Model):
         'address.Address', related_name='pickup_address',
         null=True, blank=True
     )
+    pickup_contact = models.ForeignKey(
+        'contact.Contact', related_name='pickup_contact',
+        null=True, blank=True
+    )
     active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
@@ -98,6 +103,10 @@ class DropOff(models.Model):
     )
     dropoff_address = models.ForeignKey(
         'address.Address', related_name='dropoff_address',
+        null=True, blank=True
+    )
+    dropoff_contact = models.ForeignKey(
+        'contact.Contact', related_name='dropoff_contact',
         null=True, blank=True
     )
     active = models.BooleanField(default=True)

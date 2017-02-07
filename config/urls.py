@@ -18,7 +18,8 @@ from snabb.users.views import (
     UpdatePassword,
     ForgotPassword,
     ResetPassword
-    )
+)
+from snabb.address.views import ValidateAddress
 
 router = HybridRouter(trailing_slash=False)
 router.register(r'api/user/profile', ProfileViewSet)
@@ -34,6 +35,12 @@ router.add_api_view("api/user/forgotPassword", url(r'^api/user/forgotPassword',
                     ForgotPassword.as_view(), name='forgot_password'))
 router.add_api_view("api/user/resetPassword", url(r'^api/user/resetPassword',
                     ResetPassword.as_view(), name='reset_password'))
+
+router.add_api_view(
+    "api/address/validateAddress",
+    url(r'^api/address/validateAddress',
+    ValidateAddress.as_view(), name='validateAddress')
+)
 admin.autodiscover()
 
 urlpatterns = i18n_patterns(
