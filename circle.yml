@@ -18,6 +18,7 @@ database:
     - python3 manage.py makemigrations address
     - python3 manage.py makemigrations currency
     - python3 manage.py makemigrations location
+    - python3 manage.py makemigrations contact    
     - python3 manage.py migrate
 
 test:
