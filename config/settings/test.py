@@ -22,12 +22,11 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='CHANGEME!!!')
 
 # Mail settings
 # ------------------------------------------------------------------------------
-EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 
-# In-memory email backend stores messages in django.core.mail.outbox
-# for unit testing purposes
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND')
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
 
 # CACHING
 # ------------------------------------------------------------------------------
@@ -60,3 +59,4 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.app_directories.Loader',
     ]),
 ]
+FRONTEND_URL = env('FRONTEND_URL')
