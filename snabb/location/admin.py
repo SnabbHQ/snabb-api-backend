@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from .models import Zipcode, City, Region, Country, Address
+from .models import Zipcode, City, Region, Country
 from snabb.size.models import Size
+
 
 class SizeInline(admin.TabularInline):
     model = Size
@@ -24,12 +25,7 @@ class CountryAdmin(admin.ModelAdmin):
     list_filter = ['active', ]
 
 
-class AddressAdmin(admin.ModelAdmin):
-    list_display = ['address', 'address_zip_code', 'active']
-    list_filter = ['active', ]
-
 admin.site.register(Zipcode)
 admin.site.register(City, CityAdmin)
 admin.site.register(Region)
 admin.site.register(Country, CountryAdmin)
-admin.site.register(Address, AddressAdmin)

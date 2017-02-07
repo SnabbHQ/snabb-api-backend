@@ -1,7 +1,22 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from .models import Quote, QuotePrice
+from .models import Quote, DropOff, Pickup
 
 
-admin.site.register(Quote)
-admin.site.register(QuotePrice)
+class DropOffInline(admin.TabularInline):
+    model = DropOff
+    extra = 0
+
+
+class PickupInline(admin.TabularInline):
+    model = Pickup
+    extra = 0
+
+
+class QuoteAdmin(admin.ModelAdmin):
+    list_display = ['quote_id', 'active']
+    list_filter = ['active']
+    inlines = [DropOffInline, PickupInline]
+
+
+admin.site.register(Quote, QuoteAdmin)
