@@ -34,7 +34,9 @@ class Address(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.address_id)
+        if not self.address_zip_code and not self.address:
+            return '%s' % (self.address_id)
+        return '%s %s' % (self.address_zip_code, self.address)
 
     class Meta:
         verbose_name = u'Address',
