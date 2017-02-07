@@ -20,10 +20,6 @@ class Size(models.Model):
         null=True, blank=True,
         choices=SizeChoices
     )
-    size_quote = models.ForeignKey(
-        'quote.Quote', related_name='Quote',
-        null=True, blank=True
-    )
     size_city = models.ForeignKey(
         'location.City', related_name='City',
         null=True, blank=True
