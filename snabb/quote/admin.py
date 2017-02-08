@@ -14,7 +14,7 @@ class PickupInline(admin.TabularInline):
 
 
 class QuoteAdmin(admin.ModelAdmin):
-    list_display = ['quote_id', 'active']
+    list_display = ['quote_id', 'active', 'prices']
     list_filter = ['active']
     inlines = [DropOffInline, PickupInline]
 

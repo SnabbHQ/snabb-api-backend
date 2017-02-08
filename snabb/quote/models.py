@@ -4,6 +4,7 @@ from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
 from django.contrib.auth.models import User
+from snabb.size.models import Size
 
 
 class Quote(models.Model):
@@ -21,7 +22,79 @@ class Quote(models.Model):
     @property
     def prices(self):
         'returns dictionary of size/prices'
-        return {}
+
+        # Get Sizes
+        pickup = Pickup.objects.filter(pickup_quote=self).first()
+        dropoff = DropOff.objects.filter(dropoff_quote=self).first()
+        try:
+            pickup_size_small = Size.objects.filter(
+                size='small',
+                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+            ).first()
+            pickup_price_small = pickup_size_small.size_price
+
+            pickup_size_medium = Size.objects.filter(
+                size='medium',
+                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+            ).first()
+            pickup_price_medium = pickup_size_medium.size_price
+
+            pickup_size_big = Size.objects.filter(
+                size='big',
+                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+            ).first()
+            pickup_price_big = pickup_size_big.size_price
+        except:
+            pickup_size_small = 0
+            pickup_price_small = 0
+            pickup_size_medium = 0
+            pickup_price_medium = 0
+            pickup_size_big = 0
+            pickup_price_big = 0
+
+        try:
+            dropoff_size_small = Size.objects.filter(
+                size='small',
+                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+            ).first()
+            dropoff_price_small = dropoff_size_small.size_price
+
+            dropoff_size_medium = Size.objects.filter(
+                size='medium',
+                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+            ).first()
+            dropoff_price_medium = dropoff_size_medium.size_price
+
+            dropoff_size_big = Size.objects.filter(
+                size='big',
+                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+            ).first()
+            dropoff_price_big = dropoff_size_big.size_price
+        except:
+            dropoff_size_small = 0
+            dropoff_price_small = 0
+            dropoff_size_medium = 0
+            dropoff_price_medium = 0
+            dropoff_size_big = 0
+            dropoff_price_big = 0
+
+        data_prices = {
+            'pickup': str(pickup),
+            'pickup_prices': {
+                'small': float(pickup_price_small),
+                'medium': float(pickup_price_medium),
+                'big': float(pickup_price_big)
+            },
+            'dropoff': str(dropoff),
+            'dropoff_prices': {
+                'small': float(dropoff_price_small),
+                'medium': float(dropoff_price_medium),
+                'big': float(dropoff_price_big)
+            }
+        }
+        # print (data_prices)
+
+        return data_prices
 
     @property
     def pickups(self):
