@@ -34,7 +34,7 @@ class Size(models.Model):
     updated_at = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
-        return str(self.get_size_display())+' '+self.size_city.name+' '+str(self.size_price)
+        return '%s %s' % (self.size, self.size_city)
 
     class Meta:
         verbose_name = u'Size'
