@@ -19,6 +19,15 @@ class Quote(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
+    def calculate_eta(self, address_pickup, address_dropoff, size):
+        if size == 'small':
+            return 10
+        if size == 'medium':
+            return 20
+        if size == 'big':
+            return 30
+        return 0
+
     def calculate_price(self, price_pickup, price_dropoff, eta):
         price = price_pickup + price_dropoff + eta
         return price
@@ -55,41 +64,68 @@ class Quote(models.Model):
                 size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
             ).first().size_price
 
-            eta = 1000  # Fake ETA
-
+            # Calculate eta pickup to dropoff - small
+            eta_small = self.calculate_eta(
+                pickup.pickup_address,
+                dropoff.dropoff_address,
+                'small'
+            )
+            # Calculate eta pickup to dropoff - medium
+            eta_medium = self.calculate_eta(
+                pickup.pickup_address,
+                dropoff.dropoff_address,
+                'medium'
+            )
+            # Calculate eta pickup to dropoff - big
+            eta_big = self.calculate_eta(
+                pickup.pickup_address,
+                dropoff.dropoff_address,
+                'big'
+            )
             # Calculate price pickup to dropoff - small
             price_small = self.calculate_price(
                 pickup_price_small,
                 dropoff_price_small,
-                eta
+                eta_small
             )
             # Calculate price pickup to dropoff - medium
             price_medium = self.calculate_price(
                 pickup_price_medium,
                 dropoff_price_medium,
-                eta
+                eta_medium
             )
             # Calculate price pickup to dropoff -big
             price_big = self.calculate_price(
                 pickup_price_medium,
                 dropoff_price_big,
-                eta
+                eta_big
             )
-        except:
+        except Exception as error:
+            print (error)
+            eta_small = 0
+            eta_medium = 0
+            eta_big = 0
             price_small = 0
             price_medium = 0
             price_big = 0
 
         data_prices = {
-            'standard': {
-                'small': float(price_small),
-                'medium': float(price_medium),
-                'big': float(price_big)
-            },
-            'priority': {
-                'small': float(price_small),
-                'medium': float(price_medium),
-                'big': float(price_big)
+            'size': {
+                'small': {
+                    'price': float(price_small),
+                    'price_prio': float(price_small),
+                    'eta': int(eta_small)
+                },
+                'medium': {
+                    'price': float(price_medium),
+                    'price_prio': float(price_medium),
+                    'eta': int(eta_medium)
+                },
+                'big': {
+                    'price': float(price_big),
+                    'price_prio': float(price_big),
+                    'eta': int(eta_big)
+                }
             }
         }
         return data_prices

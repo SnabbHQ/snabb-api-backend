@@ -5,6 +5,7 @@ from datetime import datetime
 from django.utils.dateformat import format
 from snabb.location.models import Zipcode
 from django.contrib.auth.models import User
+from django.contrib.gis.db import models
 
 
 class Address(models.Model):
