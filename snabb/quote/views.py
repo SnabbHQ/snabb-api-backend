@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
+from snabb.utils.code_response import get_response
 
 
 class QuoteViewSet(viewsets.ModelViewSet):
@@ -27,7 +28,6 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Quote.objects.filter(quote_user=self.request.user)
-        # queryset = Quote.objects.all()
         return queryset
 
     def list(self, request):
@@ -37,17 +37,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        print ('vas va crear')
+        print ('create')
         received = request.data
-
-        response = {
-            'data': {
-                'code': 400301,
-                'message': 'First Name is required',
-                'key': 'FIRST_NAME_REQUIRED'
-            },
-            'status': status.HTTP_400_BAD_REQUEST
-        }
 
         if not request.user.is_authenticated():  # Check if is authenticated
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -58,164 +49,92 @@ class QuoteViewSet(viewsets.ModelViewSet):
         try:  # Check Quote first_name
             pickup_contact_first_name = received['pickup']['contact']['first_name']
         except Exception as error:
-            response['data']['code'] = 400301
-            response['data']['message'] = 'Pickup first_name is required',
-            response['data']['key'] = 'PICKUP_FIRST_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400301))
 
         try:  # Check Quote last_name
             pickup_contact_last_name = received['pickup']['contact']['last_name']
         except Exception as error:
-            response['data']['code'] = 400302
-            response['data']['message'] = 'Pickup last_name is required',
-            response['data']['key'] = 'PICKUP_LAST_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400302))
 
         try:  # Check Quote company_name
             pickup_contact_company_name = received['pickup']['contact']['company_name']
         except Exception as error:
-            response['data']['code'] = 400303
-            response['data']['message'] = 'Pickup company_name is required',
-            response['data']['key'] = 'PICKUP_COMPANY_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400303))
 
         try:  # Check Quote phone
             pickup_contact_phone = received['pickup']['contact']['phone']
         except Exception as error:
-            response['data']['code'] = 400304
-            response['data']['message'] = 'Pickup phone is required',
-            response['data']['key'] = 'PICKUP_PHONE_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400304))
 
         try:  # Check Quote email
             pickup_contact_email = received['pickup']['contact']['email']
         except Exception as error:
-            response['data']['code'] = 400305
-            response['data']['message'] = 'Pickup email is required',
-            response['data']['key'] = 'PICKUP_EMAIL_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400305))
 
         try:  # Check Quote address
             pickup_address_address = received['pickup']['address']['address']
         except Exception as error:
-            response['data']['code'] = 400306
-            response['data']['message'] = 'Pickup address is required',
-            response['data']['key'] = 'PICKUP_ADDRESS_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400306))
 
         try:  # Check Quote coordinates
             pickup_address_coordinates = received['pickup']['address']['coordinates']
         except Exception as error:
-            response['data']['code'] = 400307
-            response['data']['message'] = 'Pickup coordinates is required',
-            response['data']['key'] = 'PICKUP_COORDINATES_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400307))
 
         try:  # Check Quote zipcode
             pickup_address_zipcode = received['pickup']['address']['zipcode']
         except Exception as error:
-            response['data']['code'] = 400308
-            response['data']['message'] = 'Pickup zipcode is required',
-            response['data']['key'] = 'PICKUP_ZIPCODE_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400308))
 
         try:  # Check Quote city
             pickup_address_city = received['pickup']['address']['city']
         except Exception as error:
-            response['data']['code'] = 400309
-            response['data']['message'] = 'Pickup city is required',
-            response['data']['key'] = 'PICKUP_CITY_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400309))
 
         try:  # Check Quote first_name
             dropoff_contact_first_name = received['dropoff']['contact']['first_name']
         except Exception as error:
-            response['data']['code'] = 400311
-            response['data']['message'] = 'dropoff first_name is required',
-            response['data']['key'] = 'DROPOFF_FIRST_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400311))
 
         try:  # Check Quote last_name
             dropoff_contact_last_name = received['dropoff']['contact']['last_name']
         except Exception as error:
-            response['data']['code'] = 400312
-            response['data']['message'] = 'dropoff last_name is required',
-            response['data']['key'] = 'DROPOFF_LAST_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400312))
 
         try:  # Check Quote company_name
             dropoff_contact_company_name = received['dropoff']['contact']['company_name']
         except Exception as error:
-            response['data']['code'] = 400313
-            response['data']['message'] = 'dropoff company_name is required',
-            response['data']['key'] = 'DROPOFF_COMPANY_NAME_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400313))
 
         try:  # Check Quote phone
             dropoff_contact_phone = received['dropoff']['contact']['phone']
         except Exception as error:
-            response['data']['code'] = 400314
-            response['data']['message'] = 'DROPOFF phone is required',
-            response['data']['key'] = 'dropoff_PHONE_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400314))
 
         try:  # Check Quote email
             dropoff_contact_email = received['dropoff']['contact']['email']
         except Exception as error:
-            response['data']['code'] = 400315
-            response['data']['message'] = 'dropoff email is required',
-            response['data']['key'] = 'DROPOFF_EMAIL_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400315))
 
         try:  # Check Quote address
             dropoff_address_address = received['dropoff']['address']['address']
         except Exception as error:
-            response['data']['code'] = 400316
-            response['data']['message'] = 'dropoff address is required',
-            response['data']['key'] = 'DROPOFF_ADDRESS_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400316))
 
         try:  # Check Quote coordinates
             dropoff_address_coordinates = received['dropoff']['address']['coordinates']
         except Exception as error:
-            response['data']['code'] = 400317
-            response['data']['message'] = 'dropoff coordinates is required',
-            response['data']['key'] = 'DROPOFF_COORDINATES_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400317))
 
         try:  # Check Quote Zipcode
             dropoff_address_zipcode = received['dropoff']['address']['zipcode']
         except Exception as error:
-            response['data']['code'] = 400318
-            response['data']['message'] = 'dropoff zipcode is required',
-            response['data']['key'] = 'DROPOFF_ZIPCODE_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400318))
 
         try:  # Check Quote city
             dropoff_address_city = received['dropoff']['address']['city']
         except Exception as error:
-            response['data']['code'] = 400319
-            response['data']['message'] = 'Dropoff city is required',
-            response['data']['key'] = 'DROPOFF_CITY_REQUIRED'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400319))
 
         # Validate Zipcode/city
         zipcode_pickup = None
@@ -234,12 +153,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 zipcode_city__active=True
             )
         except Exception as error:
-            print(error)
-            response['data']['code'] = 400210
-            response['data']['message'] = 'Invalid Address',
-            response['data']['key'] = 'INVALID_ADDRESS'
-            response['status'] = status.HTTP_400_BAD_REQUEST
-            return Response(response)
+            return Response(get_response(400210))
 
         # Save Address Pickup
         new_pickup_address = Address()
@@ -292,11 +206,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
         new_dropoff.dropoff_contact = new_dropoff_contact
         new_dropoff.save()
 
-        response['data']['code'] = 200205
-        response['data']['message'] = 'Quote created'
-        response['data']['key'] = 'CREATED_QUOTE'
-        response['status'] = status.HTTP_200_OK
-        return Response(response)
+        return Response(get_response(200205))
 
     def update(self, request, pk=None):
         # print ('update')
