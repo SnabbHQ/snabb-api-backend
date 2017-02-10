@@ -3,7 +3,10 @@ from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Quote
+from .models import Quote, Pickup, DropOff
+from snabb.address.models import Address
+from snabb.location.models import Zipcode
+from snabb.contact.models import Contact
 from .serializers import QuoteSerializer
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -11,8 +14,6 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
-from snabb.address.models import Address
-from snabb.address.views import _check_address
 
 
 class QuoteViewSet(viewsets.ModelViewSet):
@@ -30,7 +31,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
         return queryset
 
     def list(self, request):
-        print ('vas va listar')
+        print ('list')
         entries = self.queryset
         serializer = QuoteSerializer(entries, many=True)
         return Response(serializer.data)
@@ -118,7 +119,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
             return Response(response)
 
         try:  # Check Quote zipcode
-            pickup_address_coordinates = received['pickup']['address']['zipcode']
+            pickup_address_zipcode = received['pickup']['address']['zipcode']
         except Exception as error:
             response['data']['code'] = 400308
             response['data']['message'] = 'Pickup zipcode is required',
@@ -216,45 +217,91 @@ class QuoteViewSet(viewsets.ModelViewSet):
             response['status'] = status.HTTP_400_BAD_REQUEST
             return Response(response)
 
+        # Validate Zipcode/city
+        zipcode_pickup = None
+        zipcode_dropoff = None
+        try:
+            zipcode_pickup = Zipcode.objects.get(
+                code=pickup_address_zipcode,
+                active=True,
+                zipcode_city__name=pickup_address_city,
+                zipcode_city__active=True
+            )
+            zipcode_dropoff = Zipcode.objects.get(
+                code=dropoff_address_zipcode,
+                active=True,
+                zipcode_city__name=dropoff_address_city,
+                zipcode_city__active=True
+            )
+        except Exception as error:
+            print(error)
+            response['data']['code'] = 400210
+            response['data']['message'] = 'Invalid Address',
+            response['data']['key'] = 'INVALID_ADDRESS'
+            response['status'] = status.HTTP_400_BAD_REQUEST
+            return Response(response)
 
-        # Validate Address pickup/dropoff
-        #     --> Returns zipcode_id
-        #         --> create address
-        #             --> returns address_id
-
-        # new_pickup_address = Address()
-        # new_pickup_address.zipcode = zipcode_id
-        # new_pickup_address.address = pickup_address_address
+        # Save Address Pickup
+        new_pickup_address = Address()
+        new_pickup_address.address_zipcode = zipcode_pickup
+        new_pickup_address.address = pickup_address_address
         # coordinates = pickup_address_coordinates
-        # new_pickup_address.save()
+        new_pickup_address.save()
 
-        # new_dropoff_address = Address()
-        # new_dropoff_address.zipcode = zipcode_id
-        # new_dropoff_address.address = dropoff_address_address
+        # Save Address Dropoff
+        new_dropoff_address = Address()
+        new_dropoff_address.address_zipcode = zipcode_dropoff
+        new_dropoff_address.address = dropoff_address_address
         # coordinates = dropoff_address_coordinates
-        # new_dropoff_address.save()
-
+        new_dropoff_address.save()
 
         # --> create a quote
-        # new_quote = Quote()
-        # new_quote.quote_user = user
-        # new_quote.save()
+        new_quote = Quote()
+        new_quote.quote_user = user
+        new_quote.save()
 
-        # create contact
-        #     --> returns contact_id
+        # Create pickup contact
+        new_pickup_contact = Contact()
+        new_pickup_contact.first_name = pickup_contact_first_name
+        new_pickup_contact.last_name = pickup_contact_last_name
+        new_pickup_contact.company_name = pickup_contact_company_name
+        new_pickup_contact.phone = pickup_contact_phone
+        new_pickup_contact.email = pickup_contact_email
+        new_pickup_contact.save()
 
+        # Create dropff contact
+        new_dropoff_contact = Contact()
+        new_dropoff_contact.first_name = dropoff_contact_first_name
+        new_dropoff_contact.last_name = dropoff_contact_last_name
+        new_dropoff_contact.company_name = dropoff_contact_company_name
+        new_dropoff_contact.phone = dropoff_contact_phone
+        new_dropoff_contact.email = dropoff_contact_email
+        new_dropoff_contact.save()
 
-        
+        # Create pickup
+        new_pickup = Pickup()
+        new_pickup.pickup_quote = new_quote
+        new_pickup.pickup_address = new_pickup_address
+        new_pickup.pickup_contact = new_pickup_contact
+        new_pickup.save()
 
-        # address_id - contact_id - quote_id
-        #     --> create a Pickup/Dropoff
+        # Create dropoff
+        new_dropoff = DropOff()
+        new_dropoff.dropoff_quote = new_quote
+        new_dropoff.dropoff_address = new_dropoff_address
+        new_dropoff.dropoff_contact = new_dropoff_contact
+        new_dropoff.save()
 
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        response['data']['code'] = 200205
+        response['data']['message'] = 'Quote created'
+        response['data']['key'] = 'CREATED_QUOTE'
+        response['status'] = status.HTTP_200_OK
+        return Response(response)
 
     def update(self, request, pk=None):
-        print ('vas va update')
+        # print ('update')
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def destroy(self, request, pk=None):
-        print ('destroy')
+        # print ('destroy')
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

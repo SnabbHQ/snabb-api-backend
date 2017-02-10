@@ -8,8 +8,8 @@ class AddressSerializer(serializers.ModelSerializer):
     zipcode = serializers.SerializerMethodField('zipcode_info')
 
     def zipcode_info(self, obj):
-        if obj.address_zip_code:
-            items = obj.address_zip_code
+        if obj.address_zipcode:
+            items = obj.address_zipcode
             serializer = ZipcodeSerializer(
                 items, many=False, read_only=True
             )

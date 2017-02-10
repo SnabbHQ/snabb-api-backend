@@ -41,27 +41,27 @@ class Quote(models.Model):
             # Get Data prices from sizes
             pickup_price_small = Size.objects.filter(
                 size='small',
-                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+                size_city=pickup.pickup_address.address_zipcode.zipcode_city
             ).first().size_price
             dropoff_price_small = Size.objects.filter(
                 size='small',
-                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
             ).first().size_price
             pickup_price_medium = Size.objects.filter(
                 size='medium',
-                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+                size_city=pickup.pickup_address.address_zipcode.zipcode_city
             ).first().size_price
             dropoff_price_medium = Size.objects.filter(
                 size='medium',
-                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
             ).first().size_price
             pickup_price_big = Size.objects.filter(
                 size='big',
-                size_city=pickup.pickup_address.address_zip_code.zipcode_city
+                size_city=pickup.pickup_address.address_zipcode.zipcode_city
             ).first().size_price
             dropoff_price_big = Size.objects.filter(
                 size='big',
-                size_city=dropoff.dropoff_address.address_zip_code.zipcode_city
+                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
             ).first().size_price
 
             # Calculate eta pickup to dropoff - small
