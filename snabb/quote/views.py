@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Quote
+from .models import Quote, Place, Task
 from snabb.address.models import Address
 from snabb.location.models import Zipcode
 from snabb.contact.models import Contact
@@ -46,165 +46,142 @@ class QuoteViewSet(viewsets.ModelViewSet):
         # Data to create a quote
         user = self.request.user
 
-        try:  # Check Quote first_name
-            pickup_contact_first_name = received['pickup']['contact']['first_name']
+        try:  # Check Task first_name
+            print (len(received['tasks']))
         except Exception as error:
-            return Response(get_response(400301))
-
-        try:  # Check Quote last_name
-            pickup_contact_last_name = received['pickup']['contact']['last_name']
-        except Exception as error:
-            return Response(get_response(400302))
-
-        try:  # Check Quote company_name
-            pickup_contact_company_name = received['pickup']['contact']['company_name']
-        except Exception as error:
-            return Response(get_response(400303))
-
-        try:  # Check Quote phone
-            pickup_contact_phone = received['pickup']['contact']['phone']
-        except Exception as error:
-            return Response(get_response(400304))
-
-        try:  # Check Quote email
-            pickup_contact_email = received['pickup']['contact']['email']
-        except Exception as error:
-            return Response(get_response(400305))
-
-        try:  # Check Quote address
-            pickup_address_address = received['pickup']['address']['address']
-        except Exception as error:
-            return Response(get_response(400306))
-
-        try:  # Check Quote coordinates
-            pickup_address_coordinates = received['pickup']['address']['coordinates']
-        except Exception as error:
-            return Response(get_response(400307))
-
-        try:  # Check Quote zipcode
-            pickup_address_zipcode = received['pickup']['address']['zipcode']
-        except Exception as error:
-            return Response(get_response(400308))
-
-        try:  # Check Quote city
-            pickup_address_city = received['pickup']['address']['city']
-        except Exception as error:
-            return Response(get_response(400309))
-
-        try:  # Check Quote first_name
-            dropoff_contact_first_name = received['dropoff']['contact']['first_name']
-        except Exception as error:
-            return Response(get_response(400311))
-
-        try:  # Check Quote last_name
-            dropoff_contact_last_name = received['dropoff']['contact']['last_name']
-        except Exception as error:
-            return Response(get_response(400312))
-
-        try:  # Check Quote company_name
-            dropoff_contact_company_name = received['dropoff']['contact']['company_name']
-        except Exception as error:
-            return Response(get_response(400313))
-
-        try:  # Check Quote phone
-            dropoff_contact_phone = received['dropoff']['contact']['phone']
-        except Exception as error:
-            return Response(get_response(400314))
-
-        try:  # Check Quote email
-            dropoff_contact_email = received['dropoff']['contact']['email']
-        except Exception as error:
-            return Response(get_response(400315))
-
-        try:  # Check Quote address
-            dropoff_address_address = received['dropoff']['address']['address']
-        except Exception as error:
-            return Response(get_response(400316))
-
-        try:  # Check Quote coordinates
-            dropoff_address_coordinates = received['dropoff']['address']['coordinates']
-        except Exception as error:
-            return Response(get_response(400317))
-
-        try:  # Check Quote Zipcode
-            dropoff_address_zipcode = received['dropoff']['address']['zipcode']
-        except Exception as error:
-            return Response(get_response(400318))
-
-        try:  # Check Quote city
-            dropoff_address_city = received['dropoff']['address']['city']
-        except Exception as error:
-            return Response(get_response(400319))
-
-        # Validate Zipcode/city
-        zipcode_pickup = None
-        zipcode_dropoff = None
-        try:
-            zipcode_pickup = Zipcode.objects.get(
-                code=pickup_address_zipcode,
-                active=True,
-                zipcode_city__name=pickup_address_city,
-                zipcode_city__active=True
-            )
-            zipcode_dropoff = Zipcode.objects.get(
-                code=dropoff_address_zipcode,
-                active=True,
-                zipcode_city__name=dropoff_address_city,
-                zipcode_city__active=True
-            )
-        except Exception as error:
-            return Response(get_response(400210))
-
-        # Save Address Pickup
-        new_pickup_address = Address()
-        new_pickup_address.address_zipcode = zipcode_pickup
-        new_pickup_address.address = pickup_address_address
-        # coordinates = pickup_address_coordinates
-        new_pickup_address.save()
-
-        # Save Address Dropoff
-        new_dropoff_address = Address()
-        new_dropoff_address.address_zipcode = zipcode_dropoff
-        new_dropoff_address.address = dropoff_address_address
-        # coordinates = dropoff_address_coordinates
-        new_dropoff_address.save()
+            return Response(get_response(400300))
 
         # --> create a quote
         new_quote = Quote()
         new_quote.quote_user = user
         new_quote.save()
 
-        # Create pickup contact
-        new_pickup_contact = Contact()
-        new_pickup_contact.first_name = pickup_contact_first_name
-        new_pickup_contact.last_name = pickup_contact_last_name
-        new_pickup_contact.company_name = pickup_contact_company_name
-        new_pickup_contact.phone = pickup_contact_phone
-        new_pickup_contact.email = pickup_contact_email
-        new_pickup_contact.save()
+        for task in received['tasks']:
+            # CHECK order, type
 
-        # Create dropff contact
-        new_dropoff_contact = Contact()
-        new_dropoff_contact.first_name = dropoff_contact_first_name
-        new_dropoff_contact.last_name = dropoff_contact_last_name
-        new_dropoff_contact.company_name = dropoff_contact_company_name
-        new_dropoff_contact.phone = dropoff_contact_phone
-        new_dropoff_contact.email = dropoff_contact_email
-        new_dropoff_contact.save()
+            try:  # Check Task first_name
+                task_contact_first_name = task['contact']['first_name']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400301))
 
-        # Create pickup
-        # new_pickup = Pickup()
-        # new_pickup.pickup_quote = new_quote
-        # new_pickup.pickup_address = new_pickup_address
-        # new_pickup.pickup_contact = new_pickup_contact
-        # new_pickup.save()
+            try:  # Check Address last_name
+                task_contact_last_name = task['contact']['last_name']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400302))
 
-        # Create dropoff
-        # new_dropoff = DropOff()
-        # new_dropoff.dropoff_quote = new_quote
-        # new_dropoff.dropoff_address = new_dropoff_address
-        # new_dropoff.dropoff_contact = new_dropoff_contact
-        # new_dropoff.save()
+            try:  # Check Address company_name
+                task_contact_company_name = task['contact']['company_name']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400303))
+
+            try:  # Check Address phone
+                task_contact_phone = task['contact']['phone']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400304))
+
+            try:  # Check Address email
+                task_contact_email = task['contact']['email']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400305))
+
+            try:  # Check Address address
+                task_address_address = task['place']['address']['address']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400306))
+
+            try:  # Check Address coordinates
+                task_address_coordinates = task['place']['address']['coordinates']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400307))
+
+            try:  # Check Address zipcode
+                task_address_zipcode = task['place']['address']['zipcode']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400308))
+
+            try:  # Check Address city
+                task_address_city = task['place']['address']['city']
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400309))
+
+            try:  # Check Place Description
+                task_place_description = task['place']['description']
+            except Exception as error:
+                new_quote.delete()
+                task_place_description = ''
+
+            try:  # Check Order
+                task_order = task['order']
+            except Exception as error:
+                task_order = 0
+                # new_quote.delete()
+                # Falta PONER RETURN ERROR
+
+            try:  # Check type
+                task_type = task['type']
+            except Exception as error:
+                if task_type != 'pickup' or task_type != 'dropoff':
+                    task_type = 'pickup'
+                    # new_quote.delete()
+                    # Falta PONER RETURN ERROR
+
+            # Validate Zipcode/city
+            zipcode_task = None
+            try:
+                zipcode_task = Zipcode.objects.get(
+                    code=task_address_zipcode,
+                    zipcode_city__name=task_address_city,
+                    active=True,
+                    zipcode_city__active=True
+                )
+            except Exception as error:
+                new_quote.delete()
+                return Response(get_response(400210))
+
+            # Save Address
+            new_task_address = Address()
+            new_task_address.address_zipcode = zipcode_task
+            new_task_address.address = task_address_address
+            # coordinates = task_address_coordinates
+            new_task_address.save()
+
+            # Create  contact
+            new_task_contact = Contact()
+            new_task_contact.first_name = task_contact_first_name
+            new_task_contact.last_name = task_contact_last_name
+            new_task_contact.company_name = task_contact_company_name
+            new_task_contact.phone = task_contact_phone
+            new_task_contact.email = task_contact_email
+            new_task_contact.save()
+
+            # Create place
+            new_task_place = Place()
+            new_task_place.description = task_place_description
+            new_task_place.place_address = new_task_address
+            new_task_place.save()
+
+            # Create Task
+            new_task_task = Task()
+            new_task_task.task_place = new_task_place
+            new_task_task.task_contact = new_task_contact
+            new_task_task.order = 0
+            new_task_task.task_type = 0
+            new_task_task.save()
+
+            # Assign task to quote
+            new_quote.tasks.add(new_task_task)
+
+        # Save quote
+        new_quote.save()
 
         return Response(get_response(200205))
 
