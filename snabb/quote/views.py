@@ -3,7 +3,7 @@ from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Quote, Pickup, DropOff
+from .models import Quote
 from snabb.address.models import Address
 from snabb.location.models import Zipcode
 from snabb.contact.models import Contact
@@ -193,18 +193,18 @@ class QuoteViewSet(viewsets.ModelViewSet):
         new_dropoff_contact.save()
 
         # Create pickup
-        new_pickup = Pickup()
-        new_pickup.pickup_quote = new_quote
-        new_pickup.pickup_address = new_pickup_address
-        new_pickup.pickup_contact = new_pickup_contact
-        new_pickup.save()
+        # new_pickup = Pickup()
+        # new_pickup.pickup_quote = new_quote
+        # new_pickup.pickup_address = new_pickup_address
+        # new_pickup.pickup_contact = new_pickup_contact
+        # new_pickup.save()
 
         # Create dropoff
-        new_dropoff = DropOff()
-        new_dropoff.dropoff_quote = new_quote
-        new_dropoff.dropoff_address = new_dropoff_address
-        new_dropoff.dropoff_contact = new_dropoff_contact
-        new_dropoff.save()
+        # new_dropoff = DropOff()
+        # new_dropoff.dropoff_quote = new_quote
+        # new_dropoff.dropoff_address = new_dropoff_address
+        # new_dropoff.dropoff_contact = new_dropoff_contact
+        # new_dropoff.save()
 
         return Response(get_response(200205))
 
