@@ -1,0 +1,36 @@
+{
+  "tasks" : [
+    {
+      "type": "pickup",
+      "order": 1,
+      "comments": "hay que enviarse urgentemente",
+      "place":{
+        "description" : "esto es un paquete super grande.",
+        "address": "Passtage del Doctor Serra 3, Valencia, Spain"
+      },
+      "contact":{
+        "first_name": "Jose Luís",
+        "last_name": "Camacho",
+        "company_name": "navilo",
+        "phone": 555555,
+        "email": "test@test.com"
+      }
+    },
+    {
+      "type": "dropoff",
+      "order": 2,
+      "comments": "esto es un comentario de prueba",
+      "place":{
+        "description" : "esperando que llegue",
+        "address": "Santo Domingo 44, Alcoy, Alicante, España"
+      },
+      "contact":{
+        "first_name": "Mariano",
+        "last_name": "Rajoy",
+        "company_name": "pp",
+        "phone": 666,
+        "email": "pp@pp.ppp"
+      }
+    }
+  ]
+}

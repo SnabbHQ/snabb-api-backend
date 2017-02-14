@@ -17,27 +17,56 @@ def _check_address(address):
     response = {
         'data': {
             'code': 400204,
-            'message': 'Address not valid',
-            'key': 'ADDRESS_NOT_VALID'
+            'message': 'Invalid address',
+            'key': 'INVALID_ADDRESS'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }
-
-    if 'zipcode' in address.keys():
-        try:
-            zipcode = Zipcode.objects.get(code=address['zipcode'])
-        except:
-            return response
-        response['data']['code'] = 200204
-        response['data']['message'] = 'Address valid'
-        response['data']['key'] = 'ADDRESS_OK'
-        response['status'] = status.HTTP_200_OK
-    else:
+    # Check keys
+    if 'zipcode' not in address.keys():
         response['data']['code'] = 400205
         response['data']['message'] = 'Key zipcode is required'
         response['data']['key'] = 'KEY_ZIPCODE_REQUIRED'
         response['status'] = status.HTTP_400_BAD_REQUEST
+        return response
+    if 'city' not in address.keys():
+        response['data']['code'] = 400206
+        response['data']['message'] = 'Key city is required'
+        response['data']['key'] = 'KEY_CITY_REQUIRED'
+        response['status'] = status.HTTP_400_BAD_REQUEST
+        return response
 
+    # Check Address
+    zipcode = None
+    try:
+        zipcode = Zipcode.objects.get(
+            code=address['zipcode'],
+            zipcode_city__name=address['city']
+        )
+    except:
+        response['data']['code'] = 400207
+        response['data']['message'] = 'Invalid address'
+        response['data']['key'] = 'INVALID_ADDRESS'
+        response['status'] = status.HTTP_400_BAD_REQUEST
+        return response
+
+    if not zipcode.active:
+        response['data']['code'] = 400208
+        response['data']['message'] = 'Not active zipcde'
+        response['data']['key'] = 'INACTIVE_ZIPCODE'
+        response['status'] = status.HTTP_400_BAD_REQUEST
+        return response
+    if not zipcode.zipcode_city.active:
+        response['data']['code'] = 400209
+        response['data']['message'] = 'Not active city'
+        response['data']['key'] = 'INACTIVE_CITY'
+        response['status'] = status.HTTP_400_BAD_REQUEST
+        return response
+
+    response['data']['code'] = 200204
+    response['data']['message'] = 'Address valid'
+    response['data']['key'] = 'ADDRESS_OK'
+    response['status'] = status.HTTP_200_OK
     return response
 
 

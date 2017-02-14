@@ -9,11 +9,14 @@ class Zipcode(models.Model):
     zipcode_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    code = models.IntegerField(
-        verbose_name='Code', null=False
+    code = models.CharField(
+        verbose_name=u'Code',
+        max_length=300,
+        null=False
     )
     zipcode_city = models.ForeignKey(
-        'location.City', related_name='Zipcode_city', null=True, blank=True
+        'location.City', related_name='Zipcode_city',
+        null=True, blank=True
     )
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -25,6 +28,7 @@ class Zipcode(models.Model):
     class Meta:
         verbose_name = u'Zipcode'
         verbose_name_plural = u'Zipcodes'
+        unique_together = ['code', 'zipcode_city']
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
@@ -45,6 +49,11 @@ class City(models.Model):
     name = models.CharField(
         verbose_name=u'City Name',
         max_length=300
+    )
+    google_short_name = models.CharField(
+        verbose_name=u'Google City Name',
+        max_length=300,
+        null=True, blank=True
     )
     city_region = models.ForeignKey(
         'location.Region', related_name='city_region',
@@ -80,6 +89,11 @@ class Region(models.Model):
     name = models.CharField(
         verbose_name=u'Region',
         max_length=300
+    )
+    google_short_name = models.CharField(
+        verbose_name=u'Google Region Name',
+        max_length=300,
+        null=True, blank=True
     )
     region_country = models.ForeignKey(
         'location.Country', related_name='region_country',
