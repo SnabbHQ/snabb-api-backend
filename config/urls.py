@@ -23,46 +23,6 @@ from snabb.address.views import ValidateAddress
 from snabb.quote.views import QuoteViewSet
 
 router = HybridRouter(trailing_slash=False)
-<<<<<<< HEAD
-router.register(
-    r'api/user/profile',
-    ProfileViewSet
-)
-router.add_api_view(
-    "api/user/register",
-    url(r'^api/user/register',
-    RegisterUser.as_view(), name='register_user')
-),
-router.add_api_view(
-    "api/user/verifyUser",
-    url(r'^api/user/verifyUser',
-    VerifyUser.as_view(), name='verify_user')
-),
-router.add_api_view(
-    "api/user/sendVerifyEmail",
-    url(r'^api/user/sendVerifyEmail',
-    SendVerifyEmail.as_view(), name='send_verify_email')
-)
-router.add_api_view(
-    "api/user/updatePassword",
-    url(r'^api/user/updatePassword',
-    UpdatePassword.as_view(), name='update_password')
-)
-router.add_api_view(
-    "api/user/forgotPassword",
-    url(r'^api/user/forgotPassword',
-    ForgotPassword.as_view(), name='forgot_password')
-)
-router.add_api_view(
-    "api/user/resetPassword",
-    url(r'^api/user/resetPassword',
-    ResetPassword.as_view(), name='reset_password')
-)
-router.add_api_view(
-    "api/address/validateAddress",
-    url(r'^api/address/validateAddress',
-    ValidateAddress.as_view(), name='validateAddress')
-=======
 router.register(r'api/user/profile', ProfileViewSet)
 router.add_api_view("api/user/register", url(r'^api/user/register',
                     RegisterUser.as_view(), name='register_user')),
@@ -78,7 +38,6 @@ router.add_api_view("api/user/resetPassword", url(r'^api/user/resetPassword',
                     ResetPassword.as_view(), name='reset_password'))
 router.add_api_view("api/address/validateAddress",url(r'^api/address/validateAddress',
                     ValidateAddress.as_view(), name='validateAddress')
->>>>>>> 9ef2dca703ea723edd68862ff75e9b96d041a61b
 )
 router.register(r'api/quote', QuoteViewSet, 'Quote')
 admin.autodiscover()
