@@ -13,7 +13,8 @@ class Zipcode(models.Model):
         verbose_name='Code', null=False
     )
     zipcode_city = models.ForeignKey(
-        'location.City', related_name='Zipcode_city', null=True, blank=True
+        'location.City', related_name='Zipcode_city',
+        null=True, blank=True
     )
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -25,6 +26,7 @@ class Zipcode(models.Model):
     class Meta:
         verbose_name = u'Zipcode'
         verbose_name_plural = u'Zipcodes'
+        unique_together = ['code', 'zipcode_city']
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))

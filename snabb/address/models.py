@@ -5,13 +5,14 @@ from datetime import datetime
 from django.utils.dateformat import format
 from snabb.location.models import Zipcode
 from django.contrib.auth.models import User
+from django.contrib.gis.db import models
 
 
 class Address(models.Model):
     address_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    address_zip_code = models.ForeignKey(
+    address_zipcode = models.ForeignKey(
         Zipcode, related_name='Address_Zipcode',
         null=True, blank=True
     )
@@ -34,9 +35,9 @@ class Address(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        if not self.address_zip_code and not self.address:
+        if not self.address_zipcode and not self.address:
             return '%s' % (self.address_id)
-        return '%s %s' % (self.address_zip_code, self.address)
+        return '%s %s' % (self.address_zipcode, self.address)
 
     class Meta:
         verbose_name = u'Address',
