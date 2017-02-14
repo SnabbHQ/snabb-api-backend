@@ -37,8 +37,7 @@ router.add_api_view("api/user/forgotPassword", url(r'^api/user/forgotPassword',
 router.add_api_view("api/user/resetPassword", url(r'^api/user/resetPassword',
                     ResetPassword.as_view(), name='reset_password'))
 router.add_api_view("api/address/validateAddress",url(r'^api/address/validateAddress',
-                    ValidateAddress.as_view(), name='validateAddress')
-)
+                    ValidateAddress.as_view(), name='validateAddress'))
 router.register(r'api/quote', QuoteViewSet, 'Quote')
 admin.autodiscover()
 
