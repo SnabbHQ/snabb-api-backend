@@ -6,14 +6,17 @@ from snabb.location.serializers import ZipcodeSerializer
 class AddressSerializer(serializers.ModelSerializer):
 
     zipcode = serializers.SerializerMethodField('zipcode_info')
+    city = serializers.SerializerMethodField('city_info')
 
     def zipcode_info(self, obj):
         if obj.address_zipcode:
-            items = obj.address_zipcode
-            serializer = ZipcodeSerializer(
-                items, many=False, read_only=True
-            )
-            return serializer.data
+            return obj.address_zipcode.code
+        else:
+            return None
+
+    def city_info(self, obj):
+        if obj.address_zipcode.zipcode_city:
+            return obj.address_zipcode.zipcode_city.name
         else:
             return None
 
@@ -26,5 +29,6 @@ class AddressSerializer(serializers.ModelSerializer):
             'longitude',
             'active',
             'created_at', 'updated_at',
-            'zipcode'
+            'zipcode',
+            'city'
         )

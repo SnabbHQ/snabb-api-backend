@@ -20,118 +20,54 @@ class Quote(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
-    def calculate_eta(self, address_pickup, address_dropoff, size):
-        if size == 'small':
-            return 10
-        if size == 'medium':
-            return 20
-        if size == 'big':
-            return 30
-        return 0
-
-    def calculate_price(self, price_pickup, price_dropoff, eta):
-        '''price = price_pickup + price_dropoff + eta
-        return price'''
-        return 0
-
     @property
     def prices(self):
         'Returns dictionary of size/prices'
-        '''pickup = Pickup.objects.filter(pickup_quote=self).first()
-        dropoff = DropOff.objects.filter(dropoff_quote=self).first()
+        tasks = self.tasks.all().order_by('order')
+        price_small = 0
+        price_medium = 0
+        price_big = 0
+        eta_small = 0
+        eta_medium = 0
+        eta_big = 0
         try:
-            # Get Data prices from sizes
-            pickup_price_small = Size.objects.filter(
-                size='small',
-                size_city=pickup.pickup_address.address_zipcode.zipcode_city
-            ).first().size_price
-            dropoff_price_small = Size.objects.filter(
-                size='small',
-                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
-            ).first().size_price
-            pickup_price_medium = Size.objects.filter(
-                size='medium',
-                size_city=pickup.pickup_address.address_zipcode.zipcode_city
-            ).first().size_price
-            dropoff_price_medium = Size.objects.filter(
-                size='medium',
-                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
-            ).first().size_price
-            pickup_price_big = Size.objects.filter(
-                size='big',
-                size_city=pickup.pickup_address.address_zipcode.zipcode_city
-            ).first().size_price
-            dropoff_price_big = Size.objects.filter(
-                size='big',
-                size_city=dropoff.dropoff_address.address_zipcode.zipcode_city
-            ).first().size_price
+            for task in tasks:
+                price_small += Size.objects.filter(
+                    size='small',
+                    size_city=task.task_place.place_address.address_zipcode.zipcode_city
+                ).first().size_price
+                price_medium += Size.objects.filter(
+                    size='medium',
+                    size_city=task.task_place.place_address.address_zipcode.zipcode_city
+                ).first().size_price
+                price_big += Size.objects.filter(
+                    size='big',
+                    size_city=task.task_place.place_address.address_zipcode.zipcode_city
+                ).first().size_price
 
-            # Calculate eta pickup to dropoff - small
-            eta_small = self.calculate_eta(
-                pickup.pickup_address,
-                dropoff.dropoff_address,
-                'small'
-            )
-            # Calculate eta pickup to dropoff - medium
-            eta_medium = self.calculate_eta(
-                pickup.pickup_address,
-                dropoff.dropoff_address,
-                'medium'
-            )
-            # Calculate eta pickup to dropoff - big
-            eta_big = self.calculate_eta(
-                pickup.pickup_address,
-                dropoff.dropoff_address,
-                'big'
-            )
-            # Calculate price pickup to dropoff - small
-            price_small = self.calculate_price(
-                pickup_price_small,
-                dropoff_price_small,
-                eta_small
-            )
-            # Calculate price pickup to dropoff - medium
-            price_medium = self.calculate_price(
-                pickup_price_medium,
-                dropoff_price_medium,
-                eta_medium
-            )
-            # Calculate price pickup to dropoff -big
-            price_big = self.calculate_price(
-                pickup_price_medium,
-                dropoff_price_big,
-                eta_big
-            )
-        except Exception as error:
-            print (error)
-            eta_small = 0
-            eta_medium = 0
-            eta_big = 0
-            price_small = 0
-            price_medium = 0
-            price_big = 0
-
-        data_prices = {
-            'size': {
-                'small': {
-                    'price': float(price_small),
-                    'price_prio': float(price_small),
-                    'eta': int(eta_small)
-                },
-                'medium': {
-                    'price': float(price_medium),
-                    'price_prio': float(price_medium),
-                    'eta': int(eta_medium)
-                },
-                'big': {
-                    'price': float(price_big),
-                    'price_prio': float(price_big),
-                    'eta': int(eta_big)
+            data_prices = {
+                'size': {
+                    'small': {
+                        'price': float(price_small),
+                        'price_prio': float(price_small),
+                        'eta': int(eta_small)
+                    },
+                    'medium': {
+                        'price': float(price_medium),
+                        'price_prio': float(price_medium),
+                        'eta': int(eta_medium)
+                    },
+                    'big': {
+                        'price': float(price_big),
+                        'price_prio': float(price_big),
+                        'eta': int(eta_big)
+                    }
                 }
             }
-        }
-        return data_prices'''
-        return 0
+            return data_prices
+        except Exception as error:
+            pass
+        return None
 
     def __str__(self):
         return str(self.quote_id)
@@ -169,7 +105,7 @@ class Task(models.Model):
         null=True, blank=True
     )
     order = models.IntegerField(
-        default=0, editable=False, blank=True
+        default=0, blank=True
     )
     comments = models.CharField(
         verbose_name="Comments", max_length=500, null=True, blank=True
