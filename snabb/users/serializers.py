@@ -11,3 +11,4 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'email', 'phone', 'verified', 'send_email_notifications',
                   'send_sms_notifications', 'user_lang', 'created_at',
                   'updated_at')
+        read_only_fields = ('verified',)
