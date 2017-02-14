@@ -30,10 +30,10 @@ class Profile(models.Model):
     password = models.CharField(
         max_length=800, null=True, blank=True
     )
-    active = models.BooleanField(default=True)
-    verified = models.BooleanField(default=False)
-    send_email_notifications = models.BooleanField(default=True)
-    send_sms_notifications = models.BooleanField(default=True)
+    active = models.BooleanField(default=True, blank=True)
+    verified = models.BooleanField(default=False, blank=True)
+    send_email_notifications = models.BooleanField(default=True, blank=True)
+    send_sms_notifications = models.BooleanField(default=True, blank=True)
 
     user_lang = models.CharField(
         max_length=3, null=True, blank=True, editable=True)
