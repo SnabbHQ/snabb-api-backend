@@ -37,6 +37,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
+        return 0
+
         print ('create')
         received = request.data
 
@@ -90,7 +92,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 return Response(get_response(400305))
 
             try:  # Check Address address
-                task_address_address = task['place']['address']['address']
+                task_address_address = task['place']['address']
             except Exception as error:
                 new_quote.delete()
                 return Response(get_response(400306))
@@ -100,18 +102,6 @@ class QuoteViewSet(viewsets.ModelViewSet):
             except Exception as error:
                 new_quote.delete()
                 return Response(get_response(400307))
-
-            try:  # Check Address zipcode
-                task_address_zipcode = task['place']['address']['zipcode']
-            except Exception as error:
-                new_quote.delete()
-                return Response(get_response(400308))
-
-            try:  # Check Address city
-                task_address_city = task['place']['address']['city']
-            except Exception as error:
-                new_quote.delete()
-                return Response(get_response(400309))
 
             try:  # Check Place Description
                 task_place_description = task['place']['description']
@@ -134,6 +124,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
                     # new_quote.delete()
                     # Falta PONER RETURN ERROR
 
+            '''''''''' VALIDATE ADDRESS GOOGLE '''''''''''''''
             # Validate Zipcode/city
             zipcode_task = None
             try:
@@ -153,6 +144,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
             new_task_address.address = task_address_address
             # coordinates = task_address_coordinates
             new_task_address.save()
+
+            ''''''''''''''''''''''''''''''''''''''''''''''''''
 
             # Create  contact
             new_task_contact = Contact()

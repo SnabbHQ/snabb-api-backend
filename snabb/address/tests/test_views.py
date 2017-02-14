@@ -22,7 +22,8 @@ class ProfileTests(APITestCase):
 
     def test_verify_address(self):
         """ Ensure we can verify an address by zipcode. """
-        return 0
+
+    '''
         url = reverse('validateAddress')
 
         city = self.create_city('Valencia', True)
@@ -72,3 +73,4 @@ class ProfileTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.data['data']['code'], 400206)
         self.assertEqual(response.data['data']['key'], 'KEY_CITY_REQUIRED')
+    '''

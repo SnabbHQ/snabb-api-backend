@@ -6,12 +6,7 @@
       "comments": "hay que enviarse urgentemente",
       "place":{
         "description" : "esto es un paquete super grande.",
-        "address":{
-          "address": "Santa Ana",
-          "coordinates": 21345,
-          "zipcode": 46860,
-          "city": "Albaida"
-        }
+        "address": "Passtage del Doctor Serra 3, Valencia, Spain"
       },
       "contact":{
         "first_name": "Jose Luís",
@@ -27,12 +22,7 @@
       "comments": "esto es un comentario de prueba",
       "place":{
         "description" : "esperando que llegue",
-        "address":{
-          "address": "Santo Domingo 44",
-          "coordinates": 123464,
-          "zipcode": 46870,
-          "city": "Ontinyent"
-        }
+        "address": "Santo Domingo 44, Alcoy, Alicante, España"
       },
       "contact":{
         "first_name": "Mariano",
