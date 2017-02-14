@@ -3,7 +3,7 @@ from django.conf import settings
 from django.db import models
 from datetime import datetime
 from django.utils.dateformat import format
-from snabb.location.models import Zipcode
+from snabb.location.models import City
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 
@@ -12,12 +12,16 @@ class Address(models.Model):
     address_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    address_zipcode = models.ForeignKey(
-        Zipcode, related_name='Address_Zipcode',
+    address_city = models.ForeignKey(
+        City, related_name='Address_City',
         null=True, blank=True
     )
     address = models.CharField(
         verbose_name='Address',
+        max_length=300, null=True, blank=True
+    )
+    zipcode = models.CharField(
+        verbose_name='Zipcode',
         max_length=300, null=True, blank=True
     )
     latitude = models.DecimalField(
@@ -35,9 +39,9 @@ class Address(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        if not self.address_zipcode and not self.address:
+        if not self.zipcode and not self.address:
             return '%s' % (self.address_id)
-        return '%s %s' % (self.address_zipcode, self.address)
+        return '%s %s' % (self.zipcode, self.address)
 
     class Meta:
         verbose_name = u'Address',
