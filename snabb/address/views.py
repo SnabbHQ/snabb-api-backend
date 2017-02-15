@@ -1,73 +1,96 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
-
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
-from .models import Address
-from snabb.location.models import Zipcode
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework import status
-from django.http import Http404, HttpResponse
+from rest_framework.views import APIView
+from django.contrib.auth import authenticate
+from snabb.utils.code_response import get_response
+from django.contrib.auth.models import User
+from snabb.location.models import Zipcode, Region, City, Country
+import urllib.request
+import json
 
 
 def _check_address(address):
     ''' Check if address is valid '''
-    response = {
-        'data': {
-            'code': 400204,
-            'message': 'Invalid address',
-            'key': 'INVALID_ADDRESS'
-        },
-        'status': status.HTTP_400_BAD_REQUEST
-    }
-    # Check keys
-    if 'zipcode' not in address.keys():
-        response['data']['code'] = 400205
-        response['data']['message'] = 'Key zipcode is required'
-        response['data']['key'] = 'KEY_ZIPCODE_REQUIRED'
-        response['status'] = status.HTTP_400_BAD_REQUEST
-        return response
-    if 'city' not in address.keys():
-        response['data']['code'] = 400206
-        response['data']['message'] = 'Key city is required'
-        response['data']['key'] = 'KEY_CITY_REQUIRED'
-        response['status'] = status.HTTP_400_BAD_REQUEST
-        return response
 
-    # Check Address
-    zipcode = None
-    try:
-        zipcode = Zipcode.objects.get(
-            code=address['zipcode'],
-            zipcode_city__name=address['city']
+    if 'address' not in address.keys():  # Check keys
+        return get_response(400211)
+
+    # Data to send
+    api_key = 'AIzaSyBenCk9al8Bj5Gms0-G11Ug1jaKt0sf2mo'
+    address_google = urllib.parse.quote_plus(address['address'])
+
+    webURL = urllib.request.urlopen(
+        "https://maps.googleapis.com/maps/api/geocode/json?address=" +
+        address_google + "&key=" + api_key + "&language=en"
+    )
+    webURLdata = webURL.read()
+    encoding = webURL.info().get_content_charset('utf-8')
+    respJSON = json.loads(webURLdata.decode(encoding))
+
+    try:  # Check if has data
+        address_components = respJSON['results'][0]['address_components']
+    except Exception as error:
+        return get_response(400407)
+
+    google_city = None     # [locality]                    --> short_name
+    google_country = None  # [country]                     --> short_name
+    google_zipcode = None  # [postal_code]                 --> short_name
+    google_region = None   # [administrative_area_level_1] --> short_name
+    google_route = None    # [route]                       --> short_name
+    google_location = respJSON['results'][0]['geometry']  # --> Coords Google
+
+    for comp in address_components:
+        for address_type in comp['types']:
+            if address_type == 'locality':
+                google_city = comp['short_name']
+            if address_type == 'country':
+                google_country = comp['short_name']
+            if address_type == 'postal_code':
+                google_zipcode = comp['short_name']
+            if address_type == 'administrative_area_level_1':
+                google_region = comp['short_name']
+            if address_type == 'route':
+                google_route = comp['short_name']
+
+    # print ('city --> ', google_city)
+    # print ('country -->', google_country)
+    # print ('zipcode -->', google_zipcode)
+    # print ('region --> ', google_region)
+    # print ('route --> ', google_route)
+
+    if not google_route:  # Check if has route
+        return get_response(400402)
+
+    try:  # Check Country
+        country = Country.objects.get(iso_code=google_country, active=True)
+    except Exception as error:
+        return get_response(400403)
+
+    try:  # Check Region
+        region = Region.objects.get(
+            google_short_name=google_region, active=True
         )
-    except:
-        response['data']['code'] = 400207
-        response['data']['message'] = 'Invalid address'
-        response['data']['key'] = 'INVALID_ADDRESS'
-        response['status'] = status.HTTP_400_BAD_REQUEST
-        return response
+    except Exception as error:
+        return get_response(400404)
 
-    if not zipcode.active:
-        response['data']['code'] = 400208
-        response['data']['message'] = 'Not active zipcde'
-        response['data']['key'] = 'INACTIVE_ZIPCODE'
-        response['status'] = status.HTTP_400_BAD_REQUEST
-        return response
-    if not zipcode.zipcode_city.active:
-        response['data']['code'] = 400209
-        response['data']['message'] = 'Not active city'
-        response['data']['key'] = 'INACTIVE_CITY'
-        response['status'] = status.HTTP_400_BAD_REQUEST
-        return response
+    if google_zipcode:  # Check Valid Zipcode
+        try:
+            zipcode = Zipcode.objects.get(
+                code=google_zipcode, active=True,
+                zipcode_city__google_short_name=google_city,
+                zipcode_city__active=True
+            )
+        except Exception as error:
+            return get_response(400405)
+    else:  # Check City
+        try:
+            city = City.objects.get(google_short_name=google_city, active=True)
+        except Exception as error:
+            return get_response(400406)
 
-    response['data']['code'] = 200204
-    response['data']['message'] = 'Address valid'
-    response['data']['key'] = 'ADDRESS_OK'
-    response['status'] = status.HTTP_200_OK
-    return response
+    return get_response(200206)
 
 
 class ValidateAddress(APIView):
@@ -76,6 +99,5 @@ class ValidateAddress(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
-        received = request.data
-        response = _check_address(received)
+        response = _check_address(request.data)
         return Response(response)

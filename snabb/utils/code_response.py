@@ -6,13 +6,21 @@ def get_response(code):
 
 
 responses = {
-    400306: {
+    200205: {
         'data': {
-            'code': 400306,
-            'message': 'Task address is required',
-            'key': 'TASK_ADDRESS_REQUIRED'
+            'code': 200205,
+            'message': 'Quote created',
+            'key': 'CREATED_QUOTE'
         },
-        'status': status.HTTP_400_BAD_REQUEST
+        'status': status.HTTP_200_OK
+    },
+    200206: {
+        'data': {
+            'code': 200206,
+            'message': 'Address valid',
+            'key': 'ADDRESS_OK'
+        },
+        'status': status.HTTP_200_OK
     },
     400300: {
         'data': {
@@ -46,7 +54,7 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
-    400303: {
+    400304: {
         'data': {
             'code': 400304,
             'message': 'Task phone is required',
@@ -94,20 +102,60 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
-    400210: {
+    400401: {
         'data': {
-            'code': 400210,
+            'code': 400401,
+            'message': 'Key address is required',
+            'key': 'KEY_ADDRESS_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400402: {
+        'data': {
+            'code': 400402,
+            'message': 'Route is required',
+            'key': 'ROUTE_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400403: {
+        'data': {
+            'code': 400403,
+            'message': 'Country not valid',
+            'key': 'INVALID_COUNTRY'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400404: {
+        'data': {
+            'code': 400404,
+            'message': 'Region not valid',
+            'key': 'INVALID_REGION'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400405: {
+        'data': {
+            'code': 400405,
+            'message': 'Zipcode not valid',
+            'key': 'INVALID_ZIPCODE'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400406: {
+        'data': {
+            'code': 400406,
+            'message': 'City not valid',
+            'key': 'INVALID_CITY'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400407: {
+        'data': {
+            'code': 400407,
             'message': 'Invalid Address',
             'key': 'INVALID_ADDRESS'
         },
         'status': status.HTTP_400_BAD_REQUEST
-    },
-    200205: {
-        'data': {
-            'code': 200205,
-            'message': 'Quote created',
-            'key': 'CREATED_QUOTE'
-        },
-        'status': status.HTTP_200_OK
-    },
+    }
 }
