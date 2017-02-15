@@ -2,11 +2,10 @@
   "tasks" : [
     {
       "type": "pickup",
-      "order": 1,
       "comments": "hay que enviarse urgentemente",
       "place":{
         "description" : "esto es un paquete super grande.",
-        "address": "Passtage del Doctor Serra 3, Valencia, Spain"
+        "address": "Santa Ana 22, Albaida, 46860, Spain"
       },
       "contact":{
         "first_name": "Jose Luís",
@@ -18,11 +17,10 @@
     },
     {
       "type": "dropoff",
-      "order": 2,
       "comments": "esto es un comentario de prueba",
       "place":{
         "description" : "esperando que llegue",
-        "address": "Santo Domingo 44, Alcoy, Alicante, España"
+        "address": "Avinguda de Almaig, Ontinyent, 46870, Spain"
       },
       "contact":{
         "first_name": "Mariano",

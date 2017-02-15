@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from snabb.google.utils import _check_google_address
+from snabb.google.utils import _check_api_address
+from snabb.utils.code_response import get_response
 
 
 class ValidateAddress(APIView):
@@ -14,5 +15,8 @@ class ValidateAddress(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
-        response = _check_google_address(request.data)
-        return Response(response)
+
+        if 'address' not in request.data.keys():  # Check keys
+            return Response(get_response(400401))
+
+        return Response(_check_api_address(str(request.data['address'])))

@@ -20,8 +20,10 @@ class QuoteSerializer(serializers.ModelSerializer):
         model = Quote
         fields = (
             'quote_id',
+            'distance', 'duration', 'expire_at', 'polyline',
             'quote_user',
             'tasks_info',
+            'prices',
             'created_at', 'updated_at'
         )
 
@@ -53,7 +55,10 @@ class TaskSerializer(serializers.ModelSerializer):
         fields = (
             'task_id',
             'place_info',
-            'contact_info'
+            'contact_info',
+            'order',
+            'comments',
+            'task_type'
         )
 
 

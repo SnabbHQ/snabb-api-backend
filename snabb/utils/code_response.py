@@ -102,6 +102,22 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
+    400310: {
+        'data': {
+            'code': 400310,
+            'message': 'Task order is required',
+            'key': 'TASK_ORDER_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400311: {
+        'data': {
+            'code': 400311,
+            'message': 'Invalid task type',
+            'key': 'TASK_TYPE_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
     400401: {
         'data': {
             'code': 400401,

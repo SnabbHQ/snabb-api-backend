@@ -34,7 +34,7 @@ class Address(models.Model):
         max_digits=11, decimal_places=8,
         blank=True, null=True
     )
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 

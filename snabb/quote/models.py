@@ -15,6 +15,13 @@ class Quote(models.Model):
         User, related_name='quote_user',
         null=True, blank=True
     )
+    distance = models.IntegerField(default=0, editable=False, blank=True)
+    expire_at = models.IntegerField(default=0, editable=False, blank=True)
+    duration = models.IntegerField(default=0, editable=False, blank=True)
+    polyline = models.CharField(
+        verbose_name='PolyLine', max_length=500, null=True, blank=True
+    )
+
     tasks = models.ManyToManyField('quote.Task')
     active = models.BooleanField(default=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -30,6 +37,22 @@ class Quote(models.Model):
         eta_small = 0
         eta_medium = 0
         eta_big = 0
+
+        data_prices = {
+            'small': {
+                'price': 150,
+                'eta': 15
+            },
+            'medium': {
+                'price': 300,
+                'eta': 30
+            },
+            'big': {
+                'price': 400,
+                'eta': 40
+            }
+        }
+
         try:
             for task in tasks:
                 price_small += Size.objects.filter(
@@ -46,28 +69,24 @@ class Quote(models.Model):
                 ).first().size_price
 
             data_prices = {
-                'size': {
-                    'small': {
-                        'price': float(price_small),
-                        'price_prio': float(price_small),
-                        'eta': int(eta_small)
-                    },
-                    'medium': {
-                        'price': float(price_medium),
-                        'price_prio': float(price_medium),
-                        'eta': int(eta_medium)
-                    },
-                    'big': {
-                        'price': float(price_big),
-                        'price_prio': float(price_big),
-                        'eta': int(eta_big)
-                    }
+                'small': {
+                    'price': float(price_small),
+                    'eta': int(eta_small)
+                },
+                'medium': {
+                    'price': float(price_medium),
+                    'eta': int(eta_medium)
+                },
+                'big': {
+                    'price': float(price_big),
+                    'eta': int(eta_big)
                 }
             }
             return data_prices
         except Exception as error:
             pass
-        return None
+            # print(error)
+        return data_prices
 
     def __str__(self):
         return str(self.quote_id)
@@ -130,7 +149,7 @@ class Task(models.Model):
 
         if not self.task_id:
             self.created_at = int(format(datetime.now(), u'U'))
-
+            self.expire_at = self.created_at + 600
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
