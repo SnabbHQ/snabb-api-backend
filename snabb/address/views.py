@@ -15,7 +15,7 @@ def _check_address(address):
     ''' Check if address is valid '''
 
     if 'address' not in address.keys():  # Check keys
-        return get_response(400211)
+        return get_response(400401)
 
     # Data to send
     api_key = 'AIzaSyBenCk9al8Bj5Gms0-G11Ug1jaKt0sf2mo'

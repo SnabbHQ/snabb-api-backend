@@ -131,7 +131,7 @@ class Country(models.Model):
     )
     iso_code = models.CharField(
         verbose_name=u'Iso Code',
-        max_length=2,
+        max_length=3,
         null=True, blank=True
     )
     country_currency = models.ForeignKey(
