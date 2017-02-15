@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from .utils import _check_google_address
+from snabb.google.utils import _check_google_address
 
 
 class ValidateAddress(APIView):

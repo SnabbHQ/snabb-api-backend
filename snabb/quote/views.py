@@ -15,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
 from snabb.utils.code_response import get_response
+from snabb.google.utils import _check_google_address
 
 
 class QuoteViewSet(viewsets.ModelViewSet):
@@ -37,7 +38,6 @@ class QuoteViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        return 0
 
         print ('create')
         received = request.data
