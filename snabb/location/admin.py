@@ -25,7 +25,12 @@ class CountryAdmin(admin.ModelAdmin):
     list_filter = ['active', ]
 
 
-admin.site.register(Zipcode)
+class ZipcodeAdmin(admin.ModelAdmin):
+    list_display = ['code', 'zipcode_city', 'active']
+    list_filter = ['active', ]
+
+
+admin.site.register(Zipcode, ZipcodeAdmin)
 admin.site.register(City, CityAdmin)
 admin.site.register(Region)
 admin.site.register(Country, CountryAdmin)

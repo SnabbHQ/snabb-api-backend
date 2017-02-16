@@ -31,10 +31,10 @@ class Contact(models.Model):
         max_length=300, null=False, blank=True
     )
     contact_user = models.ForeignKey(
-        User, related_name='Quote_User',
-        null=True, blank=True
+        User, related_name='Contact_User',
+        verbose_name=u'Created by', null=True, blank=True
     )
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 

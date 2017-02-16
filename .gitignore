@@ -87,4 +87,5 @@ snabb/size/migrations/*
 snabb/deliveries/migrations/*
 snabb/address/migrations/*
 snabb/contact/migrations/*
+snabb/google/migrations/*
 .cache/*
