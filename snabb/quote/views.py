@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
 from snabb.utils.code_response import get_response
-from snabb.google.utils import (
+from snabb.geo_utils.utils import (
     _check_api_address, _get_location_info
 )
 

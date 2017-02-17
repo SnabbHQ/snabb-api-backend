@@ -10,13 +10,14 @@ import json
 import urllib.request
 from snabb.utils.code_response import get_response
 from snabb.location.models import Zipcode, Region, City, Country
+from django.conf import settings
 
 
 def _get_data_to_api_address(address):
     ''' Get Data from API '''
     try:
         # Data to send
-        api_key = 'AIzaSyBenCk9al8Bj5Gms0-G11Ug1jaKt0sf2mo'
+        api_key = settings.MAPS_API_KEY
         address_google = urllib.parse.quote_plus(address)
 
         webURL = urllib.request.urlopen(
@@ -58,6 +59,8 @@ def _get_location_info(address):
                     info['region'] = comp['short_name']
                 if address_type == 'route':
                     info['route'] = comp['short_name']
+                if address_type == 'postal_town':
+                    info['city'] = comp['short_name']
         try:
             geometry = respJSON['results'][0]['geometry']
             info['latitude'] = geometry['location']['lat']
@@ -86,8 +89,6 @@ def _check_api_address(address):
     api_region = location_info['region']
     api_route = location_info['route']
 
-    # print (location_info)
-
     if not api_route:  # Check if has route
         return get_response(400402)
 
@@ -95,14 +96,15 @@ def _check_api_address(address):
         country = Country.objects.get(iso_code=api_country, active=True)
     except Exception as error:
         return get_response(400403)
-
-    try:  # Check Region
-        region = Region.objects.get(
-            google_short_name=api_region, active=True
-        )
-    except Exception as error:
-        return get_response(400404)
-
+    '''
+        # For now, we don't check region.
+        try:  # Check Region
+            region = Region.objects.get(
+                google_short_name=api_region, active=True
+            )
+        except Exception as error:
+            return get_response(400404)
+    '''
     if api_zipcode:  # Check Valid Zipcode
         try:
             zipcode = Zipcode.objects.get(

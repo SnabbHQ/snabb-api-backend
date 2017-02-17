@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from snabb.google.utils import _check_api_address
+from snabb.geo_utils.utils import _check_api_address
 from snabb.utils.code_response import get_response
 
 
