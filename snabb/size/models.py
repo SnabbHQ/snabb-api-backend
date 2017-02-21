@@ -26,7 +26,7 @@ class Size(models.Model):
     )
     size_price = models.DecimalField(
         verbose_name="Price/meter",
-        max_digits=50, decimal_places=2, default=0.00,
+        max_digits=50, decimal_places=3, default=0.000,
         blank=True
     )
     active = models.BooleanField(default=False)

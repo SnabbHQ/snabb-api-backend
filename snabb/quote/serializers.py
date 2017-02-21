@@ -2,12 +2,13 @@ from rest_framework import serializers
 from .models import Quote, Task, Place
 from snabb.address.serializers import AddressSerializer
 from snabb.contact.serializers import ContactSerializer
-
+from snabb.currency.serializers import CurrencySerializer
 
 class QuoteSerializer(serializers.ModelSerializer):
-    tasks_info = serializers.SerializerMethodField('tasks')
+    tasks = serializers.SerializerMethodField('tasks_info')
+    currency = serializers.SerializerMethodField('currency_info')
 
-    def tasks(self, obj):
+    def tasks_info(self, obj):
         if obj.tasks:
             items = obj.tasks
             serializer = TaskSerializer(
@@ -16,23 +17,38 @@ class QuoteSerializer(serializers.ModelSerializer):
         else:
             return None
 
+    def currency_info(self, obj):
+        if obj.tasks:
+            task = obj.tasks.all().order_by('order')[:1][0]
+            country = task.task_place.place_address.address_city.city_region.region_country
+            currency = country.country_currency
+
+            serializer = CurrencySerializer(
+                currency, many=False, read_only=True)
+            return serializer.data
+        else:
+            return None
+
+        return serializer.data
+
     class Meta:
         model = Quote
         fields = (
             'quote_id',
-            'distance', 'duration', 'expire_at', 'polyline',
+            'distance', 'expire_at',
             'quote_user',
-            'tasks_info',
+            'tasks',
             'prices',
+            'currency',
             'created_at', 'updated_at'
         )
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    place_info = serializers.SerializerMethodField('place')
-    contact_info = serializers.SerializerMethodField('contact')
+    place = serializers.SerializerMethodField('place_info')
+    contact = serializers.SerializerMethodField('contact_info')
 
-    def place(self, obj):
+    def place_info(self, obj):
         if obj.task_place:
             items = obj.task_place
             serializer = PlaceSerializer(
@@ -41,7 +57,7 @@ class TaskSerializer(serializers.ModelSerializer):
         else:
             return None
 
-    def contact(self, obj):
+    def contact_info(self, obj):
         if obj.task_contact:
             items = obj.task_contact
             serializer = ContactSerializer(
@@ -54,8 +70,8 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = (
             'task_id',
-            'place_info',
-            'contact_info',
+            'place',
+            'contact',
             'order',
             'comments',
             'task_type'
@@ -63,9 +79,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    address_info = serializers.SerializerMethodField('address')
+    address = serializers.SerializerMethodField('address_info')
 
-    def address(self, obj):
+    def address_info(self, obj):
         if obj.place_address:
             items = obj.place_address
             serializer = AddressSerializer(
@@ -79,5 +95,5 @@ class PlaceSerializer(serializers.ModelSerializer):
         fields = (
             'place_id',
             'description',
-            'address_info'
+            'address'
         )
