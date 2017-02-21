@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from .models import Zipcode, City, Region, Country
-from snabb.size.models import Size
+from snabb.size.models import Size, MinimumPrice
+
+
+class MinimumPriceInline(admin.TabularInline):
+    model = MinimumPrice
+    extra = 0
 
 
 class SizeInline(admin.TabularInline):
@@ -17,7 +22,7 @@ class ZipcodeInline(admin.TabularInline):
 class CityAdmin(admin.ModelAdmin):
     list_display = ['name', 'active']
     list_filter = ['active']
-    inlines = [SizeInline, ZipcodeInline]
+    inlines = [SizeInline, ZipcodeInline, MinimumPriceInline]
 
 
 class CountryAdmin(admin.ModelAdmin):
