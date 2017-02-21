@@ -94,10 +94,6 @@ class ProfileTests(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.data['data']['code'], 400403)
 
-        data = {'address': 'Calle San Lucas, Toledo, Spain'}
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400404)
-
         data = {'address': 'Avenida Albaida, Ontinyent, 46870, Spain'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.data['data']['code'], 400405)
