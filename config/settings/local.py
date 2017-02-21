@@ -73,3 +73,5 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 # ------------------------------------------------------------------------------
 CORS_ORIGIN_ALLOW_ALL = True
 FRONTEND_URL = env('FRONTEND_URL')
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')

@@ -45,3 +45,6 @@ django-filter==0.15
 
 # Sendgrid for email sending
 sendgrid-django==4.0.4
+
+# Geocode
+geopy==1.11.0

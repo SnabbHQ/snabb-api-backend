@@ -7,7 +7,6 @@ class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
         fields = (
-            'currency',
             'symbol',
             'iso_code'
         )

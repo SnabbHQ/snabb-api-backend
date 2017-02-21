@@ -34,7 +34,7 @@ class Contact(models.Model):
         User, related_name='Contact_User',
         verbose_name=u'Created by', null=True, blank=True
     )
-    active = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
