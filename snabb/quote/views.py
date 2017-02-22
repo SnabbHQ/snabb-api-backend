@@ -73,7 +73,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
         try:  # Check Task first_name
             print (len(received['tasks']))
         except Exception as error:
-            return Response(get_response(400300))
+            response = get_response(400300)
+            return Response(data=response['data'], status=response['status'])
 
         # --> create a quote
         new_quote = Quote()
@@ -95,31 +96,36 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 task_contact_first_name = task['contact']['first_name']
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400301))
+                response = get_response(400301)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Address last_name
                 task_contact_last_name = task['contact']['last_name']
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400302))
+                response = get_response(400302)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Address company_name
                 task_contact_company_name = task['contact']['company_name']
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400303))
+                response = get_response(400303)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Address phone
                 task_contact_phone = task['contact']['phone']
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400304))
+                response = get_response(400304)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Address email
                 task_contact_email = task['contact']['email']
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400305))
+                response = get_response(400305)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Address address
                 task_address_address = task['place']['address']
@@ -127,9 +133,9 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
                 if check_address['data']['code'] != 200206:
                     cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                    return Response(
-                        get_response(check_address['data']['code'])
-                    )
+                    response = get_response(check_address['data']['code'])
+                    return Response(data=response['data'], status=response['status'])
+
                 else:
                     location_info = _get_location_info(task_address_address)
                     api_city = location_info['city']
@@ -139,7 +145,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
                     if not api_latitude or not api_longitude:
                             cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                            return Response(get_response(400306))
+                            response = get_response(400306)
+                            return Response(data=response['data'], status=response['status'])
                     # api_country = location_info['country']
                     # api_region = location_info['region']
                     # api_route = location_info['route']
@@ -147,7 +154,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
             except Exception as error:
                 print(error)
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                return Response(get_response(400306))
+                response = get_response(400306)
+                return Response(data=response['data'], status=response['status'])
 
             try:  # Check Place Description
                 task_place_description = task['place']['description']
@@ -165,8 +173,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
             except Exception as error:
                 if task_type != 'pickup' and task_type != 'dropoff':
                     cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                    return Response(get_response(400311))
-
+                    response = get_response(400311)
+                    return Response(data=response['data'], status=response['status'])
             # Validate Zipcode/city
             if api_zipcode:
                 zipcode_task = api_zipcode
@@ -181,8 +189,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
             except Exception as error:
                 cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
                 print(error)
-                return Response(get_response(400407))
-
+                response = get_response(400407)
+                return Response(data=response['data'], status=response['status'])
             # Save Address
             new_task_address = Address()
             new_task_address.zipcode = zipcode_task
