@@ -16,7 +16,9 @@ class ValidateAddress(APIView):
 
     def post(self, request, format=None):
 
-        if 'address' not in request.data.keys():  # Check keys
-            return Response(get_response(400401))
+        if 'address' not in request.data.keys():
+            response = get_response(400401)
+            return Response(data=response['data'], status=response['status'])
 
-        return Response(_check_api_address(str(request.data['address'])))
+        response = _check_api_address(str(request.data['address']))
+        return Response(data=response['data'], status=response['status'])
