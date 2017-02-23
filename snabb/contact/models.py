@@ -28,7 +28,7 @@ class Contact(models.Model):
     )
     email = models.CharField(
         verbose_name=u'Email',
-        max_length=300, null=False, blank=True
+        max_length=300, null=True, blank=True
     )
     contact_user = models.ForeignKey(
         User, related_name='Contact_User',
