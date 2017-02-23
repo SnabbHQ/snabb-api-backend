@@ -6,7 +6,7 @@ from django.utils.dateformat import format
 from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
-
+from snabb.dispatching.utils import _get_eta
 
 class Quote(models.Model):
     quote_id = models.AutoField(
@@ -58,6 +58,10 @@ class Quote(models.Model):
         eta_medium = 0
         eta_big = 0
         data_prices = {}
+        # GET ETAs
+        origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
+        origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
+        pickup_etas = _get_eta(origin_lat, origin_lon)
 
         try:
             '''
