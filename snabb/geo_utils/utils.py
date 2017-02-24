@@ -31,6 +31,12 @@ def _check_api_address(address):
     return api_integration._check_api_address(address)
 
 
+def _get_real_eta(origin_lat, origin_lon, destination_lat, destination_lon, mode):
+    ''' Check if address is valid '''
+    return api_integration._get_real_eta(origin_lat, origin_lon,
+                                         destination_lat, destination_lon, mode)
+
+
 def _check_distance_between_points(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance between two points

@@ -62,7 +62,6 @@ class Quote(models.Model):
         origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
         origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
         pickup_etas = _get_eta(origin_lat, origin_lon)
-
         try:
             '''
             Get origin info: currency, prices, lat/lon
@@ -126,10 +125,10 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_small_meters
                     base_price = minimum_price_small_value
-                    extra_price = float(price_small)*extra_distance
+                    extra_price = price_small*extra_distance
                     price_small = base_price + extra_price
             else:
-                price_small = float(price_small)*distance
+                price_small = price_small*distance
 
             # Calculate price_medium:
             if minimum_price_medium_value:
@@ -139,10 +138,10 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_medium_meters
                     base_price = minimum_price_medium_value
-                    extra_price = float(price_medium)*extra_distance
+                    extra_price = price_medium*extra_distance
                     price_medium = base_price + extra_price
             else:
-                price_medium = float(price_medium)*distance
+                price_medium = price_medium*distance
 
             # Calculate price_big:
             if minimum_price_big_value:
@@ -152,24 +151,27 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_big_meters
                     base_price = minimum_price_big_value
-                    extra_price = float(price_big)*extra_distance
+                    extra_price = price_big*extra_distance
                     price_big = base_price + extra_price
             else:
-                price_big = float(price_big)*distance
+                price_big = price_big*distance
 
             # TO DO, get special price for city.
+            print()
+
+
             data_prices = {
                 'small': {
                     'price': price_small,
-                    'eta': int(eta_small)
+                    'eta': pickup_etas['small']
                 },
                 'medium': {
                     'price': price_medium,
-                    'eta': int(eta_medium)
+                    'eta': pickup_etas['medium']
                 },
                 'big': {
                     'price': price_big,
-                    'eta': int(eta_big)
+                    'eta': pickup_etas['big']
                 }
             }
             return data_prices

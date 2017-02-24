@@ -5,7 +5,7 @@
 '''
 from django.conf import settings
 from snabb.dispatching.onfleet import Onfleet
-from snabb.geo_utils.utils import _check_distance_between_points
+from snabb.geo_utils.utils import _get_real_eta
 
 
 def _get_eta(lat, lon):
@@ -17,41 +17,53 @@ def _get_eta(lat, lon):
     big_vehicles = ['CAR', 'TRUCK']
 
     for worker in workers['workers']:
-        print('----')
-        print (worker)
-        print('----')
         worker_vehicle = worker['vehicle']['type']
         worker_lon = worker['location'][0]
         worker_lat = worker['location'][1]
-        print(worker_lon)
-        print(worker_lat)
-        if worker_vehicle in small_vehicles:
-            distance = _check_distance_between_points(
+
+        small_eta = 0
+        medium_eta = 0
+        big_eta = 0
+        # Only workers onDuty without active task.
+        if worker['onDuty'] and worker['activeTask'] == None:
+            if worker_vehicle == 'BICYCLE':
+                mode = 'bicycling'
+            else:
+                mode = 'driving'
+
+            current_worker_eta = _get_real_eta(
+                    worker_lat,
+                    worker_lon,
                     lat,
                     lon,
-                    worker_lat,
-                    worker_lon
+                    mode
                     )
-    '''
-        https://maps.googleapis.com/maps/api/directions/json?origin=Juan%20Verdeguer,%2016,%20Valencia,%20España&destination=PAsaje%20Doctor%20Serra,%203,%2046004,%20Valencia&key=AIzaSyBenCk9al8Bj5Gms0-G11Ug1jaKt0sf2mo&mode=bicycling
-    '''
-    '''
-    _check_distance_between_points(
-        origin_latitude,
-        origin_longitude,
-        current_latitude,
-        current_longitude
-        )
+            if worker_vehicle in small_vehicles:
+                if small_eta == 0:
+                    # Only save if we don't have a better eta for this size.
+                    small_eta = current_worker_eta
+            if worker_vehicle in medium_vehicles:
+                if medium_eta == 0:
+                    # Only save if we don't have a better eta for this size.
+                    medium_eta = current_worker_eta
+            if worker_vehicle in big_vehicles:
+                if big_eta == 0:
+                    # Only save if we don't have a better eta for this size.
+                    big_eta = current_worker_eta
 
+            '''
+            if small_eta > 0 and medium_eta > 0 and big_eta > 0:
+                # If we have the three ETAs, we dont need any more info.
+                break
+            '''
+    '''
     Coche -> Todos
     Furgoneta -> Todos
     Moto -> Mediano - pequeño
     Bicicleta -> Mediano - pequeño
     A pie -> Pequeños (edited)
     '''
-    small_eta = 0
-    medium_eta = 0
-    big_eta = 0
+
     etas = {
         'small': small_eta,
         'medium': medium_eta,

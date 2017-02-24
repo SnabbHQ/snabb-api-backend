@@ -121,3 +121,22 @@ def _check_api_address(address):
             return get_response(400406)
 
     return get_response(200206)
+
+def _get_real_eta(origin_lat,origin_lon,destination_lat,destination_lon,mode):
+    ''' Get Data from API '''
+    try:
+        # Data to send
+        api_key = settings.MAPS_API_KEY
+        webURL = urllib.request.urlopen(
+            "https://maps.googleapis.com/maps/api/directions/json?origin=" +
+            str(origin_lat) + "," + str(origin_lon) + "&destination=" +  str(destination_lat) + "," + str(destination_lon) +
+            "&key=" + api_key + "&mode=" + mode
+        )
+        webURLdata = webURL.read()
+        encoding = webURL.info().get_content_charset('utf-8')
+        respJSON = json.loads(webURLdata.decode(encoding))
+        eta = respJSON['routes'][0]['legs'][0]['duration']['text']
+        return eta
+    except Exception as error:
+        print (error)
+    return None

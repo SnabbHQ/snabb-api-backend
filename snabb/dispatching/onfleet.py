@@ -17,14 +17,12 @@ class Onfleet(object):
         ''' Get Data from API '''
         try:
             # Data to send
-            print('TEST')
             url = "https://onfleet.com/api/v2/workers/location?longitude=" \
              + lon + "&latitude=" + lat + "&radius=6000"
             print(url)
             apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
             if apiCall.status_code == 200:
                 response = apiCall.json()
-                print(response)
                 return response
             else:
                 return None
