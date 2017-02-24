@@ -20,6 +20,7 @@ urlpatterns = i18n_patterns(
 # REST Framework
 urlpatterns += [
     url(r'^', include(router.urls)),
+    url(r'^api/', include(router.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/v1/o/', include('oauth2_provider.urls', namespace='oauth2_provider'))
