@@ -48,3 +48,6 @@ sendgrid-django==4.0.4
 
 # Geocode
 geopy==1.11.0
+
+# Requests
+requests==2.12.5

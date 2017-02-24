@@ -6,7 +6,9 @@ from django.utils.dateformat import format
 from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
+from snabb.dispatching.utils import _get_eta
 import decimal
+
 
 class Quote(models.Model):
     quote_id = models.AutoField(
@@ -58,7 +60,10 @@ class Quote(models.Model):
         eta_medium = 0
         eta_big = 0
         data_prices = {}
-
+        # GET ETAs
+        origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
+        origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
+        pickup_etas = _get_eta(origin_lat, origin_lon)
         try:
             '''
             Get origin info: currency, prices, lat/lon
@@ -154,15 +159,15 @@ class Quote(models.Model):
             data_prices = {
                 'small': {
                     'price': price_small.quantize(TWO_PLACES),
-                    'eta': int(eta_small)
+                    'eta': pickup_etas['small']
                 },
                 'medium': {
                     'price': price_medium.quantize(TWO_PLACES),
-                    'eta': int(eta_medium)
+                    'eta': pickup_etas['medium']
                 },
                 'big': {
                     'price': price_big.quantize(TWO_PLACES),
-                    'eta': int(eta_big)
+                    'eta': pickup_etas['big']
                 }
             }
             return data_prices

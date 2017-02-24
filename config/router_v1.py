@@ -36,4 +36,4 @@ router.add_api_view("address/validateAddress", url(r'^address/validateAddress',
                     ValidateAddress.as_view(), name='validateAddress'))
 
 # Quote Views
-router.register(r'quote/quote', QuoteViewSet, 'Quote')
+router.register(r'delivery/quote', QuoteViewSet, 'Quote')
