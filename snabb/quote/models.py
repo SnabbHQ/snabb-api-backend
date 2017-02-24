@@ -6,7 +6,7 @@ from django.utils.dateformat import format
 from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
-
+import decimal
 
 class Quote(models.Model):
     quote_id = models.AutoField(
@@ -117,54 +117,51 @@ class Quote(models.Model):
             # Calculate price_small:
             if minimum_price_small_value:
                 if distance < minimum_price_small_meters:
-                    # Minimum Price.
                     price_small = minimum_price_small_value
                 else:
                     extra_distance = distance - minimum_price_small_meters
                     base_price = minimum_price_small_value
-                    extra_price = float(price_small)*extra_distance
+                    extra_price = price_small*extra_distance
                     price_small = base_price + extra_price
             else:
-                price_small = float(price_small)*distance
+                price_small = price_small*distance
 
             # Calculate price_medium:
             if minimum_price_medium_value:
                 if distance < minimum_price_medium_meters:
-                    # Minimum Price.
                     price_medium = minimum_price_medium_value
                 else:
                     extra_distance = distance - minimum_price_medium_meters
                     base_price = minimum_price_medium_value
-                    extra_price = float(price_medium)*extra_distance
+                    extra_price = price_medium*extra_distance
                     price_medium = base_price + extra_price
             else:
-                price_medium = float(price_medium)*distance
+                price_medium = price_medium*distance
 
             # Calculate price_big:
             if minimum_price_big_value:
                 if distance < minimum_price_big_meters:
-                    # Minimum Price.
                     price_big = minimum_price_big_value
                 else:
                     extra_distance = distance - minimum_price_big_meters
                     base_price = minimum_price_big_value
-                    extra_price = float(price_big)*extra_distance
+                    extra_price = price_big*extra_distance
                     price_big = base_price + extra_price
             else:
-                price_big = float(price_big)*distance
+                price_big = price_big*distance
 
-            # TO DO, get special price for city.
+            TWO_PLACES = decimal.Decimal("0.01")
             data_prices = {
                 'small': {
-                    'price': price_small,
+                    'price': price_small.quantize(TWO_PLACES),
                     'eta': int(eta_small)
                 },
                 'medium': {
-                    'price': price_medium,
+                    'price': price_medium.quantize(TWO_PLACES),
                     'eta': int(eta_medium)
                 },
                 'big': {
-                    'price': price_big,
+                    'price': price_big.quantize(TWO_PLACES),
                     'eta': int(eta_big)
                 }
             }
