@@ -16,21 +16,22 @@ def _get_eta(lat, lon):
     medium_vehicles = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
     big_vehicles = ['CAR', 'TRUCK']
 
+    small_eta = 0
+    medium_eta = 0
+    big_eta = 0
+
     for worker in workers['workers']:
         worker_vehicle = worker['vehicle']['type']
         worker_lon = worker['location'][0]
         worker_lat = worker['location'][1]
 
-        small_eta = 0
-        medium_eta = 0
-        big_eta = 0
+
         # Only workers onDuty without active task.
         if worker['onDuty'] and worker['activeTask'] == None:
             if worker_vehicle == 'BICYCLE':
                 mode = 'bicycling'
             else:
                 mode = 'driving'
-
             current_worker_eta = _get_real_eta(
                     worker_lat,
                     worker_lon,
