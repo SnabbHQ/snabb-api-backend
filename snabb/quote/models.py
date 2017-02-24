@@ -7,6 +7,8 @@ from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
 from snabb.dispatching.utils import _get_eta
+import decimal
+
 
 class Quote(models.Model):
     quote_id = models.AutoField(
@@ -120,7 +122,6 @@ class Quote(models.Model):
             # Calculate price_small:
             if minimum_price_small_value:
                 if distance < minimum_price_small_meters:
-                    # Minimum Price.
                     price_small = minimum_price_small_value
                 else:
                     extra_distance = distance - minimum_price_small_meters
@@ -133,7 +134,6 @@ class Quote(models.Model):
             # Calculate price_medium:
             if minimum_price_medium_value:
                 if distance < minimum_price_medium_meters:
-                    # Minimum Price.
                     price_medium = minimum_price_medium_value
                 else:
                     extra_distance = distance - minimum_price_medium_meters
@@ -146,7 +146,6 @@ class Quote(models.Model):
             # Calculate price_big:
             if minimum_price_big_value:
                 if distance < minimum_price_big_meters:
-                    # Minimum Price.
                     price_big = minimum_price_big_value
                 else:
                     extra_distance = distance - minimum_price_big_meters
@@ -156,21 +155,18 @@ class Quote(models.Model):
             else:
                 price_big = price_big*distance
 
-            # TO DO, get special price for city.
-            print()
-
-
+            TWO_PLACES = decimal.Decimal("0.01")
             data_prices = {
                 'small': {
-                    'price': price_small,
+                    'price': price_small.quantize(TWO_PLACES),
                     'eta': pickup_etas['small']
                 },
                 'medium': {
-                    'price': price_medium,
+                    'price': price_medium.quantize(TWO_PLACES),
                     'eta': pickup_etas['medium']
                 },
                 'big': {
-                    'price': price_big,
+                    'price': price_big.quantize(TWO_PLACES),
                     'eta': pickup_etas['big']
                 }
             }

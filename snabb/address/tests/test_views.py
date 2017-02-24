@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 from snabb.location.models import Zipcode, City, Region, Country
 
@@ -72,32 +73,40 @@ class ProfileTests(APITestCase):
         # Test cases
         data = {'address': 'Santa Ana 22, Albaida, 46860, Spain'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 200206)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['code'], 200206)
 
         data = {'address': 'Calle 66 Este, Panama, Panama'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 200206)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['code'], 200206)
 
         data = {}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400401)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400401)
 
         data = {'address': 'Calle Washington 99, Albaida, Spain'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400407)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400407)
 
         data = {'address': 'Albaida, Spain'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400402)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400402)
 
         data = {'address': 'Via Schubert, Roma, Italy'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400403)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400403)
 
         data = {'address': 'Avenida Albaida, Ontinyent, 46870, Spain'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400405)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400405)
 
         data = {'address': 'Calle los abanicos, David, Panama'}
         response = self.client.post(url, data, format='json')
-        self.assertEqual(response.data['data']['code'], 400406)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400406)
