@@ -16,18 +16,17 @@ def _get_eta(lat, lon):
     medium_vehicles = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
     big_vehicles = ['CAR', 'TRUCK']
 
-    small_eta = 0
-    medium_eta = 0
-    big_eta = 0
+    small_eta = "0"
+    medium_eta = "0"
+    big_eta = "0"
 
     for worker in workers['workers']:
         worker_vehicle = worker['vehicle']['type']
         worker_lon = worker['location'][0]
         worker_lat = worker['location'][1]
 
-
         # Only workers onDuty without active task.
-        if worker['onDuty'] and worker['activeTask'] == None:
+        if worker['onDuty'] and worker['activeTask'] is None:
             if worker_vehicle == 'BICYCLE':
                 mode = 'bicycling'
             else:
@@ -40,23 +39,22 @@ def _get_eta(lat, lon):
                     mode
                     )
             if worker_vehicle in small_vehicles:
-                if small_eta == 0:
+                if small_eta == "0":
                     # Only save if we don't have a better eta for this size.
                     small_eta = current_worker_eta
             if worker_vehicle in medium_vehicles:
-                if medium_eta == 0:
+                if medium_eta == "0":
                     # Only save if we don't have a better eta for this size.
                     medium_eta = current_worker_eta
             if worker_vehicle in big_vehicles:
-                if big_eta == 0:
+                if big_eta == "0":
                     # Only save if we don't have a better eta for this size.
                     big_eta = current_worker_eta
 
-            '''
-            if small_eta > 0 and medium_eta > 0 and big_eta > 0:
+            if small_eta != "0" and medium_eta != "0" and big_eta != "0":
                 # If we have the three ETAs, we dont need any more info.
                 break
-            '''
+
     '''
     Coche -> Todos
     Furgoneta -> Todos
