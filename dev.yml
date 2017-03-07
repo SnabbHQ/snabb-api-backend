@@ -30,8 +30,6 @@ services:
     links:
       - postgres
 
-
-
   pycharm:
     build:
       context: .
