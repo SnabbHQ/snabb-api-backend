@@ -27,9 +27,7 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='t(@jacwfx(k3nfdv9&v^dlz*v#51+p5mb
 
 # Mail settings
 # ------------------------------------------------------------------------------
-
 EMAIL_PORT = 1025
-
 EMAIL_HOST = 'localhost'
 EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND')
 SENDGRID_API_KEY = env('SENDGRID_API_KEY')
