@@ -152,23 +152,23 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # CACHING
 # ------------------------------------------------------------------------------
-REDIS_LOCATION = "redis://{}:{}/0".format(
-    env('REDIS_ENDPOINT_ADDRESS'),
-    env('REDIS_PORT')
-)
+# REDIS_LOCATION = "redis://{}:{}/0".format(
+#     env('REDIS_ENDPOINT_ADDRESS'),
+#     env('REDIS_PORT')
+# )
 
 # Heroku URL does not pass the DB number, so we parse it in
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_LOCATION,
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
-                                        # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-        }
-    }
-}
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': REDIS_LOCATION,
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#             'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
+#                                         # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
+#         }
+#     }
+# }
 
 
 # Sentry Configuration
