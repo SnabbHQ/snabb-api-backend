@@ -89,3 +89,4 @@ snabb/address/migrations/*
 snabb/contact/migrations/*
 snabb/google/migrations/*
 .cache/*
+dhparams.pem

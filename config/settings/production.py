@@ -3,8 +3,7 @@
 Production Configurations
 
 - Use Amazon's S3 for storing static files and uploaded media
-- Use mailgun to send emails
-- Use Redis for cache
+- Use SenGrid to send emails
 
 - Use sentry for error logging
 
@@ -235,3 +234,8 @@ ADMIN_URL = env('DJANGO_ADMIN_URL')
 
 # Your production stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+CORS_ORIGIN_ALLOW_ALL = True
+FRONTEND_URL = env('FRONTEND_URL')
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
+ONFLEET_API_KEY = env('ONFLEET_API_KEY')
