@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class UsersConfig(AppConfig):
+class CouriersConfig(AppConfig):
     name = 'snabb.couriers'
     verbose_name = "Couriers"
 

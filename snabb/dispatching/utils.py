@@ -69,3 +69,47 @@ def _get_eta(lat, lon):
         'big': big_eta
     }
     return etas
+
+
+# Team related functions
+def _create_team(team_name):
+    on = Onfleet()
+    new_team = on._create_team(team_name)
+    return new_team
+
+
+def _update_team(team_name, team_id):
+    on = Onfleet()
+    updated_team = on._update_team(team_name, team_id)
+    return updated_team
+
+
+def _delete_team(team_id):
+    on = Onfleet()
+    deleted_team = on._delete_team(team_id)
+    return deleted_team
+
+
+def _get_team_detail(team_id):
+    on = Onfleet()
+    detail_team = on._get_team_detail(team_id)
+    return detail_team
+
+
+# Courier related functions
+def _create_worker(name, phone, teams):
+    on = Onfleet()
+    new_courier = on._create_worker(name, phone, teams)
+    return new_courier
+
+
+def _get_worker_detail(worker_id):
+    on = Onfleet()
+    detail_courier = on._get_worker_detail(worker_id)
+    return detail_courier
+
+
+def _update_worker(worker_id, name=None, teams=None):
+    on = Onfleet()
+    updated_courier = on._update_worker(worker_id, name, teams)
+    return updated_courier
