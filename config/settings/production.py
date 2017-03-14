@@ -59,7 +59,8 @@ X_FRAME_OPTIONS = 'DENY'
 # ------------------------------------------------------------------------------
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['snabb.io'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['*.snabb.io'])
+
 # END SITE CONFIGURATION
 
 INSTALLED_APPS += ('gunicorn', )
@@ -76,8 +77,9 @@ INSTALLED_APPS += (
 
 AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
+AWS_LOCATION = env('DJANGO_AWS_LOCATION')
 AWS_STORAGE_BUCKET_NAME = env('DJANGO_AWS_STORAGE_BUCKET_NAME')
-AWS_AUTO_CREATE_BUCKET = True
+AWS_AUTO_CREATE_BUCKET = False # Disable for now at it seems doesn't want to create it in the right location...
 AWS_QUERYSTRING_AUTH = False
 AWS_S3_CALLING_FORMAT = OrdinaryCallingFormat()
 
@@ -137,39 +139,17 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
-# Uses Amazon RDS for database hosting, which doesn't follow the Heroku-style spec
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': env('RDS_DB_NAME'),
-#         'USER': env('RDS_USERNAME'),
-#         'PASSWORD': env('RDS_PASSWORD'),
-#         'HOST': env('RDS_HOSTNAME'),
-#         'PORT': env('RDS_PORT'),
-#     }
-# }
-
-
-# CACHING
-# ------------------------------------------------------------------------------
-# REDIS_LOCATION = "redis://{}:{}/0".format(
-#     env('REDIS_ENDPOINT_ADDRESS'),
-#     env('REDIS_PORT')
-# )
-
-# Heroku URL does not pass the DB number, so we parse it in
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': REDIS_LOCATION,
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#             'IGNORE_EXCEPTIONS': True,  # mimics memcache behavior.
-#                                         # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
-#         }
-#     }
-# }
-
+# Uses Amazon RDS for database hosting
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env('RDS_DB_NAME'),
+        'USER': env('RDS_USERNAME'),
+        'PASSWORD': env('RDS_PASSWORD'),
+        'HOST': env('RDS_HOSTNAME'),
+        'PORT': env('RDS_PORT'),
+    }
+}
 
 # Sentry Configuration
 SENTRY_DSN = env('DJANGO_SENTRY_DSN')

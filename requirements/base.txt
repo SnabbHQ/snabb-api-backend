@@ -33,10 +33,6 @@ django-autoslug==1.9.3
 # Time zones support
 pytz==2016.10
 
-# Redis support
-django-redis==4.7.0
-redis>=2.10.5
-
 # Rest Framework
 djangorestframework==3.4.7
 django-cors-headers==2.0.1
