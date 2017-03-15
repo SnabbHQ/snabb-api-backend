@@ -10,6 +10,6 @@ gunicorn==19.6.0
 
 # Raven is the Sentry client
 # --------------------------
-raven==5.27.0
+raven==5.31.0
 
 

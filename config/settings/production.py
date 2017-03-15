@@ -2,11 +2,8 @@
 """
 Production Configurations
 
-- Use Amazon's S3 for storing static files and uploaded media
 - Use SenGrid to send emails
-
 - Use sentry for error logging
-
 
 """
 from __future__ import absolute_import, unicode_literals
@@ -22,10 +19,6 @@ from .common import *  # noqa
 # Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
-
-# This ensures that Django will be able to detect a secure connection
-# properly on Heroku.
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # raven sentry client
 # See https://docs.getsentry.com/hosted/clients/python/integrations/django/
 INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
@@ -45,7 +38,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     'DJANGO_SECURE_CONTENT_TYPE_NOSNIFF', default=True)
 SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
 CSRF_COOKIE_SECURE = True
@@ -56,14 +49,13 @@ X_FRAME_OPTIONS = 'DENY'
 # ------------------------------------------------------------------------------
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
-# TODO - For some reason 127.0.0.1 does not work when included in allow host to test prod locally. Change when done
 # ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['.snabb.io'])
+# ALLOWED_HOSTS = ['*']
 DEBUG = env.bool('DJANGO_DEBUG', default=True)
 
 # END SITE CONFIGURATION
 
 INSTALLED_APPS += ('gunicorn', )
-
 
 # EMAIL
 # ------------------------------------------------------------------------------
