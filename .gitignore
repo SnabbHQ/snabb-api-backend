@@ -88,4 +88,7 @@ snabb/deliveries/migrations/*
 snabb/address/migrations/*
 snabb/contact/migrations/*
 snabb/google/migrations/*
+snabb/couriers/migrations/*
+snabb/billing/migrations/*
+snabb/app_info/migrations/*
 .cache/*
