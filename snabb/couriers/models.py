@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
-from django.db import models
-from django.contrib.auth.models import User
 from datetime import datetime
+from django.db import models
 from django.utils.dateformat import format
 from django.db.models.signals import pre_delete, post_save, m2m_changed
-import uuid
 from snabb.dispatching.utils import (
     _create_team,
     _update_team,
@@ -14,10 +11,12 @@ from snabb.dispatching.utils import (
     _create_worker,
     _get_worker_detail,
     _update_worker
-    )
+)
 
 
 class Team(models.Model):
+    """Model Team."""
+
     team_id = models.AutoField(
         primary_key=True, blank=True, editable=False)
     team_onfleet_id = models.CharField(
@@ -35,14 +34,14 @@ class Team(models.Model):
         verbose_name = u'Team'
         verbose_name_plural = u'Teams'
 
+    @property
     def team_detail(self):
-        "Returns team info from dispatching platform."
+        """Returns team info from dispatching platform."""
         team_details = _get_team_detail(self.team_onfleet_id)
         return team_details
 
-    team_detail = property(team_detail)
-
     def save(self, *args, **kwargs):
+        """Method called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.team_id:
@@ -60,6 +59,7 @@ class Team(models.Model):
 
 
 class Courier(models.Model):
+    """Model Courier."""
     courier_id = models.AutoField(
         primary_key=True, blank=True, editable=False)
     courier_onfleet_id = models.CharField(
@@ -71,7 +71,10 @@ class Courier(models.Model):
         max_length=15, null=False, blank=False
     )
     teams = models.ManyToManyField(
-        Team, related_name='teams', null=False, blank=False)
+        Team, related_name='teams', blank=False)
+    fee = models.DecimalField(
+        null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
+    )
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
@@ -82,14 +85,14 @@ class Courier(models.Model):
         verbose_name = u'Courier'
         verbose_name_plural = u'Couriers'
 
+    @property
     def courier_details(self):
-        "Returns Courier info from dispatching platform."
+        """Returns Courier info from dispatching platform."""
         courier_details = _get_worker_detail(self.courier_onfleet_id)
         return courier_details
 
-    courier_details = property(courier_details)
-
     def save(self, *args, **kwargs):
+        """Method called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.courier_id:
@@ -98,12 +101,13 @@ class Courier(models.Model):
             orig = Courier.objects.get(pk=self.pk)
             if (self.name != orig.name):
                 _update_worker(
-                    worker_id=instance.courier_id, name=self.name, teams=None)
-
+                    worker_id=instance.courier_id, name=self.name, teams=None
+                )
         super(Courier, self).save(*args, **kwargs)
 
 
 def create_worker(sender, instance, created, **kwargs):
+    """Set Worker created at True."""
     if created:
         instance.created = True
 
@@ -112,6 +116,7 @@ post_save.connect(
 
 
 def teams_changed(sender, instance, **kwargs):
+    """Sync teams changed."""
     if hasattr(instance, 'created'):
         # Create Onfleet courier only when we alve almost 1 team selected.
         if len(instance.teams.all()) > 0:
@@ -132,6 +137,7 @@ m2m_changed.connect(teams_changed, sender=Courier.teams.through)
 
 
 def delete_team(sender, instance, **kwargs):
+    """Delete Team."""
     try:
         _delete_team(instance.team_onfleet_id)
     except:

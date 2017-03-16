@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
+"""App Delivery."""
 from __future__ import unicode_literals
-
-import hashlib
-import time
 from django.db import models
 
 
 class Delivery(models.Model):
+    """Model Delivery."""
+
     statusChoices = (
         ('new', 'new'),
         ('processing', 'processing'),
