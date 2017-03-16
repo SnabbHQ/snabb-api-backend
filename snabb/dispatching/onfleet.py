@@ -189,3 +189,17 @@ class Onfleet(object):
         except Exception as error:
             print (error)
         return None
+
+    def _delete_worker(self, worker_id, *args, **kwargs):
+        ''' Delete a worker from onfleet '''
+        try:
+            # Data to send
+            url = self.api_root + "workers/" + str(worker_id)
+            apiCall = requests.delete(url, auth=HTTPBasicAuth(self.api_key, ''))
+            if apiCall.status_code == 200:
+                return apiCall.status_code
+            else:
+                return None
+        except Exception as error:
+            print (error)
+        return None

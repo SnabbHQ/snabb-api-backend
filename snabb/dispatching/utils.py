@@ -55,14 +55,6 @@ def _get_eta(lat, lon):
                 # If we have the three ETAs, we dont need any more info.
                 break
 
-    '''
-    Coche -> Todos
-    Furgoneta -> Todos
-    Moto -> Mediano - pequeño
-    Bicicleta -> Mediano - pequeño
-    A pie -> Pequeños (edited)
-    '''
-
     etas = {
         'small': small_eta,
         'medium': medium_eta,
@@ -113,3 +105,9 @@ def _update_worker(worker_id, name=None, teams=None):
     on = Onfleet()
     updated_courier = on._update_worker(worker_id, name, teams)
     return updated_courier
+
+
+def _delete_worker(worker_id, name=None, teams=None):
+    on = Onfleet()
+    deleted_courier = on._delete_worker(worker_id, name, teams)
+    return deleted_courier
