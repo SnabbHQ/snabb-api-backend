@@ -201,8 +201,9 @@ class OrderCourier(models.Model):
             self.order_reference = 'SNABB-2017-C-'+str(orders_count+1)
             # Falta definir Formato --> 0001
 
-            if self.courier:  # Rellenar datos
+            if self.courier:
                 pass
+
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
