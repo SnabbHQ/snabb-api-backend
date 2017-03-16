@@ -30,14 +30,6 @@ class Delivery(models.Model):
     price = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
-    # This would be a foreignKey to order, for now, charfield for dev,
-    order_reference_id = models.CharField(
-        verbose_name="Order reference",
-        max_length=300,
-        null=False,
-        blank=True,
-        default=''
-    )
     delivery_quote = models.ForeignKey(
         'quote.Quote', related_name='delivery_quote',
         null=True, blank=True

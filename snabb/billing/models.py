@@ -1,6 +1,8 @@
 """Models Order, for User and Courier."""
 from datetime import datetime
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.dateformat import format
 from snabb.couriers.models import Courier
 from snabb.users.models import User
@@ -24,6 +26,18 @@ class OrderUser(models.Model):
     nif = models.CharField(
         verbose_name=u'NIF',
         max_length=15, null=True, blank=True
+    )
+    name = models.CharField(
+        verbose_name=u'Name',
+        max_length=100, null=True, blank=True
+    )
+    company = models.CharField(
+        verbose_name=u'Company',
+        max_length=100, null=True, blank=True
+    )
+    phone = models.CharField(
+        verbose_name=u'Phone',
+        max_length=100, null=True, blank=True
     )
     address = models.CharField(
         verbose_name=u'Address',
@@ -152,6 +166,18 @@ class OrderCourier(models.Model):
         verbose_name=u'NIF',
         max_length=15, null=True, blank=True
     )
+    name = models.CharField(
+        verbose_name=u'Name',
+        max_length=100, null=True, blank=True
+    )
+    company = models.CharField(
+        verbose_name=u'Company',
+        max_length=100, null=True, blank=True
+    )
+    phone = models.CharField(
+        verbose_name=u'Phone',
+        max_length=100, null=True, blank=True
+    )
     address = models.CharField(
         verbose_name=u'Address',
         max_length=100, null=True, blank=True
@@ -203,7 +229,21 @@ class OrderCourier(models.Model):
             # Falta definir Formato --> 0001
 
             if self.courier:
-                pass
+                self.name = self.courier.name
+                self.phone = self.courier.phone
+                self.fee = self.courier.fee
+                # Campos por rellenar:
+                # self.nif = ''
+                # self.company = ''
+                # self.address = ''
+                # self.region = ''
+                # self.zipcode = ''
+                # self.country = ''
+                # self.city = ''
+                # self.tax = 0
+                self.total = 0
+
+                # Definir Lineas de pedido
 
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
@@ -261,3 +301,24 @@ class LineOrderCourier(models.Model):
             self.updated_at = int(format(datetime.now(), u'U'))
 
         super(LineOrderCourier, self).save(*args, **kwargs)
+
+
+@receiver(post_save, sender=OrderCourier)
+def create_lines_order_courier(sender, instance, **kwargs):
+    """Create lines for Order Courier when is created."""
+    order = instance
+    # Execute only when order is created
+    if order.created_at == order.updated_at:
+        line = LineOrderCourier()
+        line.order_courier = order
+        # Falta definir los campos
+        # line.price = 0
+        # line.discount = 0
+        # line.total = (line.price * line.quantity) - line.discount
+        # line.task = ''
+        # line.description = ''
+        # line.quantity = 1
+        line.save()
+        print ('line courier order saved')
+
+    print (sender)
