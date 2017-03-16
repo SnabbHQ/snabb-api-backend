@@ -124,6 +124,22 @@ class Onfleet(object):
             print (error)
         return None
 
+    def _get_all_teams(self, *args, **kwargs):
+        ''' Get all Teams from API '''
+        try:
+            # Data to send
+            url = self.api_root + "teams"
+            apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
+            if apiCall.status_code == 200:
+                response = apiCall.json()
+                return response
+            else:
+                return None
+
+        except Exception as error:
+            print (error)
+        return None
+
     def _create_worker(self, name, phone, teams, *args, **kwargs):
         ''' Create a worker in onfleet '''
         '''
@@ -200,6 +216,22 @@ class Onfleet(object):
                 return apiCall.status_code
             else:
                 return None
+        except Exception as error:
+            print (error)
+        return None
+
+    def _get_all_workers(self, *args, **kwargs):
+        ''' Get all Workers from API '''
+        try:
+            # Data to send
+            url = self.api_root + "workers"
+            apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
+            if apiCall.status_code == 200:
+                response = apiCall.json()
+                return response
+            else:
+                return None
+
         except Exception as error:
             print (error)
         return None
