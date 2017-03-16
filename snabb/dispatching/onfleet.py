@@ -70,7 +70,6 @@ class Onfleet(object):
             )
             if apiCall.status_code == 200:
                 response = apiCall.json()
-                return response
             else:
                 return None
         except Exception as error:

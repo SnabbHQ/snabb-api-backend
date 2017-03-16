@@ -70,9 +70,13 @@ class OrderUser(models.Model):
 
         if not self.order_id:
             self.created_at = int(format(datetime.now(), u'U'))
+            # Num Factura
+            prefix = 'SNABB'
+            serie = 'U'
+            year = str(datetime.now().year)
             orders_count = OrderUser.objects.all().count()
-            self.order_reference = 'SNABB-2017-U-'+str(orders_count+1)
-            # Falta definir Formato --> 0001
+            num = str(orders_count+1)
+            self.order_reference = prefix+'-'+year+'-'+serie+'-'+num
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
@@ -196,6 +200,9 @@ class OrderCourier(models.Model):
             orders_count = OrderCourier.objects.all().count()
             self.order_reference = 'SNABB-2017-C-'+str(orders_count+1)
             # Falta definir Formato --> 0001
+
+            if self.courier:  # Rellenar datos
+                pass
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 

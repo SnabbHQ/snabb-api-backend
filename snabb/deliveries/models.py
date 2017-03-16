@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 from datetime import datetime
 from django.db import models
+from snabb.billing.models import OrderCourier
 
 
 class Delivery(models.Model):
@@ -65,5 +66,13 @@ class Delivery(models.Model):
 
         if not self.delivery_id:
             self.created_at = int(format(datetime.now(), u'U'))
+        else:
+            # Generate Order when Status Change to completed
+            if self.status == 'completed':
+                delivery = Delivery.objects.get(pk=self.delivery_id)
+                if delivery.status != 'completed':
+                    order = OrderCourier()
+                    order.courier = self.courier
+                    order.save()
 
         super(Delivery, self).save(*args, **kwargs)
