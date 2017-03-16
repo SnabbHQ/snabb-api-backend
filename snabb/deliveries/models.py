@@ -1,5 +1,6 @@
 """App Delivery."""
 from __future__ import unicode_literals
+from datetime import datetime
 from django.db import models
 
 
@@ -25,7 +26,7 @@ class Delivery(models.Model):
         null=True, blank=True
     )
     price = models.DecimalField(
-        null=False, blank=False, decimal_places=2, default=0.00
+        null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
     # This would be a foreignKey to order, for now, charfield for dev,
     order_reference_id = models.CharField(
@@ -49,3 +50,20 @@ class Delivery(models.Model):
     )
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
+
+    def __str__(self):
+        return u'%s' % (self.delivery_id)
+
+    class Meta:
+        verbose_name = u'Delivery'
+        verbose_name_plural = u'Deliveries'
+
+
+    def save(self, *args, **kwargs):
+        """Method called on Save Model."""
+        self.updated_at = int(format(datetime.now(), u'U'))
+
+        if not self.delivery_id:
+            self.created_at = int(format(datetime.now(), u'U'))
+
+        super(Delivery, self).save(*args, **kwargs)
