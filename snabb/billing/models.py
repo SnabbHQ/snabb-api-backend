@@ -58,7 +58,7 @@ class OrderUser(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.order_id + ' - ' + self.order_reference)
+        return str(self.order_id)
 
     class Meta:
         verbose_name = u'Order User',
@@ -185,7 +185,8 @@ class OrderCourier(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.order_id + ' - ' + self.order_reference)
+        # return str(self.order_id + ' - ' + self.order_reference)
+        return str(self.order_id)
 
     class Meta:
         verbose_name = u'Order Courier',

@@ -1,6 +1,7 @@
 """App Delivery."""
 from __future__ import unicode_literals
 from datetime import datetime
+from django.utils.dateformat import format
 from django.db import models
 from snabb.billing.models import OrderCourier
 
@@ -74,5 +75,6 @@ class Delivery(models.Model):
                     order = OrderCourier()
                     order.courier = self.courier
                     order.save()
+                    print ('NEW ORDER')
 
         super(Delivery, self).save(*args, **kwargs)
