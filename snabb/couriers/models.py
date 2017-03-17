@@ -49,8 +49,9 @@ class Team(models.Model):
         if not self.team_id:
             self.created_at = int(format(datetime.now(), u'U'))
             # We generate an Onfleet Team linked to this Team.
-            new_team = _create_team(self.name)
-            self.team_onfleet_id = new_team['id']
+            if not self.team_onfleet_id:
+                new_team = _create_team(self.name)
+                self.team_onfleet_id = new_team['id']
 
         else:
             orig = Team.objects.get(pk=self.pk)
@@ -113,7 +114,7 @@ post_save.connect(
 
 
 def teams_changed(sender, instance, **kwargs):
-    if hasattr(instance, 'created'):
+    if hasattr(instance, 'created') and not instance.courier_onfleet_id:
         # Create Onfleet courier only when we alve almost 1 team selected.
         if instance.teams.all().count() > 0:
             courier_teams = []
