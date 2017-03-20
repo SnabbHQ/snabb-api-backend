@@ -15,7 +15,7 @@ from snabb.dispatching.utils import (
     _get_worker_detail,
     _update_worker,
     _delete_worker
-    )
+)
 
 
 class Team(models.Model):
@@ -100,7 +100,7 @@ class Courier(models.Model):
             orig = Courier.objects.get(pk=self.pk)
             if (self.name != orig.name):
                 _update_worker(
-                    worker_id=instance.courier_id, name=self.name, teams=None)
+                    worker_id=self.courier_id, name=self.name, teams=None)
 
         super(Courier, self).save(*args, **kwargs)
 
@@ -108,6 +108,7 @@ class Courier(models.Model):
 def create_worker(sender, instance, created, **kwargs):
     if created:
         instance.created = True
+
 
 post_save.connect(
     create_worker, sender=Courier, dispatch_uid="create_worker")
@@ -120,7 +121,8 @@ def teams_changed(sender, instance, **kwargs):
             courier_teams = []
             for team in instance.teams.all():
                 courier_teams.append(team.team_onfleet_id)
-            new_worker = _create_worker(instance.name, instance.phone, courier_teams)
+            new_worker = _create_worker(
+                instance.name, instance.phone, courier_teams)
             instance.courier_onfleet_id = new_worker['id']
             instance.save()
     else:
@@ -128,7 +130,9 @@ def teams_changed(sender, instance, **kwargs):
             courier_teams = []
             for team in instance.teams.all():
                 courier_teams.append(team.team_onfleet_id)
-            _update_worker(worker_id=instance.courier_onfleet_id, name=None, teams=courier_teams)
+            _update_worker(worker_id=instance.courier_onfleet_id,
+                           name=None, teams=courier_teams)
+
 
 m2m_changed.connect(teams_changed, sender=Courier.teams.through)
 
@@ -139,6 +143,7 @@ def delete_team(sender, instance, **kwargs):
     except Exception as error:
         print(error)
 
+
 pre_delete.connect(
     delete_team, sender=Team, dispatch_uid="delete_team")
 
@@ -148,6 +153,7 @@ def delete_courier(sender, instance, **kwargs):
         _delete_worker(instance.courier_onfleet_id)
     except Exception as error:
         print(error)
+
 
 pre_delete.connect(
     delete_courier, sender=Courier, dispatch_uid="delete_courier")

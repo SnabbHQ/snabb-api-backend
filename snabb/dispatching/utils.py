@@ -32,12 +32,12 @@ def _get_eta(lat, lon):
             else:
                 mode = 'driving'
             current_worker_eta = _get_real_eta(
-                    worker_lat,
-                    worker_lon,
-                    lat,
-                    lon,
-                    mode
-                    )
+                worker_lat,
+                worker_lon,
+                lat,
+                lon,
+                mode
+            )
             if worker_vehicle in small_vehicles:
                 if small_eta == "0":
                     # Only save if we don't have a better eta for this size.
@@ -123,3 +123,23 @@ def _get_all_workers():
     on = Onfleet()
     all_workers = on._get_all_workers()
     return all_workers
+
+
+# Tasks related functions
+def _create_task(self, destination,
+                 recipients, completeAfter=None,
+                 completeBefore=None, pickupTask=False,
+                 notes, container=None, *args, **kwargs
+                 ):
+    on = Onfleet()
+    new_task = on._create_task(destination,
+                               recipients, completeAfter,
+                               completeBefore, pickupTask,
+                               notes, container)
+    return new_task
+
+
+def _get_task_detail(task_id):
+    on = Onfleet()
+    detail_task = on._get_task_detail(task_id)
+    return detail_task
