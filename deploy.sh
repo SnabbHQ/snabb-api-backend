@@ -11,7 +11,7 @@ deploy_image() {
 
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASS -e $DOCKER_EMAIL
     docker push javiertarazaga/snabb-api-backend:$CIRCLE_SHA1 | cat # workaround progress weirdness
-    docker push snabbhq/nginx:$CIRCLE_SHA1 | cat # workaround progress weirdness
+    docker push javiertarazaga/nginx:$CIRCLE_SHA1 | cat # workaround progress weirdness
 
 }
 
