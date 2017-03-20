@@ -33,5 +33,5 @@ cmd="$@"
 #  sleep 1
 #done
 
->&2 echo "Postgres is up - continuing..."
+#>&2 echo "Postgres is up - continuing..."
 exec $cmd

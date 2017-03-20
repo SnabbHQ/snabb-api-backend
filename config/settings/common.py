@@ -22,7 +22,7 @@ env.read_env(ROOT_DIR('.env'))
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
-DJANGO_APPS = (
+DJANGO_APPS = [
     # Default Django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,16 +34,16 @@ DJANGO_APPS = (
 
     # Admin
     'django.contrib.admin',
-)
-THIRD_PARTY_APPS = (
+]
+THIRD_PARTY_APPS = [
     'crispy_forms',  # Form layouts
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
-)
+]
 
 # Apps specific for this project go here.
-LOCAL_APPS = (
+LOCAL_APPS = [
     # custom users app. Your stuff: custom apps go here
     'snabb.users.apps.UsersConfig',
     'snabb.currency.apps.CurrencyConfig',
@@ -52,24 +52,22 @@ LOCAL_APPS = (
     'snabb.size.apps.SizeConfig',
     'snabb.address.apps.AddressConfig',
     'snabb.contact.apps.ContactConfig'
-)
+]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------
