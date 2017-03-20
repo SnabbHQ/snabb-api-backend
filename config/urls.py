@@ -3,27 +3,24 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.conf.urls import include, url
-from django.conf.urls.i18n import i18n_patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
-from django.views.generic import TemplateView
+
 from .router_v1 import router
 
 admin.autodiscover()
 
-urlpatterns = i18n_patterns(
-    # Django Admin, use {% url 'admin:index' %}
-    url(settings.ADMIN_URL, include(admin.site.urls)),
-)
-
 # REST Framework
-urlpatterns += [
+urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api/', include(router.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/v1/o/', include('oauth2_provider.urls', namespace='oauth2_provider'))
+    url(r'^api/v1/o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
+    # Django Admin, use {% url 'admin:index' %}
+    url(settings.ADMIN_URL, include(admin.site.urls)),
 ]
 
 if settings.DEBUG:
