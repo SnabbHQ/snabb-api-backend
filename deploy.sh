@@ -11,6 +11,7 @@ deploy_image() {
 
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASS -e $DOCKER_EMAIL
     docker push javiertarazaga/snabb-api-backend:$CIRCLE_SHA1 | cat # workaround progress weirdness
+    docker push snabbhq/nginx:$CIRCLE_SHA1 | cat # workaround progress weirdness
 
 }
 
@@ -34,7 +35,7 @@ make_task_def() {
 	    "image": "nginx:latest",
 	    "portMappings": [
 		{
-		    "containerPort": 8000,
+		    "containerPort": 80,
 		    "hostPort": %s
 		}
 	    ],
@@ -42,22 +43,6 @@ make_task_def() {
 	    "memory": 200,
 	    "essential": true
 	},
-	{
-	    "name": "postgres",
-	    "links": [
-		"django"
-	    ],
-	    "image": "postgres:9.5",
-	    "portMappings": [
-		{
-		    "containerPort": 8000,
-		    "hostPort": %s
-		}
-	    ],
-	    "cpu": 10,
-	    "memory": 200,
-	    "essential": true
-	}
     ]'
 
     task_def=$(printf "$task_template" $CIRCLE_SHA1 $host_port)
