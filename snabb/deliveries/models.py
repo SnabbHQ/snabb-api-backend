@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
-from snabb.billing.models import OrderCourier
+from snabb.billing.models import OrderCourier, OrderUser
 
 
 class Delivery(models.Model):
@@ -65,8 +65,13 @@ class Delivery(models.Model):
                 delivery = Delivery.objects.get(pk=self.delivery_id)
                 if delivery.status != 'completed':
                     order = OrderCourier()
-                    order.courier = self.courier
+                    order.order_delivery = self
                     order.save()
-                    print ('NEW ORDER')
+                    print ('NEW ORDER COURIER')
+
+                    order = OrderUser()
+                    order.order_delivery = self
+                    order.save()
+                    print ('NEW ORDER USER')
 
         super(Delivery, self).save(*args, **kwargs)

@@ -10,6 +10,8 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from .router_v1 import router
 
+from snabb.billing.views import OrderUserPDF, OrderCourierPDF
+
 admin.autodiscover()
 
 urlpatterns = i18n_patterns(
@@ -23,7 +25,9 @@ urlpatterns += [
     url(r'^api/', include(router.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^api/v1/o/', include('oauth2_provider.urls', namespace='oauth2_provider'))
+    url(r'^api/v1/o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^billing/orderUserPDF/(?P<pk>[0-9]+)/$', OrderUserPDF), # Register this route in router_v1 ????
+    url(r'^billing/orderCourierPDF/(?P<pk>[0-9]+)/$', OrderCourierPDF), # Register this route in router_v1 ????
 ]
 
 if settings.DEBUG:

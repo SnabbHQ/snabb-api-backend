@@ -13,7 +13,7 @@ class TeamAdmin(admin.ModelAdmin):
 class CourierAdmin(admin.ModelAdmin):
 
     model = Team
-    list_display = ['name']
+    list_display = ['name', 'phone']
     readonly_fields = ('courier_onfleet_id', 'courier_details')
 
 admin.site.register(Team, TeamAdmin)

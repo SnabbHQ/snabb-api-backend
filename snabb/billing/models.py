@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.dateformat import format
 from snabb.couriers.models import Courier
-from snabb.users.models import User
+from snabb.users.models import User, Profile
 
 
 class OrderUser(models.Model):
@@ -14,8 +14,12 @@ class OrderUser(models.Model):
     order_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
+    order_delivery = models.ForeignKey(
+        'deliveries.Delivery', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='Order_User_Delivery', verbose_name="Delivery"
+    )
     user = models.ForeignKey(
-        User, related_name='BillUser', verbose_name="BillUser",
+        User, related_name='Bill_User', verbose_name="User",
         blank=True, null=True, on_delete=models.SET_NULL
     )
     order_reference = models.CharField(
@@ -65,9 +69,16 @@ class OrderUser(models.Model):
     fee = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
-    total = models.DecimalField(
-        null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
-    )
+
+    @property
+    def total(self):
+        lines = LineOrderUser.objects.filter(order_user=self)
+        total = 0
+        if lines.count() > 0:
+            for line in lines:
+                total += line.total
+        return total
+
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
@@ -83,7 +94,7 @@ class OrderUser(models.Model):
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.order_id:
-            self.created_at = int(format(datetime.now(), u'U'))
+            self.created_at = self.updated_at
             # Num Factura
             prefix = 'SNABB'
             serie = 'U'
@@ -91,8 +102,24 @@ class OrderUser(models.Model):
             orders_count = OrderUser.objects.all().count()
             num = str(orders_count+1)
             self.order_reference = prefix+'-'+year+'-'+serie+'-'+num
-        else:
-            self.updated_at = int(format(datetime.now(), u'U'))
+
+            if self.order_delivery:
+                quote = self.order_delivery.delivery_quote
+                self.user = quote.quote_user
+
+            if self.user:
+                profile = Profile.objects.get(profile_apiuser=self.user)
+                self.name = profile.first_name
+                self.phone = profile.phone
+                self.company = profile.company_name
+                # Campos por rellenar:
+                # self.nif = ''
+                # self.address = ''
+                # self.region = ''
+                # self.zipcode = ''
+                # self.country = ''
+                # self.city = ''
+                # self.tax = 0
 
         super(OrderUser, self).save(*args, **kwargs)
 
@@ -129,7 +156,10 @@ class LineOrderUser(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.line_order_user_id + ' - ' + self.order_user.reference)
+        return str(
+            str(self.line_order_user_id) + ' - ' +
+            str(self.order_user.order_reference)
+        )
 
     class Meta:
         verbose_name = u'Line Order User',
@@ -154,8 +184,12 @@ class OrderCourier(models.Model):
         primary_key=True, blank=True, editable=False
     )
     courier = models.ForeignKey(
-        Courier, related_name='BillCourier', verbose_name="BillCourier",
+        Courier, related_name='Bill_Courier', verbose_name="Courier",
         blank=True, null=True, on_delete=models.SET_NULL
+    )
+    order_delivery = models.ForeignKey(
+        'deliveries.Delivery', blank=True, null=True, on_delete=models.SET_NULL,
+        related_name='Order_Courier_Delivery', verbose_name="Delivery"
     )
     order_reference = models.CharField(
         verbose_name="Reference",
@@ -204,9 +238,15 @@ class OrderCourier(models.Model):
     fee = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
-    total = models.DecimalField(
-        null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
-    )
+    @property
+    def total(self):
+        lines = LineOrderCourier.objects.filter(order_courier=self)
+        total = 0
+        if lines.count() > 0:
+            for line in lines:
+                total += line.total
+        return total
+
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
@@ -226,7 +266,9 @@ class OrderCourier(models.Model):
             self.created_at = int(format(datetime.now(), u'U'))
             orders_count = OrderCourier.objects.all().count()
             self.order_reference = 'SNABB-2017-C-'+str(orders_count+1)
-            # Falta definir Formato --> 0001
+
+            if self.order_delivery:
+                self.courier = self.order_delivery.courier
 
             if self.courier:
                 self.name = self.courier.name
@@ -241,10 +283,6 @@ class OrderCourier(models.Model):
                 # self.country = ''
                 # self.city = ''
                 # self.tax = 0
-                self.total = 0
-
-                # Definir Lineas de pedido
-
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
@@ -284,7 +322,8 @@ class LineOrderCourier(models.Model):
 
     def __str__(self):
         return str(
-            self.liner_order_courier_id + ' - ' + self.order_courier.reference
+            str(self.line_order_courier_id) + ' - ' +
+            str(self.order_courier.order_reference)
         )
 
     class Meta:
@@ -295,7 +334,7 @@ class LineOrderCourier(models.Model):
         """Method Called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.liner_order_courier_id:
+        if not self.line_order_courier_id:
             self.created_at = int(format(datetime.now(), u'U'))
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
@@ -309,16 +348,31 @@ def create_lines_order_courier(sender, instance, **kwargs):
     order = instance
     # Execute only when order is created
     if order.created_at == order.updated_at:
+        delivery = order.order_delivery
         line = LineOrderCourier()
         line.order_courier = order
-        # Falta definir los campos
-        # line.price = 0
-        # line.discount = 0
-        # line.total = (line.price * line.quantity) - line.discount
-        # line.task = ''
-        # line.description = ''
-        # line.quantity = 1
+        line.price = delivery.price
+        line.description = 'Delivery'
+        line.task = 'Task 1'
+        line.quantity = 1
+        line.discount = 0
+        line.total = (line.price * line.quantity) - line.discount
         line.save()
-        print ('line courier order saved')
 
-    print (sender)
+
+@receiver(post_save, sender=OrderUser)
+def create_lines_order_user(sender, instance, **kwargs):
+    """Create lines for Order User when is created."""
+    order = instance
+    # Execute only when order is created
+    if order.created_at == order.updated_at:
+        delivery = order.order_delivery
+        line = LineOrderUser()
+        line.order_user = order
+        line.price = delivery.price
+        line.description = 'Delivery'
+        line.task = 'Task 1'
+        line.quantity = 1
+        line.discount = 0
+        line.total = (line.price * line.quantity) - line.discount
+        line.save()

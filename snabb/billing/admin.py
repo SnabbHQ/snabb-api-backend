@@ -36,7 +36,6 @@ class OrderUserAdmin(admin.ModelAdmin):
     ]
     model = OrderUser
     list_display = ['order_reference', 'total']
-    readonly_fields = ('order_id', 'total')
     suit_form_tabs = (
         ('general', 'General'), ('LineOrderUser', u'Lines')
     )
