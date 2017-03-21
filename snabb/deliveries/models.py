@@ -6,8 +6,47 @@ import time
 from django.db import models
 
 
-def _create_hash():
-    """This function generate 10 character long hash"""
-    hash_value = hashlib.sha1()
-    hash_value.update(str(time.time()).encode('utf8'))
-    return hash_value.hexdigest()[:-20]
+class Delivery(models.Model):
+    statusChoices = (
+        ('new', 'new'),
+        ('processing', 'processing'),
+        ('no_couriers_available', 'no_couriers_available'),
+        ('en_route_to_pickup', 'en_route_to_pickup'),
+        ('en_route_to_dropoff', 'en_route_to_dropoff'),
+        ('at_dropoff', 'at_dropoff'),
+        ('completed', 'completed'),
+        ('unable_to_deliver', 'unable_to_deliver'),
+        ('scheduled', 'scheduled'),
+    )
+    delivery_id = models.AutoField(
+        primary_key=True, blank=True, editable=False
+    )
+    courier = models.ForeignKey(
+        'couriers.Courier', related_name='delivery_courier',
+        null=True, blank=True
+    )
+    price = models.DecimalField(
+        null=False, blank=False, decimal_places=2, default=0.00
+    )
+    # This would be a foreignKey to order, for now, charfield for dev,
+    order_reference_id = models.CharField(
+        verbose_name="Order reference",
+        max_length=300,
+        null=False,
+        blank=True,
+        default=''
+    )
+    delivery_quote = models.ForeignKey(
+        'quote.Quote', related_name='delivery_quote',
+        null=True, blank=True
+    )
+    status = models.CharField(
+        verbose_name="Status",
+        max_length=300,
+        null=False,
+        blank=False,
+        choices=statusChoices,
+        default='new'
+    )
+    created_at = models.IntegerField(default=0, editable=False, blank=True)
+    updated_at = models.IntegerField(default=0, editable=False)
