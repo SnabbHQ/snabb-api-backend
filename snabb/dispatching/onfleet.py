@@ -143,14 +143,13 @@ class Onfleet(object):
         try:
             # Data to send
             payload = {'name': team_name}
-            url = self.api_root + "teams"
+            url = self.api_root + "/teams"
             apiCall = requests.post(
                 url, data=json.dumps(payload),
                 auth=HTTPBasicAuth(self.api_key, '')
             )
             if apiCall.status_code == 200:
                 response = apiCall.json()
-                return response
             else:
                 return None
         except Exception as error:
