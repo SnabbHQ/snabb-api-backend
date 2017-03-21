@@ -132,7 +132,6 @@ class OrderUser(models.Model):
         verbose_name_plural = u'Orders User'
 
     def save(self, *args, **kwargs):
-        """Method called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.order_id:
