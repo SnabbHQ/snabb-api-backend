@@ -7,6 +7,7 @@ from django.utils.dateformat import format
 from snabb.couriers.models import Courier
 from snabb.users.models import User, Profile
 from snabb.app_info.models import AppInfo
+from snabb.utils.utils import get_app_info
 
 
 class OrderUser(models.Model):
@@ -136,14 +137,8 @@ class OrderUser(models.Model):
 
         if not self.order_id:
             self.created_at = self.updated_at
-            try:  # Num Factura
-                prefix = AppInfo.objects.get(name='prefix_order_user').content
-            except AppInfo.DoesNotExist:
-                prefix = 'SNABB'
-            try:
-                prefix = AppInfo.objects.get(name='serie_order_user').content
-            except AppInfo.DoesNotExist:
-                serie = 'U'
+            prefix = get_app_info('prefix_order_user', 'SNABB')
+            serie = get_app_info('serie_order_user', 'U')
             year = str(datetime.now().year)
             orders_count = OrderUser.objects.all().count()
             num = str(orders_count+1)
@@ -168,42 +163,15 @@ class OrderUser(models.Model):
                 # self.tax = 0
 
             # Get Data from AppInfo
-            try:
-                self.snabb_nif = AppInfo.objects.get(name='nif').content
-            except AppInfo.DoesNotExist:
-                self.snabb_nif = None
-            try:
-                self.snabb_name = AppInfo.objects.get(name='name').content
-            except AppInfo.DoesNotExist:
-                self.snabb_name = None
-            try:
-                self.snabb_company = AppInfo.objects.get(name='company').content
-            except AppInfo.DoesNotExist:
-                self.snabb_company = None
-            try:
-                self.snabb_phone = AppInfo.objects.get(name='phone').content
-            except AppInfo.DoesNotExist:
-                self.snabb_phone = None
-            try:
-                self.snabb_address = AppInfo.objects.get(name='address').content
-            except AppInfo.DoesNotExist:
-                self.snabb_address = None
-            try:
-                self.snabb_region = AppInfo.objects.get(name='region').content
-            except AppInfo.DoesNotExist:
-                self.snabb_region = None
-            try:
-                self.snabb_zipcode = AppInfo.objects.get(name='zipcode').content
-            except AppInfo.DoesNotExist:
-                self.snabb_zipcode = None
-            try:
-                self.snabb_country = AppInfo.objects.get(name='country').content
-            except AppInfo.DoesNotExist:
-                self.snabb_country = None
-            try:
-                self.snabb_city = AppInfo.objects.get(name='city').content
-            except AppInfo.DoesNotExist:
-                self.snabb_city = None
+            self.snabb_nif = get_app_info('nif')
+            self.snabb_name = get_app_info('name')
+            self.snabb_company = get_app_info('company')
+            self.snabb_phone = get_app_info('phone')
+            self.snabb_address = get_app_info('address')
+            self.snabb_region = get_app_info('region')
+            self.snabb_zipcode = get_app_info('zipcode')
+            self.snabb_country = get_app_info('country')
+            self.snabb_city = get_app_info('city')
 
         super(OrderUser, self).save(*args, **kwargs)
 
@@ -388,16 +356,8 @@ class OrderCourier(models.Model):
 
         if not self.order_id:
             self.created_at = int(format(datetime.now(), u'U'))
-
-            try:  # Num Factura
-                prefix = AppInfo.objects.get(name='prefix_order_courier').content
-            except AppInfo.DoesNotExist:
-                prefix = 'SNABB'
-            try:
-                prefix = AppInfo.objects.get(name='serie_order_courier').content
-            except AppInfo.DoesNotExist:
-                serie = 'C'
-
+            prefix = get_app_info('prefix_order_user', 'SNABB')
+            serie = get_app_info('serie_order_user', 'C')
             year = str(datetime.now().year)
             orders_count = OrderCourier.objects.all().count()
             num = str(orders_count+1)
@@ -421,42 +381,15 @@ class OrderCourier(models.Model):
                 # self.tax = 0
 
             # Get Data from AppInfo
-            try:
-                self.snabb_nif = AppInfo.objects.get(name='nif').content
-            except AppInfo.DoesNotExist:
-                self.snabb_nif = None
-            try:
-                self.snabb_name = AppInfo.objects.get(name='name').content
-            except AppInfo.DoesNotExist:
-                self.snabb_name = None
-            try:
-                self.snabb_company = AppInfo.objects.get(name='company').content
-            except AppInfo.DoesNotExist:
-                self.snabb_company = None
-            try:
-                self.snabb_phone = AppInfo.objects.get(name='phone').content
-            except AppInfo.DoesNotExist:
-                self.snabb_phone = None
-            try:
-                self.snabb_address = AppInfo.objects.get(name='address').content
-            except AppInfo.DoesNotExist:
-                self.snabb_address = None
-            try:
-                self.snabb_region = AppInfo.objects.get(name='region').content
-            except AppInfo.DoesNotExist:
-                self.snabb_region = None
-            try:
-                self.snabb_zipcode = AppInfo.objects.get(name='zipcode').content
-            except AppInfo.DoesNotExist:
-                self.snabb_zipcode = None
-            try:
-                self.snabb_country = AppInfo.objects.get(name='country').content
-            except AppInfo.DoesNotExist:
-                self.snabb_country = None
-            try:
-                self.snabb_city = AppInfo.objects.get(name='city').content
-            except AppInfo.DoesNotExist:
-                self.snabb_city = None
+            self.snabb_nif = get_app_info('nif')
+            self.snabb_name = get_app_info('name')
+            self.snabb_company = get_app_info('company')
+            self.snabb_phone = get_app_info('phone')
+            self.snabb_address = get_app_info('address')
+            self.snabb_region = get_app_info('region')
+            self.snabb_zipcode = get_app_info('zipcode')
+            self.snabb_country = get_app_info('country')
+            self.snabb_city = get_app_info('city')
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
