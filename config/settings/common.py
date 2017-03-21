@@ -18,7 +18,18 @@ ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/common.py - 3 = 
 APPS_DIR = ROOT_DIR.path('snabb')
 
 env = environ.Env()
-env.read_env(ROOT_DIR('.env'))
+
+# .env file, should load only in development environment
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
+
+if READ_DOT_ENV_FILE:
+    # Operating System Environment variables have precedence over variables defined in the .env file,
+    # that is to say variables from the .env files will only be used if not defined
+    # as environment variables.
+    env_file = str(ROOT_DIR.path('.env'))
+    print('Loading : {}'.format(env_file))
+    env.read_env(env_file)
+    print('The .env file has been loaded. See base.py for more information')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
