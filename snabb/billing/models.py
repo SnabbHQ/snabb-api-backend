@@ -6,7 +6,6 @@ from django.dispatch import receiver
 from django.utils.dateformat import format
 from snabb.couriers.models import Courier
 from snabb.users.models import User, Profile
-from snabb.app_info.models import AppInfo
 from snabb.utils.utils import get_app_info
 
 
@@ -110,17 +109,6 @@ class OrderUser(models.Model):
     total = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=10
     )
-
-    '''@property
-    def total(self):
-        lines = LineOrderUser.objects.filter(order_user=self)
-        total = 0
-        if lines.count() > 0:
-            for line in lines:
-                total += line.total
-        return total
-    '''
-
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
@@ -217,7 +205,6 @@ class LineOrderUser(models.Model):
         verbose_name_plural = u'Lines Order User'
 
     def save(self, *args, **kwargs):
-        """Method Called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.line_order_user_id:
@@ -328,15 +315,6 @@ class OrderCourier(models.Model):
     total = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=10
     )
-    '''@property
-    def total(self):
-        lines = LineOrderCourier.objects.filter(order_courier=self)
-        total = 0
-        if lines.count() > 0:
-            for line in lines:
-                total += line.total
-        return total
-    '''
 
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -350,7 +328,6 @@ class OrderCourier(models.Model):
         verbose_name_plural = u'Orders Courier'
 
     def save(self, *args, **kwargs):
-        """Method Called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.order_id:
