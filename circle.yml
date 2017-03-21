@@ -19,6 +19,7 @@ database:
     - python3 manage.py makemigrations currency
     - python3 manage.py makemigrations location
     - python3 manage.py makemigrations contact
+    - python3 manage.py makemigrations couriers
     - python3 manage.py makemigrations app_info
     - python3 manage.py makemigrations billing
     - python3 manage.py migrate
