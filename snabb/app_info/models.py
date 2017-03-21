@@ -13,7 +13,6 @@ class AppInfo(models.Model):
     )
     name = models.CharField(max_length=200, null=True, blank=True)
     content = models.TextField(max_length=300, null=True, blank=True)
-    updatedAt = models.IntegerField(default=0, editable=False)
     active = models.BooleanField(default=True)
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)

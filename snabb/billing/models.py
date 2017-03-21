@@ -6,6 +6,7 @@ from django.dispatch import receiver
 from django.utils.dateformat import format
 from snabb.couriers.models import Courier
 from snabb.users.models import User, Profile
+from snabb.app_info.models import AppInfo
 
 
 class OrderUser(models.Model):
@@ -63,14 +64,53 @@ class OrderUser(models.Model):
         verbose_name=u'City',
         max_length=50, null=True, blank=True
     )
+    snabb_nif = models.CharField(
+        verbose_name=u'SNABB_NIF',
+        max_length=15, null=True, blank=True
+    )
+    snabb_name = models.CharField(
+        verbose_name=u'SNABB_Name',
+        max_length=100, null=True, blank=True
+    )
+    snabb_company = models.CharField(
+        verbose_name=u'SNABB_Company',
+        max_length=100, null=True, blank=True
+    )
+    snabb_phone = models.CharField(
+        verbose_name=u'SNABB_Phone',
+        max_length=100, null=True, blank=True
+    )
+    snabb_address = models.CharField(
+        verbose_name=u'SNABB_Address',
+        max_length=100, null=True, blank=True
+    )
+    snabb_region = models.CharField(
+        verbose_name=u'SNABB_Region',
+        max_length=100, null=True, blank=True
+    )
+    snabb_zipcode = models.CharField(
+        verbose_name=u'SNABB_ZipCode',
+        max_length=15, null=True, blank=True
+    )
+    snabb_country = models.CharField(
+        verbose_name=u'SNABB_Country',
+        max_length=50, null=True, blank=True
+    )
+    snabb_city = models.CharField(
+        verbose_name=u'SNABB_City',
+        max_length=50, null=True, blank=True
+    )
     tax = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
     fee = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
+    total = models.DecimalField(
+        null=False, blank=False, decimal_places=2, default=0.00, max_digits=10
+    )
 
-    @property
+    '''@property
     def total(self):
         lines = LineOrderUser.objects.filter(order_user=self)
         total = 0
@@ -78,6 +118,7 @@ class OrderUser(models.Model):
             for line in lines:
                 total += line.total
         return total
+    '''
 
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -95,9 +136,14 @@ class OrderUser(models.Model):
 
         if not self.order_id:
             self.created_at = self.updated_at
-            # Num Factura
-            prefix = 'SNABB'
-            serie = 'U'
+            try:  # Num Factura
+                prefix = AppInfo.objects.get(name='prefix_order_user').content
+            except AppInfo.DoesNotExist:
+                prefix = 'SNABB'
+            try:
+                prefix = AppInfo.objects.get(name='serie_order_user').content
+            except AppInfo.DoesNotExist:
+                serie = 'U'
             year = str(datetime.now().year)
             orders_count = OrderUser.objects.all().count()
             num = str(orders_count+1)
@@ -120,6 +166,44 @@ class OrderUser(models.Model):
                 # self.country = ''
                 # self.city = ''
                 # self.tax = 0
+
+            # Get Data from AppInfo
+            try:
+                self.snabb_nif = AppInfo.objects.get(name='nif').content
+            except AppInfo.DoesNotExist:
+                self.snabb_nif = None
+            try:
+                self.snabb_name = AppInfo.objects.get(name='name').content
+            except AppInfo.DoesNotExist:
+                self.snabb_name = None
+            try:
+                self.snabb_company = AppInfo.objects.get(name='company').content
+            except AppInfo.DoesNotExist:
+                self.snabb_company = None
+            try:
+                self.snabb_phone = AppInfo.objects.get(name='phone').content
+            except AppInfo.DoesNotExist:
+                self.snabb_phone = None
+            try:
+                self.snabb_address = AppInfo.objects.get(name='address').content
+            except AppInfo.DoesNotExist:
+                self.snabb_address = None
+            try:
+                self.snabb_region = AppInfo.objects.get(name='region').content
+            except AppInfo.DoesNotExist:
+                self.snabb_region = None
+            try:
+                self.snabb_zipcode = AppInfo.objects.get(name='zipcode').content
+            except AppInfo.DoesNotExist:
+                self.snabb_zipcode = None
+            try:
+                self.snabb_country = AppInfo.objects.get(name='country').content
+            except AppInfo.DoesNotExist:
+                self.snabb_country = None
+            try:
+                self.snabb_city = AppInfo.objects.get(name='city').content
+            except AppInfo.DoesNotExist:
+                self.snabb_city = None
 
         super(OrderUser, self).save(*args, **kwargs)
 
@@ -232,13 +316,52 @@ class OrderCourier(models.Model):
         verbose_name=u'City',
         max_length=50, null=True, blank=True
     )
+    snabb_nif = models.CharField(
+        verbose_name=u'SNABB_NIF',
+        max_length=15, null=True, blank=True
+    )
+    snabb_name = models.CharField(
+        verbose_name=u'SNABB_Name',
+        max_length=100, null=True, blank=True
+    )
+    snabb_company = models.CharField(
+        verbose_name=u'SNABB_Company',
+        max_length=100, null=True, blank=True
+    )
+    snabb_phone = models.CharField(
+        verbose_name=u'SNABB_Phone',
+        max_length=100, null=True, blank=True
+    )
+    snabb_address = models.CharField(
+        verbose_name=u'SNABB_Address',
+        max_length=100, null=True, blank=True
+    )
+    snabb_region = models.CharField(
+        verbose_name=u'SNABB_Region',
+        max_length=100, null=True, blank=True
+    )
+    snabb_zipcode = models.CharField(
+        verbose_name=u'SNABB_ZipCode',
+        max_length=15, null=True, blank=True
+    )
+    snabb_country = models.CharField(
+        verbose_name=u'SNABB_Country',
+        max_length=50, null=True, blank=True
+    )
+    snabb_city = models.CharField(
+        verbose_name=u'SNABB_City',
+        max_length=50, null=True, blank=True
+    )
     tax = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
     fee = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
     )
-    @property
+    total = models.DecimalField(
+        null=False, blank=False, decimal_places=2, default=0.00, max_digits=10
+    )
+    '''@property
     def total(self):
         lines = LineOrderCourier.objects.filter(order_courier=self)
         total = 0
@@ -246,6 +369,7 @@ class OrderCourier(models.Model):
             for line in lines:
                 total += line.total
         return total
+    '''
 
     updated_at = models.IntegerField(default=0, editable=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
@@ -264,8 +388,20 @@ class OrderCourier(models.Model):
 
         if not self.order_id:
             self.created_at = int(format(datetime.now(), u'U'))
+
+            try:  # Num Factura
+                prefix = AppInfo.objects.get(name='prefix_order_courier').content
+            except AppInfo.DoesNotExist:
+                prefix = 'SNABB'
+            try:
+                prefix = AppInfo.objects.get(name='serie_order_courier').content
+            except AppInfo.DoesNotExist:
+                serie = 'C'
+
+            year = str(datetime.now().year)
             orders_count = OrderCourier.objects.all().count()
-            self.order_reference = 'SNABB-2017-C-'+str(orders_count+1)
+            num = str(orders_count+1)
+            self.order_reference = prefix+'-'+year+'-'+serie+'-'+num
 
             if self.order_delivery:
                 self.courier = self.order_delivery.courier
@@ -283,6 +419,44 @@ class OrderCourier(models.Model):
                 # self.country = ''
                 # self.city = ''
                 # self.tax = 0
+
+            # Get Data from AppInfo
+            try:
+                self.snabb_nif = AppInfo.objects.get(name='nif').content
+            except AppInfo.DoesNotExist:
+                self.snabb_nif = None
+            try:
+                self.snabb_name = AppInfo.objects.get(name='name').content
+            except AppInfo.DoesNotExist:
+                self.snabb_name = None
+            try:
+                self.snabb_company = AppInfo.objects.get(name='company').content
+            except AppInfo.DoesNotExist:
+                self.snabb_company = None
+            try:
+                self.snabb_phone = AppInfo.objects.get(name='phone').content
+            except AppInfo.DoesNotExist:
+                self.snabb_phone = None
+            try:
+                self.snabb_address = AppInfo.objects.get(name='address').content
+            except AppInfo.DoesNotExist:
+                self.snabb_address = None
+            try:
+                self.snabb_region = AppInfo.objects.get(name='region').content
+            except AppInfo.DoesNotExist:
+                self.snabb_region = None
+            try:
+                self.snabb_zipcode = AppInfo.objects.get(name='zipcode').content
+            except AppInfo.DoesNotExist:
+                self.snabb_zipcode = None
+            try:
+                self.snabb_country = AppInfo.objects.get(name='country').content
+            except AppInfo.DoesNotExist:
+                self.snabb_country = None
+            try:
+                self.snabb_city = AppInfo.objects.get(name='city').content
+            except AppInfo.DoesNotExist:
+                self.snabb_city = None
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
@@ -331,7 +505,6 @@ class LineOrderCourier(models.Model):
         verbose_name_plural = u'Lines Order Courier'
 
     def save(self, *args, **kwargs):
-        """Method Called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.line_order_courier_id:
@@ -358,6 +531,9 @@ def create_lines_order_courier(sender, instance, **kwargs):
         line.discount = 0
         line.total = (line.price * line.quantity) - line.discount
         line.save()
+        order.updated_at += 1
+        order.total = line.total
+        order.save()
 
 
 @receiver(post_save, sender=OrderUser)
@@ -376,3 +552,6 @@ def create_lines_order_user(sender, instance, **kwargs):
         line.discount = 0
         line.total = (line.price * line.quantity) - line.discount
         line.save()
+        order.updated_at += 1
+        order.total = line.total
+        order.save()
