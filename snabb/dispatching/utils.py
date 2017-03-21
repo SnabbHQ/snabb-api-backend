@@ -32,12 +32,12 @@ def _get_eta(lat, lon):
             else:
                 mode = 'driving'
             current_worker_eta = _get_real_eta(
-                    worker_lat,
-                    worker_lon,
-                    lat,
-                    lon,
-                    mode
-                    )
+                worker_lat,
+                worker_lon,
+                lat,
+                lon,
+                mode
+            )
             if worker_vehicle in small_vehicles:
                 if small_eta == "0":
                     # Only save if we don't have a better eta for this size.
@@ -88,6 +88,12 @@ def _get_team_detail(team_id):
     return detail_team
 
 
+def _get_all_teams():
+    on = Onfleet()
+    all_teams = on._get_all_teams()
+    return all_teams
+
+
 # Courier related functions
 def _create_worker(name, phone, teams):
     on = Onfleet()
@@ -111,3 +117,27 @@ def _delete_worker(worker_id, name=None, teams=None):
     on = Onfleet()
     deleted_courier = on._delete_worker(worker_id, name, teams)
     return deleted_courier
+
+
+def _get_all_workers():
+    on = Onfleet()
+    all_workers = on._get_all_workers()
+    return all_workers
+
+
+# Tasks related functions
+def _create_task(self, destination, recipients, notes, pickupTask=False,
+                 completeAfter=None, completeBefore=None, container=None,
+                 *args, **kwargs):
+    on = Onfleet()
+    new_task = on._create_task(destination,
+                               recipients, completeAfter,
+                               completeBefore, pickupTask,
+                               notes, container)
+    return new_task
+
+
+def _get_task_detail(task_id):
+    on = Onfleet()
+    detail_task = on._get_task_detail(task_id)
+    return detail_task

@@ -108,3 +108,7 @@ See detailed cookiecutter-django Elastic Beanstalk documentation\_.
     $docker-compose -f dev.yml run django python manage.py makemigrations
     $docker-compose -f dev.yml run django python manage.py migrate
     $docker-compose -f dev.yml run django pytest snabb --cov=snabb
+
+### Sync you local BBDD with Onfleet
+
+    $docker-compose -f dev.yml run django python manage.py sync_onfleet
