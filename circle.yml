@@ -23,7 +23,6 @@ dependencies:
     # Build the images
     - docker build -f ./compose/django/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/snabb-api-backend:$CIRCLE_SHA1 . | cat # workaround progress weirdness
     - docker build -f ./compose/nginx/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
-#  - docker pull bellkev/nginx-base:stable | cat
 
 database:
   override:
@@ -48,5 +47,5 @@ deployment:
   prod:
     branch: aws-prod
     commands:
-      - ./deploy.sh
+      - ./utility/deploy.sh
 

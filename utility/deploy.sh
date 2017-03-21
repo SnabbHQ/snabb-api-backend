@@ -9,7 +9,6 @@ JQ="jq --raw-output --exit-status"
 
 deploy_image() {
 
-#    docker login -u $DOCKER_USERNAME -p $DOCKER_PASS -e $DOCKER_EMAIL
     docker push 057142750304.dkr.ecr.eu-central-1.amazonaws.com/snabb-api-backend:$CIRCLE_SHA1 | cat # workaround progress weirdness
     docker push 057142750304.dkr.ecr.eu-central-1.amazonaws.com/nginx:$CIRCLE_SHA1 | cat # workaround progress weirdness
 }
@@ -44,7 +43,7 @@ make_task_def() {
 	},
     ]'
 
-    task_def=$(printf "$task_template" $CIRCLE_SHA1 $host_port)
+    task_def=$(printf "$task_template" $CIRCLE_SHA1 $CIRCLE_SHA1 $host_port)
 
 }
 
@@ -64,11 +63,11 @@ register_definition() {
 deploy_cluster() {
 
     host_port=80
-    family="circle-ecs-cluster"
+    family="default"
 
     make_task_def
     register_definition
-    if [[ $(aws ecs update-service --cluster default --service circle-ecs --task-definition $revision | \
+    if [[ $(aws ecs update-service --cluster default --service snabb-api-backend --task-definition $revision | \
                    $JQ '.service.taskDefinition') != $revision ]]; then
         echo "Error updating service."
         return 1
@@ -77,7 +76,7 @@ deploy_cluster() {
     # wait for older revisions to disappear
     # not really necessary, but nice for demos
     for attempt in {1..30}; do
-        if stale=$(aws ecs describe-services --cluster default --services circle-ecs | \
+        if stale=$(aws ecs describe-services --cluster default --services snabb-api-backend | \
                        $JQ ".services[0].deployments | .[] | select(.taskDefinition != \"$revision\") | .taskDefinition"); then
             echo "Waiting for stale deployments:"
             echo "$stale"
