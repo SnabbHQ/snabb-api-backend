@@ -15,7 +15,7 @@ dependencies:
     - curl -L -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5rc1/jq-linux-x86_64-static && chmod +x ~/bin/jq
     - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > ../bin/docker-compose && chmod +x ../bin/docker-compose
     - docker build -f ./compose/django/Dockerfile --rm=false -t javiertarazaga/snabb-api-backend:$CIRCLE_SHA1 . | cat # workaround progress weirdness
-    - docker build -f ./compose/nginx/Dockerfile --rm=false -t javiertarazaga/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
+    - docker build -f ./compose/nginx/Dockerfile --rm=false -t snabbhq/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
 #  - docker pull bellkev/nginx-base:stable | cat
 
 database:
