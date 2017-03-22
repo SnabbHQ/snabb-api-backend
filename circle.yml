@@ -13,16 +13,16 @@ dependencies:
     - pip3 install -r requirements/test.txt # In reality we should test our app inside the docker container
   override:
     # set region so we can use the aws command-line tool to log into ecr
-    - aws configure set default.region eu-central-1
-    - eval $(aws ecr get-login --region eu-central-1)
+#    - aws configure set default.region eu-central-1
+#    - eval $(aws ecr get-login --region eu-central-1)
 
     # Install required dependencies for docker compose
-    - curl -L -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5rc1/jq-linux-x86_64-static && chmod +x ~/bin/jq
-    - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > ../bin/docker-compose && chmod +x ../bin/docker-compose
+#    - curl -L -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5rc1/jq-linux-x86_64-static && chmod +x ~/bin/jq
+#    - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > ../bin/docker-compose && chmod +x ../bin/docker-compose
 
     # Build the images
-    - docker build -f ./compose/django/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/snabb-api-backend:$CIRCLE_SHA1 . | cat # workaround progress weirdness
-    - docker build -f ./compose/nginx/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
+#    - docker build -f ./compose/django/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/snabb-api-backend:$CIRCLE_SHA1 . | cat # workaround progress weirdness
+#    - docker build -f ./compose/nginx/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
 
 database:
   override:
@@ -44,8 +44,12 @@ test:
         background: true
 
 deployment:
-  prod:
-    branch: aws-prod
-    commands:
-      - ./utility/deploy.sh
+  develop:
+    branch: heroku-stuff
+    heroku:
+      appname: snabb-api-backend-develop
+  production:
+    branch: master
+    heroku:
+      appname: snabb-api-backend
 
