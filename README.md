@@ -75,36 +75,16 @@ The following details how to deploy this application.
 
 In order to get docker working on your local machine first of all you need to bake the image:
 
-    $docker-compose -f dev.yml build
+    $docker-compose -f docker-compose-local build
 
 This will setup docker compose with the development environment. If you setup it for the first time or need to run
 migrations, you can run the commands in the already created image as follows:
 
-    $docker-compose -f dev.yml run django python manage.py makemigrations
-    $docker-compose -f dev.yml run django python manage.py migrate
-    $docker-compose -f dev.yml run django python manage.py createsuperuser
+    $docker-compose -f docker-compose-local.yml run django python manage.py makemigrations
+    $docker-compose -f docker-compose-local.yml run django python manage.py migrate
+    $docker-compose -f docker-compose-local.yml run django python manage.py createsuperuser
 
 Finally you can simply run the docker container using (Remember the first time will take a bit of time but once it is
 done, will be super fast!):    
 
-    $docker-compose -f dev.yml up
-
-
-See detailed [cookiecutter-django Docker
-documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-elastic-beanstalk.html).
-
-#### Elastic Beanstalk
-
-See detailed cookiecutter-django Elastic Beanstalk documentation\_.
-
-#### Deploy in development server
-
-    $ssh -i YOUR_KEY.pem ubuntu@54.246.188.31
-    $sudo su snabb
-    $cd ~/snabb-api-backend/
-    $git pull origin develop
-    $docker-compose -f dev.yml build
-    $docker-compose -f dev.yml up -d
-    $docker-compose -f dev.yml run django python manage.py makemigrations
-    $docker-compose -f dev.yml run django python manage.py migrate
-    $docker-compose -f dev.yml run django pytest snabb --cov=snabb
+    $docker-compose -f docker-compose-local.yml up
