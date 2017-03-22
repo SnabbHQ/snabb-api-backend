@@ -13,7 +13,7 @@ from django.utils import six
 import logging
 
 
-from .common import *  # noqa
+from .base import *  # noqa
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------

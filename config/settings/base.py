@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/common.py - 3 = snabb/)
+ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/base.py - 3 = snabb/)
 APPS_DIR = ROOT_DIR.path('snabb')
 
 env = environ.Env()
