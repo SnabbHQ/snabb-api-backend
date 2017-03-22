@@ -45,6 +45,3 @@ geopy==1.11.0
 
 # Requests
 requests==2.12.5
-
-# PDF
-WeasyPrint==0.36
