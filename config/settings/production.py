@@ -15,6 +15,11 @@ import logging
 
 from .base import *  # noqa
 
+# DEBUG (Be careful with this option and make sure in prod is not actually set!
+# ------------------------------------------------------------------------------
+DEBUG = env.bool('DJANGO_DEBUG', default=False)
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
+
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
@@ -62,7 +67,6 @@ X_FRAME_OPTIONS = 'DENY'
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['.herokuapp.com', '.snabb.io', ])
-DEBUG = env.bool('DJANGO_DEBUG', default=True)
 
 # END SITE CONFIGURATION
 
@@ -122,9 +126,23 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.filesystem.Loader', 'django.template.loaders.app_directories.Loader', ]),
 ]
 
-# Use the Heroku-style specification
-# Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-DATABASES['default'] = env.db('DATABASE_URL')
+# DATABASE CONFIGURATION
+# ------------------------------------------------------------------------------
+# Uses Amazon RDS for database hosting
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': env('RDS_DB_NAME'),
+        'USER': env('RDS_USERNAME'),
+        'PASSWORD': env('RDS_PASSWORD'),
+        'HOST': env('RDS_HOSTNAME'),
+        'PORT': env('RDS_PORT'),
+    }
+}
+
+# # Use the Heroku-style specification
+# # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+# DATABASES['default'] = env.db('DATABASE_URL')
 
 # CACHING
 # ------------------------------------------------------------------------------
