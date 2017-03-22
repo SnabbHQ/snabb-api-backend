@@ -71,6 +71,8 @@ class OrderUserPDF(APIView):
         pk = request.GET.get('order_id')
         order = get_object_or_404(OrderUser, pk=pk)
         lines = get_object_or_404(LineOrderUser, order_user=pk)
+
+        print (lines)
         dateOrder = (
             datetime.datetime.fromtimestamp(
                 int(order.created_at)
