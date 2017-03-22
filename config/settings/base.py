@@ -66,8 +66,8 @@ LOCAL_APPS = [
     'snabb.couriers.apps.CouriersConfig',
     'snabb.billing.apps.BillingConfig',
     'snabb.app_info.apps.AppInfoConfig',
-    'snabb.deliveries.apps.DeliveriesConfig'
-)
+    'snabb.deliveries.apps.DeliveriesConfig',
+]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
