@@ -1,12 +1,12 @@
 {% load static %}
-<!doctype html>
 <html>
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"></meta>
     <title>Snabb - Invoice</title>
 
     <style>
     .invoice-box{
+        height:1200px;
         max-width:800px;
         margin:auto;
         padding:30px;
@@ -94,11 +94,11 @@
                     <table>
                         <tr>
                             <td class="title">
-                              <img src="{% static 'img/logo.png' %}" alt="Snabb" style="width:100%; max-width:300px;">
+                              <img src="{% static 'img/logo.png' %}" alt="Snabb" style="width:100%; max-width:300px;"/>
                             </td>
                             <td>
-                                Invoice #: {{order.order_reference}}<br>
-                                Created: {{dateOrder}}<br>
+                                Invoice #: {{order.order_reference}}<br/>
+                                Created: {{dateOrder}}<br/>
                             </td>
                         </tr>
                     </table>
@@ -110,14 +110,14 @@
                     <table>
                         <tr>
                             <td>
-                                Snabb SL, Inc.<br>
-                                46800 Valencia<br>
+                                Snabb SL, Inc.<br/>
+                                46800 Valencia<br/>
                                 Valencia (Spain)
                             </td>
 
                             <td>
-                                {{order.nif}}<br>
-                                {{order.company}}<br>
+                                216392784-Z{{order.nif}}<br/>
+                                Cactus SL{{order.company}}<br/>
                                 {{order.name}}
                             </td>
                         </tr>
@@ -135,15 +135,15 @@
                 </td>
             </tr>
 
-            <!--<tr class="details">
+            <tr class="details">
                 <td>
-                    Check
+                    <br>
                 </td>
 
                 <td>
-                    1000
+
                 </td>
-            </tr>-->
+            </tr>
 
             <tr class="heading">
                 <td>
@@ -157,24 +157,25 @@
 
             <tr class="item">
                 <td>
-                    {{lines.0.description}}
+                  {{line.description}}
                 </td>
-
                 <td>
-                    {{lines.0.price}}
+                    {{line.price}}
                 </td>
             </tr>
 
             <tr class="total">
                 <td></td>
                 <td>
-                   Base: {{order.total}} € <br>
+                  <br>
+                   Base: {{order.total}} € <br/>
                    TAX: {{order.tax}} %
-                   <br>
-                   TOTAL: {{total}}
-                 <br>
+                   <br/>
+                   TOTAL: {{total}} €
+                 <br/>
                 </td>
             </tr>
+
         </table>
     </div>
 </body>
