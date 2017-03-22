@@ -11,7 +11,8 @@ from snabb.billing.models import(
     OrderCourier, LineOrderCourier
 )
 from rest_framework.views import APIView
-from weasyprint import HTML
+from django.shortcuts import render
+# from weasyprint import HTML
 
 
 class OrderCourierPDF(APIView):
@@ -26,7 +27,7 @@ class OrderCourierPDF(APIView):
 
         pk = request.GET.get('order_id')
         order = get_object_or_404(OrderCourier, pk=pk)
-        lines = get_object_or_404(LineOrderCourier, order_courier=pk)
+        line = get_object_or_404(LineOrderCourier, order_courier=pk)
 
         dateOrder = (
             datetime.datetime.fromtimestamp(
@@ -40,12 +41,13 @@ class OrderCourierPDF(APIView):
 
         data = {
             'order': order,
-            'lines': lines,
+            'line': line,
             'dateOrder': dateOrder,
             'total': total
         }
+        return render(request, 'orderCourier.html', data)
 
-        html_string = render_to_string('orderCourier.html', data)
+        '''html_string = render_to_string('orderCourier.html', data)
         html = HTML(string=html_string)
         html.write_pdf(target='/tmp/tmpPDF.pdf');
         fs = FileSystemStorage('/tmp')
@@ -54,7 +56,7 @@ class OrderCourierPDF(APIView):
             response['Content-Disposition'] = 'attachment; filename="'+order.order_reference+'.pdf"'
             return response
 
-        return response
+        return response'''
 
 
 
@@ -87,7 +89,8 @@ class OrderUserPDF(APIView):
             'dateOrder': dateOrder,
             'total': total
         }
-        html_string = render_to_string('orderUser.html', data)
+        return render(request, 'orderUser.html', data)
+        '''html_string = render_to_string('orderUser.html', data)
         html = HTML(string=html_string)
         html.write_pdf(target='/tmp/tmpPDF.pdf');
         fs = FileSystemStorage('/tmp')
@@ -96,4 +99,4 @@ class OrderUserPDF(APIView):
             response['Content-Disposition'] = 'attachment; filename="'+order.order_reference+'.pdf"'
             return response
 
-        return response
+        return response'''

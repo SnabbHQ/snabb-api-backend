@@ -429,12 +429,12 @@ def create_lines_order_courier(sender, instance, **kwargs):
     """Create lines for Order Courier when is created."""
     order = instance
     # Execute only when order is created
-    if order.created_at == order.updated_at:
+    if order.created_at == order.updated_at and order.total==0:
         delivery = order.order_delivery
         line = LineOrderCourier()
         line.order_courier = order
         line.price = delivery.price
-        line.description = 'Delivery'
+        line.description = 'Delivery #' + str(delivery.delivery_id)
         line.task = 'Task 1'
         line.quantity = 1
         line.discount = 0
@@ -450,12 +450,12 @@ def create_lines_order_user(sender, instance, **kwargs):
     """Create lines for Order User when is created."""
     order = instance
     # Execute only when order is created
-    if order.created_at == order.updated_at:
+    if order.created_at == order.updated_at and order.total==0:
         delivery = order.order_delivery
         line = LineOrderUser()
         line.order_user = order
         line.price = delivery.price
-        line.description = 'Delivery'
+        line.description = 'Delivery #' + str(delivery.delivery_id)
         line.task = 'Task 1'
         line.quantity = 1
         line.discount = 0
