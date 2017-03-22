@@ -79,14 +79,14 @@ snabb_env
 **.min.css
 **.min.js
 
-snabb/users/migrations/*
-snabb/location/migrations/*
-snabb/currency/migrations/*
-snabb/quote/migrations/*
-snabb/size/migrations/*
-snabb/deliveries/migrations/*
-snabb/address/migrations/*
-snabb/contact/migrations/*
-snabb/google/migrations/*
+#snabb/users/migrations/*
+#snabb/location/migrations/*
+#snabb/currency/migrations/*
+#snabb/quote/migrations/*
+#snabb/size/migrations/*
+#snabb/deliveries/migrations/*
+#snabb/address/migrations/*
+#snabb/contact/migrations/*
+#snabb/google/migrations/*
 .cache/*
 dhparams.pem
