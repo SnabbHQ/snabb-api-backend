@@ -39,7 +39,7 @@ test:
 
 deployment:
   develop:
-    branch: heroku-stuff
+    branch: develop
     commands:
       - |
         cat >~/.netrc <<EOF
@@ -59,9 +59,25 @@ deployment:
           timeout: 400 # if your deploys take a long time
       - heroku scale web=1 --app snabb-api-backend-develop
       - heroku maintenance:off --app snabb-api-backend-develop
-
-  production:
+  develop:
     branch: master
-    heroku:
-      appname: snabb-api-backend
+    commands:
+      - |
+        cat >~/.netrc <<EOF
+        machine api.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        machine git.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        EOF
+      - chmod 600 ~/.netrc # Heroku cli complains about permissions without this
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - heroku maintenance:on --app snabb-api-backend
+      - heroku scale web=0 --app snabb-api-backend
+      - git push git@heroku.com:snabb-api-backend.git $CIRCLE_SHA1:refs/heads/master
+      - heroku run python manage.py migrate --app snabb-api-backend:
+          timeout: 400 # if your deploys take a long time
+      - heroku scale web=1 --app snabb-api-backend
+      - heroku maintenance:off --app snabb-api-backend
 
