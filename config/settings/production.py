@@ -128,17 +128,10 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
-# Uses Amazon RDS for database hosting
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('RDS_DB_NAME'),
-        'USER': env('RDS_USERNAME'),
-        'PASSWORD': env('RDS_PASSWORD'),
-        'HOST': env('RDS_HOSTNAME'),
-        'PORT': env('RDS_PORT'),
-    }
-}
+# Use the Heroku-style specification
+# Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+DATABASES['default'] = env.db('DATABASE_URL')
+
 
 # # Use the Heroku-style specification
 # # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
