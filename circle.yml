@@ -28,7 +28,7 @@ database:
   override:
     - createuser -s -d snabb
     - createdb snabb
-    - python3 manage.py makemigrations users quote size address currency location contact
+    - python3 manage.py makemigrations users quote size address currency location contact couriers app_info billing
     - python3 manage.py migrate
 
 test:

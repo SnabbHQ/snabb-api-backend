@@ -9,6 +9,7 @@ from django.views import defaults as default_views
 
 from .router_v1 import router
 
+
 admin.autodiscover()
 
 # REST Framework
