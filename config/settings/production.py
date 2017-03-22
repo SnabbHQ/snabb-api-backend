@@ -213,10 +213,17 @@ RAVEN_CONFIG = {
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')
 
+# OnFleet
+ONFLEET_API_KEY = env('ONFLEET_API_KEY')
+ONFLEET_API_ROOT = env('ONFLEET_API_ROOT')
+
+# Maps
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
+
 # Your production stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
 CORS_ORIGIN_ALLOW_ALL = True
 FRONTEND_URL = env('FRONTEND_URL')
-MAPS_API_KEY = env('MAPS_API_KEY')
-MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
-ONFLEET_API_KEY = env('ONFLEET_API_KEY')
+
+
