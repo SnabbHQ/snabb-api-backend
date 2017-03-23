@@ -1,0 +1,84 @@
+machine:
+  environment:
+    PATH: "$PATH:~/$CIRCLE_PROJECT_REPONAME/bin"
+  python:
+    version: 3.5.1
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - /home/ubuntu/.cache/pip
+  pre:
+    - pip3 install -r requirements/test.txt # In reality we should test our app inside the docker container
+  override:
+    # set region so we can use the aws command-line tool to log into ecr
+#    - aws configure set default.region eu-central-1
+#    - eval $(aws ecr get-login --region eu-central-1)
+
+    # Install required dependencies for docker compose
+#    - curl -L -o ~/bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5rc1/jq-linux-x86_64-static && chmod +x ~/bin/jq
+#    - curl -L https://github.com/docker/compose/releases/download/1.5.0/docker-compose-`uname -s`-`uname -m` > ../bin/docker-compose && chmod +x ../bin/docker-compose
+
+    # Build the images
+#    - docker build -f ./compose/django/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/snabb-api-backend:$CIRCLE_SHA1 . | cat # workaround progress weirdness
+#    - docker build -f ./compose/nginx/Dockerfile --rm=false -t 057142750304.dkr.ecr.eu-central-1.amazonaws.com/nginx:$CIRCLE_SHA1 . | cat # workaround progress weirdness
+
+database:
+  override:
+    - createuser -s -d snabb
+    - createdb snabb
+    - python3 manage.py migrate
+
+test:
+  override:
+    - pytest snabb --cov=snabb --cov-report html:$CIRCLE_ARTIFACTS
+#    - ../bin/docker-compose up:
+#        background: true
+
+deployment:
+  develop:
+    branch: develop
+    commands:
+      - |
+        cat >~/.netrc <<EOF
+        machine api.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        machine git.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        EOF
+      - chmod 600 ~/.netrc # Heroku cli complains about permissions without this
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - heroku maintenance:on --app snabb-api-backend-develop
+      - heroku scale web=0 --app snabb-api-backend-develop
+      - git push git@heroku.com:snabb-api-backend-develop.git $CIRCLE_SHA1:refs/heads/master
+      - heroku pg:backups:capture --app snabb-api-backend-develop
+      - heroku run python manage.py migrate --app snabb-api-backend-develop:
+          timeout: 400 # if your deploys take a long time
+      - heroku scale web=1 --app snabb-api-backend-develop
+      - heroku maintenance:off --app snabb-api-backend-develop
+  production:
+    branch: master
+    commands:
+      - |
+        cat >~/.netrc <<EOF
+        machine api.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        machine git.heroku.com
+          login $HEROKU_EMAIL
+          password $HEROKU_TOKEN
+        EOF
+      - chmod 600 ~/.netrc # Heroku cli complains about permissions without this
+      - "[[ ! -s \"$(git rev-parse --git-dir)/shallow\" ]] || git fetch --unshallow"
+      - heroku maintenance:on --app snabb-api-backend
+      - heroku scale web=0 --app snabb-api-backend
+      - git push git@heroku.com:snabb-api-backend.git $CIRCLE_SHA1:refs/heads/master
+      - heroku pg:backups:capture --app snabb-api-backend
+      - heroku run python manage.py migrate --app snabb-api-backend:
+          timeout: 400 # if your deploys take a long time
+      - heroku scale web=1 --app snabb-api-backend
+      - heroku maintenance:off --app snabb-api-backend
+

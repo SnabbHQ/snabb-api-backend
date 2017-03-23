@@ -2,23 +2,23 @@
 """
 Production Configurations
 
-- Use Amazon's S3 for storing static files and uploaded media
-- Use mailgun to send emails
-- Use Redis for cache
-
+- Use SenGrid to send emails
 - Use sentry for error logging
-
 
 """
 from __future__ import absolute_import, unicode_literals
-
 from boto.s3.connection import OrdinaryCallingFormat
 from django.utils import six
 
 import logging
 
 
-from .common import *  # noqa
+from .base import *  # noqa
+
+# DEBUG (Be careful with this option and make sure in prod is not actually set!
+# ------------------------------------------------------------------------------
+DEBUG = env.bool('DJANGO_DEBUG', default=False)
+TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
 
 # SECRET CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -26,16 +26,22 @@ from .common import *  # noqa
 # Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
-
 # This ensures that Django will be able to detect a secure connection
 # properly on Heroku.
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # raven sentry client
 # See https://docs.getsentry.com/hosted/clients/python/integrations/django/
-INSTALLED_APPS += ('raven.contrib.django.raven_compat', )
-RAVEN_MIDDLEWARE = ('raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware', )
-MIDDLEWARE_CLASSES = RAVEN_MIDDLEWARE + MIDDLEWARE_CLASSES
+INSTALLED_APPS += ['raven.contrib.django.raven_compat', ]
+RAVEN_MIDDLEWARE = ['raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware']
+MIDDLEWARE  = RAVEN_MIDDLEWARE + MIDDLEWARE
 
+# Use Whitenoise to serve static files
+# See: https://whitenoise.readthedocs.io/
+WHITENOISE_MIDDLEWARE = ['whitenoise.middleware.WhiteNoiseMiddleware', ]
+MIDDLEWARE = WHITENOISE_MIDDLEWARE + MIDDLEWARE
+RAVEN_MIDDLEWARE = ['raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware']
+MIDDLEWARE = RAVEN_MIDDLEWARE + MIDDLEWARE
 
 # SECURITY CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -49,7 +55,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
 SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
     'DJANGO_SECURE_CONTENT_TYPE_NOSNIFF', default=True)
 SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = True
 SECURE_SSL_REDIRECT = env.bool('DJANGO_SECURE_SSL_REDIRECT', default=True)
 CSRF_COOKIE_SECURE = True
@@ -60,20 +66,18 @@ X_FRAME_OPTIONS = 'DENY'
 # ------------------------------------------------------------------------------
 # Hosts/domain names that are valid for this site
 # See https://docs.djangoproject.com/en/1.6/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['snabb.io'])
+ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['.herokuapp.com', '.snabb.io', ])
+
 # END SITE CONFIGURATION
 
-INSTALLED_APPS += ('gunicorn', )
-
+INSTALLED_APPS += ['gunicorn', ]
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
 # Uploaded Media Files
 # ------------------------
 # See: http://django-storages.readthedocs.io/en/latest/index.html
-INSTALLED_APPS += (
-    'storages',
-)
+INSTALLED_APPS += ['storages', ]
 
 AWS_ACCESS_KEY_ID = env('DJANGO_AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('DJANGO_AWS_SECRET_ACCESS_KEY')
@@ -95,25 +99,11 @@ AWS_HEADERS = {
 
 # URL that handles the media served from MEDIA_ROOT, used for managing
 # stored files.
-
-#  See:http://stackoverflow.com/questions/10390244/
-from storages.backends.s3boto import S3BotoStorage
-StaticRootS3BotoStorage = lambda: S3BotoStorage(location='static')
-MediaRootS3BotoStorage = lambda: S3BotoStorage(location='media')
-DEFAULT_FILE_STORAGE = 'config.settings.production.MediaRootS3BotoStorage'
-
-MEDIA_URL = 'https://s3.amazonaws.com/%s/media/' % AWS_STORAGE_BUCKET_NAME
+MEDIA_URL = 'https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME
 
 # Static Assets
 # ------------------------
-
-STATIC_URL = 'https://s3.amazonaws.com/%s/static/' % AWS_STORAGE_BUCKET_NAME
-STATICFILES_STORAGE = 'config.settings.production.StaticRootS3BotoStorage'
-# See: https://github.com/antonagestam/collectfast
-# For Django 1.7+, 'collectfast' should come before
-# 'django.contrib.staticfiles'
-AWS_PRELOAD_METADATA = True
-INSTALLED_APPS = ('collectfast', ) + INSTALLED_APPS
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -122,12 +112,10 @@ DEFAULT_FROM_EMAIL = env('DJANGO_DEFAULT_FROM_EMAIL',
 EMAIL_SUBJECT_PREFIX = env('DJANGO_EMAIL_SUBJECT_PREFIX', default='[snabb] ')
 SERVER_EMAIL = env('DJANGO_SERVER_EMAIL', default=DEFAULT_FROM_EMAIL)
 
-# Anymail with Mailgun
-INSTALLED_APPS += ("anymail", )
-ANYMAIL = {
-    "MAILGUN_API_KEY": env('DJANGO_MAILGUN_API_KEY'),
-}
-EMAIL_BACKEND = "anymail.backends.mailgun.MailgunBackend"
+# SendGrid
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND')
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
+
 
 # TEMPLATE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -140,26 +128,19 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 
 # DATABASE CONFIGURATION
 # ------------------------------------------------------------------------------
-# Uses Amazon RDS for database hosting, which doesn't follow the Heroku-style spec
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': env('RDS_DB_NAME'),
-        'USER': env('RDS_USERNAME'),
-        'PASSWORD': env('RDS_PASSWORD'),
-        'HOST': env('RDS_HOSTNAME'),
-        'PORT': env('RDS_PORT'),
-    }
-}
+# Use the Heroku-style specification
+# Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+DATABASES['default'] = env.db('DATABASE_URL')
 
+
+# # Use the Heroku-style specification
+# # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
+# DATABASES['default'] = env.db('DATABASE_URL')
 
 # CACHING
 # ------------------------------------------------------------------------------
-REDIS_LOCATION = "redis://{}:{}/0".format(
-    env('REDIS_ENDPOINT_ADDRESS'),
-    env('REDIS_PORT')
-)
 
+REDIS_LOCATION = '{0}/{1}'.format(env('REDIS_URL', default='redis://127.0.0.1:6379'), 0)
 # Heroku URL does not pass the DB number, so we parse it in
 CACHES = {
     'default': {
@@ -173,7 +154,6 @@ CACHES = {
     }
 }
 
-
 # Sentry Configuration
 SENTRY_DSN = env('DJANGO_SENTRY_DSN')
 SENTRY_CLIENT = env('DJANGO_SENTRY_CLIENT', default='raven.contrib.django.raven_compat.DjangoClient')
@@ -182,7 +162,7 @@ LOGGING = {
     'disable_existing_loggers': True,
     'root': {
         'level': 'WARNING',
-        'handlers': ['sentry'],
+        'handlers': ['sentry', ],
     },
     'formatters': {
         'verbose': {
@@ -204,22 +184,22 @@ LOGGING = {
     'loggers': {
         'django.db.backends': {
             'level': 'ERROR',
-            'handlers': ['console'],
+            'handlers': ['console', ],
             'propagate': False,
         },
         'raven': {
             'level': 'DEBUG',
-            'handlers': ['console'],
+            'handlers': ['console', ],
             'propagate': False,
         },
         'sentry.errors': {
             'level': 'DEBUG',
-            'handlers': ['console'],
+            'handlers': ['console', ],
             'propagate': False,
         },
         'django.security.DisallowedHost': {
             'level': 'ERROR',
-            'handlers': ['console', 'sentry'],
+            'handlers': ['console', 'sentry', ],
             'propagate': False,
         },
     },
@@ -233,5 +213,17 @@ RAVEN_CONFIG = {
 # Custom Admin URL, use {% url 'admin:index' %}
 ADMIN_URL = env('DJANGO_ADMIN_URL')
 
+# OnFleet
+ONFLEET_API_KEY = env('ONFLEET_API_KEY')
+ONFLEET_API_ROOT = env('ONFLEET_API_ROOT')
+
+# Maps
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
+
 # Your production stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+CORS_ORIGIN_ALLOW_ALL = True
+FRONTEND_URL = env('FRONTEND_URL')
+
+

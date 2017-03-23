@@ -5,7 +5,7 @@ Test settings
 - Used to run tests fast on the continuous integration server and locally
 '''
 
-from .common import *  # noqa
+from .base import *  # noqa
 
 
 # DEBUG
@@ -22,12 +22,11 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='CHANGEME!!!')
 
 # Mail settings
 # ------------------------------------------------------------------------------
-EMAIL_HOST = 'localhost'
 EMAIL_PORT = 1025
 
-# In-memory email backend stores messages in django.core.mail.outbox
-# for unit testing purposes
-EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND')
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
 
 # CACHING
 # ------------------------------------------------------------------------------
@@ -60,3 +59,8 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
         'django.template.loaders.app_directories.Loader',
     ]),
 ]
+FRONTEND_URL = env('FRONTEND_URL')
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
+ONFLEET_API_KEY = env('ONFLEET_API_KEY')
+ONFLEET_API_ROOT = env('ONFLEET_API_ROOT')

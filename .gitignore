@@ -78,3 +78,6 @@ docs/_build/*
 snabb_env
 **.min.css
 **.min.js
+
+.cache/*
+dhparams.pem

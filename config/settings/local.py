@@ -12,7 +12,7 @@ Local settings
 
 import socket
 import os
-from .common import *  # noqa
+from .base import *  # noqa
 
 # DEBUG
 # ------------------------------------------------------------------------------
@@ -27,13 +27,10 @@ SECRET_KEY = env('DJANGO_SECRET_KEY', default='t(@jacwfx(k3nfdv9&v^dlz*v#51+p5mb
 
 # Mail settings
 # ------------------------------------------------------------------------------
-
 EMAIL_PORT = 1025
-
 EMAIL_HOST = 'localhost'
-EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND',
-                    default='django.core.mail.backends.console.EmailBackend')
-
+EMAIL_BACKEND = env('DJANGO_EMAIL_BACKEND')
+SENDGRID_API_KEY = env('SENDGRID_API_KEY')
 
 # CACHING
 # ------------------------------------------------------------------------------
@@ -46,8 +43,8 @@ CACHES = {
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------
-MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-INSTALLED_APPS += ('debug_toolbar', )
+MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+INSTALLED_APPS += ['debug_toolbar', ]
 
 INTERNAL_IPS = ['127.0.0.1', '10.0.2.2', ]
 # tricks to have debug toolbar when developing with docker
@@ -64,7 +61,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 # django-extensions
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ('django_extensions', )
+INSTALLED_APPS += ['django_extensions', ]
 
 # TESTING
 # ------------------------------------------------------------------------------
@@ -72,3 +69,9 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 # Your local stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+CORS_ORIGIN_ALLOW_ALL = True
+FRONTEND_URL = env('FRONTEND_URL')
+MAPS_API_KEY = env('MAPS_API_KEY')
+MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
+ONFLEET_API_KEY = env('ONFLEET_API_KEY')
+ONFLEET_API_ROOT = env('ONFLEET_API_ROOT')

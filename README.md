@@ -7,7 +7,7 @@ Snabb!
 
 Install Instructions
 --------
-In order to get your development environment up and running please follow the instructions here: [Install Guide](docs/install.rst)
+In order to get your development environment up and running please follow the instructions here: [Install Guide](docs/install.md)
 
 
 Settings
@@ -45,7 +45,11 @@ coverage report:
 
 #### Running tests with py.test
 
-    $ py.test
+    $ pytest snabb
+
+If you want to use pytest and coverage at the same time.
+
+    $ pytest snabb --cov=snabb --cov-report html
 
 ### Live reloading and Sass CSS compilation
 
@@ -69,9 +73,21 @@ The following details how to deploy this application.
 
 ### Docker
 
-See detailed [cookiecutter-django Docker
-documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-elastic-beanstalk.html).
+In order to get docker working on your local machine first of all you need to bake the image:
 
-#### Elastic Beanstalk
+    $docker-compose -f docker-compose-local build
 
-See detailed cookiecutter-django Elastic Beanstalk documentation\_.
+This will setup docker compose with the development environment. If you setup it for the first time or need to run
+migrations, you can run the commands in the already created image as follows:
+
+    $docker-compose -f docker-compose-local.yml run django python manage.py migrate
+    $docker-compose -f docker-compose-local.yml run django python manage.py createsuperuser
+
+Finally you can simply run the docker container using (Remember the first time will take a bit of time but once it is
+done, will be super fast!):    
+
+    $docker-compose -f docker-compose-local.yml up
+
+### Sync you local BBDD with Onfleet
+
+    $docker-compose -f dev.yml run django python manage.py sync_onfleet

@@ -5,27 +5,21 @@
 wheel==0.29.0
 
 # Bleeding edge Django
-django==1.9.9
+django==1.10.6
 
 # Configuration
-django-environ==0.4.0
-
-
+django-environ==0.4.1
+whitenoise==3.3.0
 
 # Forms
 django-braces==1.9.0
 django-crispy-forms==1.6.0
 
 # Models
-django-model-utils==2.5.2
+django-model-utils==2.6.1
 
-# Images
-Pillow==3.3.1
-
-# For user registration, either via email or social
-# Well-built with regular release cycles!
-django-allauth==0.27.0
-
+# OAuth 2.0
+django-oauth-toolkit==0.11.0
 
 # Python-PostgreSQL Database Adapter
 psycopg2==2.6.2
@@ -35,13 +29,19 @@ awesome-slugify==1.6.5
 django-autoslug==1.9.3
 
 # Time zones support
-pytz==2016.6.1
-
-# Redis support
-django-redis==4.4.4
-redis>=2.10.0
+pytz==2016.10
 
 # Rest Framework
 djangorestframework==3.4.7
+django-cors-headers==2.0.1
 Markdown==2.6.6
 django-filter==0.15
+
+# Sendgrid for email sending
+sendgrid-django==4.0.4
+
+# Geocode
+geopy==1.11.0
+
+# Requests
+requests==2.12.5
