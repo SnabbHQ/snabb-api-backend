@@ -80,7 +80,6 @@ In order to get docker working on your local machine first of all you need to ba
 This will setup docker compose with the development environment. If you setup it for the first time or need to run
 migrations, you can run the commands in the already created image as follows:
 
-    $docker-compose -f docker-compose-local.yml run django python manage.py makemigrations users quote size address currency location contact couriers app_info billing
     $docker-compose -f docker-compose-local.yml run django python manage.py migrate
     $docker-compose -f docker-compose-local.yml run django python manage.py createsuperuser
 
