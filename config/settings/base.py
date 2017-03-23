@@ -14,15 +14,26 @@ from django.utils.translation import ugettext_lazy as _
 
 import environ
 
-ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/common.py - 3 = snabb/)
+ROOT_DIR = environ.Path(__file__) - 3  # (snabb/config/settings/base.py - 3 = snabb/)
 APPS_DIR = ROOT_DIR.path('snabb')
 
 env = environ.Env()
-env.read_env(ROOT_DIR('.env'))
+
+# .env file, should load only in development environment
+READ_DOT_ENV_FILE = env.bool('DJANGO_READ_DOT_ENV_FILE', default=False)
+
+if READ_DOT_ENV_FILE:
+    # Operating System Environment variables have precedence over variables defined in the .env file,
+    # that is to say variables from the .env files will only be used if not defined
+    # as environment variables.
+    env_file = str(ROOT_DIR.path('.env'))
+    print('Loading : {}'.format(env_file))
+    env.read_env(env_file)
+    print('The .env file has been loaded. See base.py for more information')
 
 # APP CONFIGURATION
 # ------------------------------------------------------------------------------
-DJANGO_APPS = (
+DJANGO_APPS = [
     # Default Django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,16 +45,16 @@ DJANGO_APPS = (
 
     # Admin
     'django.contrib.admin',
-)
-THIRD_PARTY_APPS = (
+]
+THIRD_PARTY_APPS = [
     'crispy_forms',  # Form layouts
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
-)
+]
 
 # Apps specific for this project go here.
-LOCAL_APPS = (
+LOCAL_APPS = [
     # custom users app. Your stuff: custom apps go here
     'snabb.users.apps.UsersConfig',
     'snabb.currency.apps.CurrencyConfig',
@@ -55,25 +66,23 @@ LOCAL_APPS = (
     'snabb.couriers.apps.CouriersConfig',
     'snabb.billing.apps.BillingConfig',
     'snabb.app_info.apps.AppInfoConfig',
-    'snabb.deliveries.apps.DeliveriesConfig'
-)
+    'snabb.deliveries.apps.DeliveriesConfig',
+]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 # MIGRATIONS CONFIGURATION
 # ------------------------------------------------------------------------------

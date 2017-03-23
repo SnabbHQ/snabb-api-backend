@@ -79,16 +79,5 @@ snabb_env
 **.min.css
 **.min.js
 
-snabb/users/migrations/*
-snabb/location/migrations/*
-snabb/currency/migrations/*
-snabb/quote/migrations/*
-snabb/size/migrations/*
-snabb/deliveries/migrations/*
-snabb/address/migrations/*
-snabb/contact/migrations/*
-snabb/google/migrations/*
-snabb/couriers/migrations/*
-snabb/billing/migrations/*
-snabb/app_info/migrations/*
 .cache/*
+dhparams.pem
