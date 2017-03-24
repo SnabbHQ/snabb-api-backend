@@ -6,6 +6,38 @@ def get_response(code):
 
 
 responses = {
+    200101: {
+        'data': {
+            'code': 200101,
+            'message': 'Email verified',
+            'key': 'VERIFY_OK'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200102: {
+        'data': {
+            'code': 200102,
+            'message': 'Email Sended',
+            'key': 'SEND_EMAIL_OK'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200103: {
+        'data': {
+            'code': 200103,
+            'message': 'Password Updated',
+            'key': 'PASSWORD_UPDATE_OK'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200104: {
+        'data': {
+            'code': 200104,
+            'message': 'Password reset',
+            'key': 'RESET_OK'
+        },
+        'status': status.HTTP_200_OK
+    },
     200205: {
         'data': {
             'code': 200205,
@@ -21,6 +53,118 @@ responses = {
             'key': 'ADDRESS_OK'
         },
         'status': status.HTTP_200_OK
+    },
+    400101: {
+        'data': {
+            'code': 400101,
+            'message': 'Invalid email',
+            'key': 'EMAIL_WRONG'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400102: {
+        'data': {
+            'code': 400102,
+            'message': 'Password must be at least 6 chars long.',
+            'key': 'PASSWORD_WRONG'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400103: {
+        'data': {
+            'code': 400101,
+            'message': 'Email already exists',
+            'key': 'EMAIL_ALREADY_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400104: {
+        'data': {
+            'code': 400104,
+            'message': 'Company Name, Email, phone and password required',
+            'key': 'EMAIL_AND_PASSWORD_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400105: {
+        'data': {
+            'code': 400105,
+            'message': 'User hash required',
+            'key': 'HASH_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400106: {
+        'data': {
+            'code': 400106,
+            'message': 'Hash not exists',
+            'key': 'HASH_NOT_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400107: {
+        'data': {
+            'code': 400107,
+            'message': 'This user is already verified',
+            'key': 'ALREADY_VERIFIED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400108: {
+        'data': {
+            'code': 400108,
+            'message': 'An error has occurred',
+            'key': 'VERIFY_ERROR'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400109: {
+        'data': {
+            'code': 400109,
+            'message': 'Email required',
+            'key': 'EMAIL_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400110: {
+        'data': {
+            'code': 400110,
+            'message': 'Email not exists',
+            'key': 'EMAIL_NOT_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400111: {
+        'data': {
+            'code': 400111,
+            'message': 'This user is already verified',
+            'key': 'ALREADY_VERIFIED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400112: {
+        'data': {
+            'code': 400112,
+            'message': 'Wrong current password.',
+            'key': 'CURRENT_PASSWORD_WRONG'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400113: {
+        'data': {
+            'code': 400113,
+            'message': 'current_password and new_password required.',
+            'key': 'REQUIRED_FIELDS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400114: {
+        'data': {
+            'code': 400114,
+            'message': 'User hash and password required',
+            'key': 'HASH_PASSWORD_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
     },
     400300: {
         'data': {
@@ -171,6 +315,22 @@ responses = {
             'code': 400407,
             'message': 'Invalid Address',
             'key': 'INVALID_ADDRESS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400501: {
+        'data': {
+            'code': 400501,
+            'message': 'Order User does not exist',
+            'key': 'INVALID_ORDER_USER'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400502: {
+        'data': {
+            'code': 400502,
+            'message': 'Order Courier does not exist',
+            'key': 'INVALID_ORDER_COURIER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }

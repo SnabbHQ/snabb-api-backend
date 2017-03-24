@@ -16,6 +16,7 @@ import re
 # Imports for welcome email.
 from snabb.email_utils.views import send_mail_template
 from django.conf import settings
+from snabb.utils.code_response import get_response
 
 
 def _check_email(email):
@@ -61,24 +62,12 @@ class RegisterUser(APIView):
             )
 
             if not _check_email(received['email'].lower()):
-                return Response(
-                    data={
-                        'code': 400101,
-                        'message': 'Invalid email.',
-                        'key': 'EMAIL_WRONG'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                response = get_response(400101)
+                return Response(data=response['data'], status=response['status'])
 
             if not _check_password(received['password']):
-                return Response(
-                    data={
-                        'code': 400102,
-                        'message': 'Password must be at least 6 chars long.',
-                        'key': 'PASSWORD_WRONG'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                response = get_response(400102)
+                return Response(data=response['data'], status=response['status'])
 
             if current_user is False:
                 user = Profile()
@@ -107,23 +96,11 @@ class RegisterUser(APIView):
                 return Response(data=serializer.data, status=status.HTTP_201_CREATED)
 
             else:
-                return Response(
-                    data={
-                        'code': 400103,
-                        'message': 'Email already exists',
-                        'key': 'EMAIL_ALREADY_EXISTS'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                response = get_response(400103)
+                return Response(data=response['data'], status=response['status'])
         else:
-            return Response(
-                data={
-                    'code': 400104,
-                    'message': 'Company Name, Email, phone and password required',
-                    'key': 'EMAIL_AND_PASSWORD_REQUIRED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400104)
+            return Response(data=response['data'], status=response['status'])
 
 
 class VerifyUser(APIView):
@@ -139,55 +116,29 @@ class VerifyUser(APIView):
         if ('hash' in received.keys()):
             key = received['hash']
         else:
-            return Response(
-                data={
-                    'code': 400105,
-                    'message': 'User hash required',
-                    'key': 'HASH_REQUIRED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400105)
+            return Response(data=response['data'], status=response['status'])
 
         try:
             user = Profile.objects.get(profile_activation_key=key)
         except Profile.DoesNotExist:
-            return Response(
-                data={
-                    'code': 400106,
-                    'message': 'Hash not exists',
-                    'key': 'HASH_NOT_EXISTS'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400106)
+            return Response(data=response['data'], status=response['status'])
+
         if user.verified:
-            return Response(
-                data={
-                    'code': 400107,
-                    'message': 'This user is already verified',
-                    'key': 'ALREADY_VERIFIED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400107)
+            return Response(data=response['data'], status=response['status'])
+
         if user.profile_activation_key == key and user.verified is False:
             user.verified = True
             user.save()
-            return Response(
-                data={
-                    'code': 200101,
-                    'message': 'Email verified',
-                    'key': 'VERIFY_OK'
-                },
-                status=status.HTTP_200_OK
-            )
+
+            response = get_response(200101)
+            return Response(data=response['data'], status=response['status'])
+
         else:
-            return Response(
-                data={
-                    'code': 400108,
-                    'message': 'An error has occurred',
-                    'key': 'VERIFY_ERROR'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400108)
+            return Response(data=response['data'], status=response['status'])
 
 
 class SendVerifyEmail(APIView):
@@ -203,36 +154,18 @@ class SendVerifyEmail(APIView):
         if ('email' in received.keys()):
             email = received['email']
         else:
-            return Response(
-                data={
-                    'code': 400109,
-                    'message': 'Email required',
-                    'key': 'EMAIL_REQUIRED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400109)
+            return Response(data=response['data'], status=response['status'])
 
         try:
             user = Profile.objects.get(email=email)
         except Profile.DoesNotExist:
-            return Response(
-                data={
-                    'code': 400110,
-                    'message': 'Email not exists',
-                    'key': 'EMAIL_NOT_EXISTS'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400110)
+            return Response(data=response['data'], status=response['status'])
 
         if user.verified:
-            return Response(
-                data={
-                    'code': 400111,
-                    'message': 'This user is already verified',
-                    'key': 'ALREADY_VERIFIED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400111)
+            return Response(data=response['data'], status=response['status'])
         else:
             substitutions = {}
             substitutions['%user_link%'] = settings.FRONTEND_URL+'activate/' + user.profile_activation_key
@@ -241,14 +174,8 @@ class SendVerifyEmail(APIView):
 
             # Send email welcome with activation link
             send_mail_template(user, template, substitutions)
-            return Response(
-                data={
-                    'code': 200102,
-                    'message': 'Email Sended',
-                    'key': 'SEND_EMAIL_OK'
-                },
-                status=status.HTTP_200_OK
-            )
+            response = get_response(200102)
+            return Response(data=response['data'], status=response['status'])
 
 
 class UpdatePassword(APIView):
@@ -270,44 +197,20 @@ class UpdatePassword(APIView):
             if user is not None:
                 # the password verified for the user.
                 if not _check_password(new_password):
-                    return Response(
-                        data={
-                            'code': 400102,
-                            'message': 'Password must be at least 6 chars long.',
-                            'key': 'PASSWORD_WRONG'
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                    response = get_response(400102)
+                    return Response(data=response['data'], status=response['status'])
                 else:
                     user.set_password(new_password)
                     user.save()
-                    return Response(
-                        data={
-                            'code': 200103,
-                            'message': 'Password Updated',
-                            'key': 'PASSWORD_UPDATE_OK'
-                        },
-                        status=status.HTTP_200_OK
-                    )
+                    response = get_response(200103)
+                    return Response(data=response['data'], status=response['status'])
             else:
                 # Invalid current password.
-                return Response(
-                    data={
-                        'code': 400112,
-                        'message': 'Wrong current password.',
-                        'key': 'CURRENT_PASSWORD_WRONG'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                response = get_response(400112)
+                return Response(data=response['data'], status=response['status'])
         else:
-                return Response(
-                    data={
-                        'code': 400113,
-                        'message': 'current_password and new_password required.',
-                        'key': 'REQUIRED_FIELDS'
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            response = get_response(400113)
+            return Response(data=response['data'], status=response['status'])
 
 
 class ForgotPassword(APIView):
@@ -323,26 +226,14 @@ class ForgotPassword(APIView):
         if ('email' in received.keys()):
             email = received['email']
         else:
-            return Response(
-                data={
-                    'code': 400109,
-                    'message': 'Email required',
-                    'key': 'EMAIL_REQUIRED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400109)
+            return Response(data=response['data'], status=response['status'])
 
         try:
             user = Profile.objects.get(email=email)
         except Profile.DoesNotExist:
-            return Response(
-                data={
-                    'code': 400110,
-                    'message': 'Email not exists',
-                    'key': 'EMAIL_NOT_EXISTS'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400110)
+            return Response(data=response['data'], status=response['status'])
 
         #Create new hash for user:
         user.reset_password_key = "%s" % (uuid.uuid4(),)
@@ -352,16 +243,10 @@ class ForgotPassword(APIView):
         substitutions['%user_link%'] = settings.FRONTEND_URL+'resetPassword/' + user.reset_password_key
         substitutions['%name%'] = user.company_name
         template = '50f0db97-ee40-4b23-859d-9e33f460eefd'
-        print(substitutions['%user_link%'])
+        # print(substitutions['%user_link%'])
         send_mail_template(user, template, substitutions)
-        return Response(
-            data={
-                'code': 200102,
-                'message': 'Email Sended',
-                'key': 'SEND_EMAIL_OK'
-            },
-            status=status.HTTP_200_OK
-        )
+        response = get_response(200102)
+        return Response(data=response['data'], status=response['status'])
 
 
 class ResetPassword(APIView):
@@ -378,39 +263,20 @@ class ResetPassword(APIView):
             key = received['hash']
             password = received['password']
         else:
-            return Response(
-                data={
-                    'code': 400114,
-                    'message': 'User hash and password required',
-                    'key': 'HASH_PASSWORD_REQUIRED'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400114)
+            return Response(data=response['data'], status=response['status'])
 
         try:
             user = Profile.objects.get(reset_password_key=key)
         except Profile.DoesNotExist:
-            return Response(
-                data={
-                    'code': 400106,
-                    'message': 'Hash not exists',
-                    'key': 'HASH_NOT_EXISTS'
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            response = get_response(400106)
+            return Response(data=response['data'], status=response['status'])
 
         user.password = password
         user.reset_password_key = ''
         user.save()
-
-        return Response(
-            data={
-                'code': 200104,
-                'message': 'Password reset',
-                'key': 'RESET_OK'
-            },
-            status=status.HTTP_200_OK
-        )
+        response = get_response(200104)
+        return Response(data=response['data'], status=response['status'])
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
