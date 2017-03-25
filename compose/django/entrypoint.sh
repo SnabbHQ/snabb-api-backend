@@ -8,7 +8,7 @@ cmd="$@"
 # does all this for us.
 export REDIS_URL=redis://redis:6379
 
-# the official postgres image uses 'postgres' as default user if not set explictly.
+# The official postgres image uses 'postgres' as default user if not set explictly.
 if [ -z "$POSTGRES_USER" ]; then
     export POSTGRES_USER=postgres
 fi
