@@ -14,6 +14,7 @@ class TaskAdmin(admin.ModelAdmin):
     model = Task
     list_display = ['task_id', 'active']
     list_filter = ['active']
+    readonly_fields = ['task_detail']
 
 
 admin.site.register(Quote, QuoteAdmin)

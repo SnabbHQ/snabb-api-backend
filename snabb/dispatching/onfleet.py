@@ -170,6 +170,21 @@ class Onfleet(object):
             print (error)
         return None
 
+    def _delete_task(self, task_id, *args, **kwargs):
+        ''' Delete a task from onfleet '''
+        try:
+            # Data to send
+            url = self.api_root + "tasks/" + str(task_id)
+            apiCall = requests.delete(
+                url, auth=HTTPBasicAuth(self.api_key, ''))
+            if apiCall.status_code == 200:
+                return apiCall.status_code
+            else:
+                return None
+        except Exception as error:
+            print (error)
+        return None
+
     def _create_team(self, team_name, *args, **kwargs):
         ''' Create a team in onfleet '''
         try:

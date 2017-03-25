@@ -6,8 +6,15 @@ from django.utils.dateformat import format
 from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
-from snabb.dispatching.utils import _get_eta, _create_task
+from snabb.dispatching.utils import (
+    _get_eta,
+    _create_task,
+    _get_task_detail,
+    _assign_task,
+    _delete_task
+)
 import decimal
+from django.db.models.signals import pre_delete
 
 
 class Quote(models.Model):
@@ -230,34 +237,46 @@ class Task(models.Model):
     updated_at = models.IntegerField(default=0, editable=False)
 
     @property
+    def task_detail(self):
+        "Returns team info from dispatching platform."
+        task_details = _get_task_detail(self.task_onfleet_id)
+        return task_details
+
+    @property
     def send_dispatching(self):
         '''
         Only for testing purposes
         '''
-        try:
-            destination = {'address':
-                           {"unparsed": self.task_place.place_address.address},
-                           'notes': self.task_place.description}
-            notes = self.comments
-            recipients = []
-            recipient = {"name": self.task_contact._get_full_name(),
-                         "phone": self.task_contact.phone,
-                         "notes": self.comments}
-            recipients.append(recipient)
+        if not self.task_onfleet_id:
+            try:
+                destination = {
+                    'address':
+                    {"unparsed": self.task_place.place_address.address},
+                    'notes': self.task_place.description
+                }
+                notes = self.comments
+                recipients = []
+                recipient = {"name": self.task_contact._get_full_name(),
+                             "phone": self.task_contact.phone,
+                             "notes": self.comments}
+                recipients.append(recipient)
 
-            if self.task_type == 'pickup':
-                pickupTask = True
-            else:
-                pickupTask = False
+                if self.task_type == 'pickup':
+                    pickupTask = True
+                else:
+                    pickupTask = False
 
-            # Create task in onfleet.
-            new_task = _create_task(destination, recipients,
-                                    notes, pickupTask)
-            return new_task
-        except Exception as error:
-            print(error)
-            return None
-        return 'Task created'
+                # Create task in onfleet.
+                new_task = _create_task(destination, recipients,
+                                        notes, pickupTask)
+                return new_task
+            except Exception as error:
+                print(error)
+                return None
+        else:
+            # Already exists at onfleet
+            task_detail = _get_task_detail(self.task_onfleet_id)
+            return task_detail
 
     def __str__(self):
         return str(self.task_id)
@@ -275,8 +294,17 @@ class Task(models.Model):
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        # Create in onfleet.
-        self.task_onfleet_id = self.send_dispatching['id']
+            # Assign to worker_id ONLY for testing purposes
+            # This sould be at our assignment async worker.
+            assigned_task = _assign_task(
+                self.task_onfleet_id,
+                'bqHwe8jkWOUA*EtimgJkS4FQ'
+            )
+            print (assigned_task)
+
+        # Create in onfleet. ONLY for testing purposes
+        if not self.task_onfleet_id:
+            self.task_onfleet_id = self.send_dispatching['id']
 
         super(Task, self).save(*args, **kwargs)
 
@@ -313,3 +341,14 @@ class Place(models.Model):
             self.updated_at = int(format(datetime.now(), u'U'))
 
         super(Place, self).save(*args, **kwargs)
+
+
+def delete_task(sender, instance, **kwargs):
+    try:
+        _delete_task(instance.task_onfleet_id)
+    except Exception as error:
+        print(error)
+
+
+pre_delete.connect(
+    delete_task, sender=Task, dispatch_uid="delete_task")
