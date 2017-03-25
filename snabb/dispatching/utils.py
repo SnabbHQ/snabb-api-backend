@@ -126,14 +126,12 @@ def _get_all_workers():
 
 
 # Tasks related functions
-def _create_task(self, destination, recipients, notes, pickupTask=False,
-                 completeAfter=None, completeBefore=None, container=None,
-                 *args, **kwargs):
+def _create_task(destination, recipients, notes, pickupTask=False,
+                 completeAfter=None, completeBefore=None, container=None):
     on = Onfleet()
-    new_task = on._create_task(destination,
-                               recipients, completeAfter,
-                               completeBefore, pickupTask,
-                               notes, container)
+    new_task = on._create_task(destination, recipients, notes,
+                               pickupTask, completeAfter, completeBefore,
+                               container)
     return new_task
 
 

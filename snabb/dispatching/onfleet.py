@@ -86,6 +86,13 @@ class Onfleet(object):
         Optional. The number of minutes to be spent by the worker on arrival
         at this task's destination, for route optimization purposes.
         '''
+
+        '''
+        CONTAINER
+        type string TEAM or WORKER.
+        team string If type is TEAM, the ID of the target team.
+        worker string If type is WORKER, the ID of the target worker.
+        '''
         try:
             payload = {}
             if destination is not None:
@@ -114,6 +121,7 @@ class Onfleet(object):
                 url, data=json.dumps(payload),
                 auth=HTTPBasicAuth(self.api_key, '')
             )
+
             if apiCall.status_code == 200:
                 response = apiCall.json()
                 return response

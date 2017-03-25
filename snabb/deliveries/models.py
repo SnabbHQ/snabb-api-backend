@@ -4,19 +4,26 @@ from __future__ import unicode_literals
 import hashlib
 import time
 from django.db import models
+'''
+new	New delivery
+processing	In process. This mean the delivery is being processed and is not yet assigned to a courier * If there are no couriers available at that moment, we will stay in processing for 30 min max.
+assigned	The delivery has been assigned to a courier.
+in_progress	The courier is performing the delivery.
+completed	The courier has completed the delivery (we don't have a distinction yet if the delivery has been done correctly or not)
+expired	The delivery has expired after being 30 min in processing.
+cancelled	The delivery has been cancelled (independently if the delivery has been charged or not)
+'''
 
 
 class Delivery(models.Model):
     statusChoices = (
         ('new', 'new'),
         ('processing', 'processing'),
-        ('no_couriers_available', 'no_couriers_available'),
-        ('en_route_to_pickup', 'en_route_to_pickup'),
-        ('en_route_to_dropoff', 'en_route_to_dropoff'),
-        ('at_dropoff', 'at_dropoff'),
+        ('assigned', 'assigned'),
+        ('in_progress', 'in_progress'),
         ('completed', 'completed'),
-        ('unable_to_deliver', 'unable_to_deliver'),
-        ('scheduled', 'scheduled'),
+        ('expired', 'expired'),
+        ('cancelled', 'cancelled'),
     )
     delivery_id = models.AutoField(
         primary_key=True, blank=True, editable=False
@@ -27,14 +34,6 @@ class Delivery(models.Model):
     )
     price = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00
-    )
-    # This would be a foreignKey to order, for now, charfield for dev,
-    order_reference_id = models.CharField(
-        verbose_name="Order reference",
-        max_length=300,
-        null=False,
-        blank=True,
-        default=''
     )
     delivery_quote = models.ForeignKey(
         'quote.Quote', related_name='delivery_quote',
