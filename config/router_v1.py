@@ -13,7 +13,7 @@ from snabb.users.views import (
 )
 from snabb.address.views import ValidateAddress
 from snabb.quote.views import QuoteViewSet
-from snabb.billing.views import OrderUserPDF, OrderCourierPDF
+from snabb.billing.views import OrderUserViewSet, OrderCourierViewSet
 
 
 router = HybridRouter(trailing_slash=False)
@@ -41,7 +41,5 @@ router.add_api_view("address/validateAddress", url(r'^address/validateAddress',
 router.register(r'deliveries/quote', QuoteViewSet, 'Quote')
 
 # Order Views
-router.add_api_view("billing/orderUserPDF", url(r'^billing/orderUserPDF',
-                    OrderUserPDF.as_view(), name='OrderUserPDF'))
-router.add_api_view("billing/orderCourierPDF", url(r'^billing/orderCourierPDF',
-                    OrderCourierPDF.as_view(), name='OrderCourierPDF'))
+router.register(r'billing/orderUser', OrderUserViewSet, 'OrderUser')
+router.register(r'billing/orderCourier', OrderCourierViewSet, 'OrderCourier')
