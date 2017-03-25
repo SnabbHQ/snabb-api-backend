@@ -6,8 +6,15 @@ from django.utils.dateformat import format
 from django.contrib.auth.models import User
 from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
-from snabb.dispatching.utils import _get_eta
+from snabb.dispatching.utils import (
+    _get_eta,
+    _create_task,
+    _get_task_detail,
+    _assign_task,
+    _delete_task
+)
 import decimal
+from django.db.models.signals import pre_delete
 
 
 class Quote(models.Model):
@@ -44,7 +51,7 @@ class Quote(models.Model):
                     origin_longitude,
                     current_latitude,
                     current_longitude
-                    )
+                )
                 origin_latitude = current_latitude
                 origin_longitude = current_longitude
         return distance
@@ -126,10 +133,10 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_small_meters
                     base_price = minimum_price_small_value
-                    extra_price = price_small*extra_distance
+                    extra_price = price_small * extra_distance
                     price_small = base_price + extra_price
             else:
-                price_small = price_small*distance
+                price_small = price_small * distance
 
             # Calculate price_medium:
             if minimum_price_medium_value:
@@ -138,10 +145,10 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_medium_meters
                     base_price = minimum_price_medium_value
-                    extra_price = price_medium*extra_distance
+                    extra_price = price_medium * extra_distance
                     price_medium = base_price + extra_price
             else:
-                price_medium = price_medium*distance
+                price_medium = price_medium * distance
 
             # Calculate price_big:
             if minimum_price_big_value:
@@ -150,10 +157,10 @@ class Quote(models.Model):
                 else:
                     extra_distance = distance - minimum_price_big_meters
                     base_price = minimum_price_big_value
-                    extra_price = price_big*extra_distance
+                    extra_price = price_big * extra_distance
                     price_big = base_price + extra_price
             else:
-                price_big = price_big*distance
+                price_big = price_big * distance
 
             TWO_PLACES = decimal.Decimal("0.01")
             data_prices = {
@@ -189,7 +196,8 @@ class Quote(models.Model):
 
         if not self.quote_id:
             self.created_at = int(format(datetime.now(), u'U'))
-            self.expire_at = int(format(datetime.now() + timedelta(minutes=10), u'U'))
+            self.expire_at = int(
+                format(datetime.now() + timedelta(minutes=10), u'U'))
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
@@ -223,8 +231,52 @@ class Task(models.Model):
         choices=TaskTypeChoices
     )
     active = models.BooleanField(default=True)
+    task_onfleet_id = models.CharField(
+        verbose_name="Onfleet ID", max_length=500, null=True, blank=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
+
+    @property
+    def task_detail(self):
+        "Returns team info from dispatching platform."
+        task_details = _get_task_detail(self.task_onfleet_id)
+        return task_details
+
+    @property
+    def send_dispatching(self):
+        '''
+        Only for testing purposes
+        '''
+        if not self.task_onfleet_id:
+            try:
+                destination = {
+                    'address':
+                    {"unparsed": self.task_place.place_address.address},
+                    'notes': self.task_place.description
+                }
+                notes = self.comments
+                recipients = []
+                recipient = {"name": self.task_contact._get_full_name(),
+                             "phone": self.task_contact.phone,
+                             "notes": self.comments}
+                recipients.append(recipient)
+
+                if self.task_type == 'pickup':
+                    pickupTask = True
+                else:
+                    pickupTask = False
+
+                # Create task in onfleet.
+                new_task = _create_task(destination, recipients,
+                                        notes, pickupTask)
+                return new_task
+            except Exception as error:
+                print(error)
+                return None
+        else:
+            # Already exists at onfleet
+            task_detail = _get_task_detail(self.task_onfleet_id)
+            return task_detail
 
     def __str__(self):
         return str(self.task_id)
@@ -241,6 +293,18 @@ class Task(models.Model):
             self.expire_at = self.created_at + 600
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
+
+            # Assign to worker_id ONLY for testing purposes
+            # This sould be at our assignment async worker.
+            assigned_task = _assign_task(
+                self.task_onfleet_id,
+                'bqHwe8jkWOUA*EtimgJkS4FQ'
+            )
+            print (assigned_task)
+
+        # Create in onfleet. ONLY for testing purposes
+        if not self.task_onfleet_id:
+            self.task_onfleet_id = self.send_dispatching['id']
 
         super(Task, self).save(*args, **kwargs)
 
@@ -277,3 +341,14 @@ class Place(models.Model):
             self.updated_at = int(format(datetime.now(), u'U'))
 
         super(Place, self).save(*args, **kwargs)
+
+
+def delete_task(sender, instance, **kwargs):
+    try:
+        _delete_task(instance.task_onfleet_id)
+    except Exception as error:
+        print(error)
+
+
+pre_delete.connect(
+    delete_task, sender=Task, dispatch_uid="delete_task")

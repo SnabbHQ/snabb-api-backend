@@ -113,9 +113,9 @@ def _update_worker(worker_id, name=None, teams=None):
     return updated_courier
 
 
-def _delete_worker(worker_id, name=None, teams=None):
+def _delete_worker(worker_id):
     on = Onfleet()
-    deleted_courier = on._delete_worker(worker_id, name, teams)
+    deleted_courier = on._delete_worker(worker_id)
     return deleted_courier
 
 
@@ -126,14 +126,12 @@ def _get_all_workers():
 
 
 # Tasks related functions
-def _create_task(self, destination, recipients, notes, pickupTask=False,
-                 completeAfter=None, completeBefore=None, container=None,
-                 *args, **kwargs):
+def _create_task(destination, recipients, notes, pickupTask=False,
+                 completeAfter=None, completeBefore=None, container=None):
     on = Onfleet()
-    new_task = on._create_task(destination,
-                               recipients, completeAfter,
-                               completeBefore, pickupTask,
-                               notes, container)
+    new_task = on._create_task(destination, recipients, notes,
+                               pickupTask, completeAfter, completeBefore,
+                               container)
     return new_task
 
 
@@ -141,3 +139,15 @@ def _get_task_detail(task_id):
     on = Onfleet()
     detail_task = on._get_task_detail(task_id)
     return detail_task
+
+
+def _assign_task(task_id, worker_id):
+    on = Onfleet()
+    assigned_task = on._assign_task(task_id, worker_id)
+    return assigned_task
+
+
+def _delete_task(task_id):
+    on = Onfleet()
+    deleted_task = on._delete_task(task_id)
+    return deleted_task

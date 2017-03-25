@@ -86,6 +86,13 @@ class Onfleet(object):
         Optional. The number of minutes to be spent by the worker on arrival
         at this task's destination, for route optimization purposes.
         '''
+
+        '''
+        CONTAINER
+        type string TEAM or WORKER.
+        team string If type is TEAM, the ID of the target team.
+        worker string If type is WORKER, the ID of the target worker.
+        '''
         try:
             payload = {}
             if destination is not None:
@@ -114,6 +121,31 @@ class Onfleet(object):
                 url, data=json.dumps(payload),
                 auth=HTTPBasicAuth(self.api_key, '')
             )
+
+            if apiCall.status_code == 200:
+                response = apiCall.json()
+                return response
+            else:
+                return None
+        except Exception as error:
+            print (error)
+        return None
+
+    def _assign_task(self, task_id, worker_id, *args, **kwargs):
+        ''' Assign task to a worker '''
+        try:
+            # We need to make a container and update it on the task_id
+            container = {}
+            container['type'] = 'WORKER'
+            container['worker'] = worker_id
+
+            # Data to send
+            payload = {'container': container}
+            url = self.api_root + "tasks/" + str(task_id)
+            apiCall = requests.put(
+                url, data=json.dumps(payload),
+                auth=HTTPBasicAuth(self.api_key, '')
+            )
             if apiCall.status_code == 200:
                 response = apiCall.json()
                 return response
@@ -134,6 +166,21 @@ class Onfleet(object):
             else:
                 return None
 
+        except Exception as error:
+            print (error)
+        return None
+
+    def _delete_task(self, task_id, *args, **kwargs):
+        ''' Delete a task from onfleet '''
+        try:
+            # Data to send
+            url = self.api_root + "tasks/" + str(task_id)
+            apiCall = requests.delete(
+                url, auth=HTTPBasicAuth(self.api_key, ''))
+            if apiCall.status_code == 200:
+                return apiCall.status_code
+            else:
+                return None
         except Exception as error:
             print (error)
         return None

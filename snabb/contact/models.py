@@ -41,6 +41,12 @@ class Contact(models.Model):
     def __str__(self):
         return str(self.contact_id)
 
+    def _get_full_name(self):
+        "Returns user full name."
+        return '%s %s' % (self.first_name, self.last_name)
+
+    full_name = property(_get_full_name)
+
     class Meta:
         verbose_name = u'Contact',
         verbose_name_plural = u'Contacts'
