@@ -131,6 +131,30 @@ class Onfleet(object):
             print (error)
         return None
 
+    def _assign_task(self, task_id, worker_id, *args, **kwargs):
+        ''' Assign task to a worker '''
+        try:
+            # We need to make a container and update it on the task_id
+            container = {}
+            container['type'] = 'WORKER'
+            container['worker'] = worker_id
+
+            # Data to send
+            payload = {'container': container}
+            url = self.api_root + "tasks/" + str(task_id)
+            apiCall = requests.put(
+                url, data=json.dumps(payload),
+                auth=HTTPBasicAuth(self.api_key, '')
+            )
+            if apiCall.status_code == 200:
+                response = apiCall.json()
+                return response
+            else:
+                return None
+        except Exception as error:
+            print (error)
+        return None
+
     def _get_task_detail(self, task_id, *args, **kwargs):
         ''' Get Data from a task '''
         try:
