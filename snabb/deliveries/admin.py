@@ -12,5 +12,4 @@ class DeliveryAdmin(admin.ModelAdmin):
     list_filter = ['status']
 
 
-
 admin.site.register(Delivery, DeliveryAdmin)

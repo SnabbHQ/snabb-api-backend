@@ -6,23 +6,26 @@ from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.shortcuts import render
 from snabb.utils.code_response import get_response
+from snabb.utils.utils import LargeResultsSetPagination
 from rest_framework import viewsets
 from snabb.billing.models import(
-    OrderUser as OrderUserModel,
-    LineOrderUser as LineOrderUserModel,
-    OrderCourier as OrderCourierModel,
-    LineOrderCourier as LineOrderCourierModel
+    ReceiptUser as ReceiptUserModel,
+    LineReceiptUser as LineReceiptUserModel,
+    ReceiptCourier as ReceiptCourierModel,
+    LineReceiptCourier as LineReceiptCourierModel
 )
 from snabb.billing.serializers import(
-    OrderUserSerializer,
-    OrderCourierSerializer
+    ReceiptUserSerializer,
+    ReceiptCourierSerializer
 )
 
 
-class OrderUserViewSet(viewsets.ModelViewSet):
-    """ViewSet to View Order User. """
-    queryset = OrderUserModel.objects.all()
-    serializer_class = OrderUserSerializer
+class ReceiptUserViewSet(viewsets.ModelViewSet):
+    """ViewSet to View Receipt User. """
+    queryset = ReceiptUserModel.objects.all()
+    serializer_class = ReceiptUserSerializer
+    pagination_class = LargeResultsSetPagination
+
 
     def retrieve(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
@@ -31,56 +34,57 @@ class OrderUserViewSet(viewsets.ModelViewSet):
         pk = self.kwargs['pk']
         try:
             if request.user.is_superuser:
-                order = OrderUserModel.objects.get(pk=pk)
+                receipt = ReceiptUserModel.objects.get(pk=pk)
             else:
-                order = OrderUserModel.objects.get(pk=pk, user=request.user)
+                receipt = ReceiptUserModel.objects.get(pk=pk, user=request.user)
         except:
             response = get_response(400501)
             return Response(data=response['data'], status=response['status'])
 
-        lines = LineOrderUserModel.objects.filter(order_user=pk)
+        lines = LineReceiptUserModel.objects.filter(receipt_user=pk)
         if lines.count()>0:
             line = lines[0]
         else:
             line = '------'
-        dateOrder = (
+        dateReceipt = (
             datetime.datetime.fromtimestamp(
-                int(order.created_at)
+                int(receipt.created_at)
             ).strftime('%Y-%m-%d %H:%M:%S')
         )
 
-        total = order.total
-        if order.tax > 0:
-            total = order.total + (order.total*order.tax/100)
+        total = receipt.total
+        if receipt.tax > 0:
+            total = receipt.total + (receipt.total*receipt.tax/100)
 
         data = {
-            'order': order,
+            'receipt': receipt,
             'line': line,
-            'dateOrder': dateOrder,
+            'dateReceipt': dateReceipt,
             'total': total
         }
-        return render(self.request, 'orderUser.html', data)
+        return render(self.request, 'receiptUser.html', data)
 
 
-    def list(self, request):
-        if not request.user.is_authenticated():
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if request.user.is_superuser:
-            entries = OrderUserModel.objects.all()
+        if self.request.user.is_superuser:
+            queryset = ReceiptUserModel.objects.all()
         else:
-            entries = OrderUserModel.objects.filter(user=self.request.user)
+            queryset = ReceiptUserModel.objects.filter(user=self.request.user)
 
-        serializer = OrderUserSerializer(entries, many=True)
-        return Response(serializer.data)
+        return queryset
 
 
-class OrderCourierViewSet(viewsets.ModelViewSet):
-    """ViewSet to View Order Courier. """
-    queryset = OrderCourierModel.objects.all()
-    serializer_class = OrderUserSerializer
+class ReceiptCourierViewSet(viewsets.ModelViewSet):
+    """ViewSet to View Receipt Courier. """
+    queryset = ReceiptCourierModel.objects.all()
+    serializer_class = ReceiptCourierSerializer
+    pagination_class = LargeResultsSetPagination
 
     def retrieve(self, request, *args, **kwargs):
+        print('------------------------------receive')
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
@@ -89,43 +93,55 @@ class OrderCourierViewSet(viewsets.ModelViewSet):
 
         pk = self.kwargs['pk']
         try:
-            order = OrderCourierModel.objects.get(pk=pk)
+            receipt = ReceiptCourierModel.objects.get(pk=pk)
         except:
             response = get_response(400502)
             return Response(data=response['data'], status=response['status'])
 
-        lines = LineOrderCourierModel.objects.filter(order_courier=pk)
+        lines = LineReceiptCourierModel.objects.filter(receipt_courier=pk)
         if lines.count()>0:
             line = lines[0]
         else:
             line = '------'
 
-        dateOrder = (
+        dateReceipt = (
             datetime.datetime.fromtimestamp(
-                int(order.created_at)
+                int(receipt.created_at)
             ).strftime('%Y-%m-%d %H:%M:%S')
         )
 
-        total = order.total
-        if order.tax > 0:
-            total = order.total + (order.total*order.tax/100)
+        base = receipt.total
+        total = receipt.total
+        fee = 0
+        tax = 0
+        if receipt.fee > 0:
+            fee_percent = receipt.fee
+            fee = base * (fee_percent)/100
+        if receipt.tax > 0:
+            tax_percent = receipt.tax
+            tax = (total - fee) * tax_percent/100
+
+        total = total - fee - tax
 
         data = {
-            'order': order,
+            'receipt': receipt,
             'line': line,
-            'dateOrder': dateOrder,
+            'base': base,
+            'dateReceipt': dateReceipt,
+            'fee_percent': fee_percent,
+            'fee': fee,
+            'tax_percent': tax_percent,
+            'tax': tax,
             'total': total
         }
-        return render(self.request, 'orderCourier.html', data)
+        return render(self.request, 'receiptCourier.html', data)
 
-
-    def list(self, request):
-        if not request.user.is_authenticated():
+    def get_queryset(self):
+        if not self.request.user.is_authenticated():
             return HttpResponseForbidden()
 
-        if not request.user.is_superuser:
+        if not self.request.user.is_superuser:
             return HttpResponseForbidden()
 
-        entries = OrderCourierModel.objects.all()
-        serializer = OrderCourierSerializer(entries, many=True)
-        return Response(serializer.data)
+        queryset = ReceiptCourierModel.objects.all()
+        return queryset

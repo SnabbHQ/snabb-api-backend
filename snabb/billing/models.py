@@ -1,4 +1,4 @@
-"""Models Order, for User and Courier."""
+"""Models Receipt, for User and Courier."""
 from datetime import datetime
 from django.db import models
 from django.db.models.signals import post_save
@@ -9,21 +9,21 @@ from snabb.users.models import User, Profile
 from snabb.utils.utils import get_app_info
 
 
-class OrderUser(models.Model):
-    """Model Order For User."""
+class ReceiptUser(models.Model):
+    """Model Receipt For User."""
 
-    order_id = models.AutoField(
+    receipt_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    order_delivery = models.ForeignKey(
+    receipt_delivery = models.ForeignKey(
         'deliveries.Delivery', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='Order_User_Delivery', verbose_name="Delivery"
+        related_name='Receipt_User_Delivery', verbose_name="Delivery"
     )
     user = models.ForeignKey(
         User, related_name='Bill_User', verbose_name="User",
         blank=True, null=True, on_delete=models.SET_NULL
     )
-    order_reference = models.CharField(
+    receipt_reference = models.CharField(
         verbose_name="Reference",
         max_length=500, null=False,
         unique=True, editable=False
@@ -113,26 +113,26 @@ class OrderUser(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        return str(self.order_id)
+        return str(self.receipt_id)
 
     class Meta:
-        verbose_name = u'Order User',
-        verbose_name_plural = u'Orders User'
+        verbose_name = u'Receipt User',
+        verbose_name_plural = u'Receipts User'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.order_id:
+        if not self.receipt_id:
             self.created_at = self.updated_at
-            prefix = get_app_info('prefix_order_user', 'SNABB')
-            serie = get_app_info('serie_order_user', 'U')
+            prefix = get_app_info('prefix_receipt_user', 'SNABB')
+            serie = get_app_info('serie_receipt_user', 'U')
             year = str(datetime.now().year)
-            orders_count = OrderUser.objects.all().count()
-            num = str(orders_count+1)
-            self.order_reference = prefix+'-'+year+'-'+serie+'-'+num
+            receipts_count = ReceiptUser.objects.all().count()
+            num = str(receipts_count+1)
+            self.receipt_reference = prefix+'-'+year+'-'+serie+'-'+num
 
-            if self.order_delivery:
-                quote = self.order_delivery.delivery_quote
+            if self.receipt_delivery:
+                quote = self.receipt_delivery.delivery_quote
                 self.user = quote.quote_user
 
             if self.user:
@@ -140,14 +140,6 @@ class OrderUser(models.Model):
                 self.name = profile.first_name
                 self.phone = profile.phone
                 self.company = profile.company_name
-                # Campos por rellenar:
-                # self.nif = ''
-                # self.address = ''
-                # self.region = ''
-                # self.zipcode = ''
-                # self.country = ''
-                # self.city = ''
-                # self.tax = 0
 
             # Get Data from AppInfo
             self.snabb_nif = get_app_info('nif')
@@ -159,19 +151,20 @@ class OrderUser(models.Model):
             self.snabb_zipcode = get_app_info('zipcode')
             self.snabb_country = get_app_info('country')
             self.snabb_city = get_app_info('city')
+            self.tax = get_app_info('tax')
 
-        super(OrderUser, self).save(*args, **kwargs)
+        super(ReceiptUser, self).save(*args, **kwargs)
 
 
-class LineOrderUser(models.Model):
-    """Model LineOrder for User."""
+class LineReceiptUser(models.Model):
+    """Model LineReceipt for User."""
 
-    line_order_user_id = models.AutoField(
+    line_receipt_user_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    order_user = models.ForeignKey(
-        OrderUser, null=False,
-        related_name='OrderUser', verbose_name="OrderUser"
+    receipt_user = models.ForeignKey(
+        ReceiptUser, null=False,
+        related_name='ReceiptUser', verbose_name="ReceiptUser"
     )
     task = models.CharField(
         verbose_name=u'Task',
@@ -196,40 +189,40 @@ class LineOrderUser(models.Model):
 
     def __str__(self):
         return str(
-            str(self.line_order_user_id) + ' - ' +
-            str(self.order_user.order_reference)
+            str(self.line_receipt_user_id) + ' - ' +
+            str(self.receipt_user.receipt_reference)
         )
 
     class Meta:
-        verbose_name = u'Line Order User',
-        verbose_name_plural = u'Lines Order User'
+        verbose_name = u'Line Receipt User',
+        verbose_name_plural = u'Lines Receipt User'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.line_order_user_id:
+        if not self.line_receipt_user_id:
             self.created_at = int(format(datetime.now(), u'U'))
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        super(LineOrderUser, self).save(*args, **kwargs)
+        super(LineReceiptUser, self).save(*args, **kwargs)
 
 
-class OrderCourier(models.Model):
-    """Model Order For Courier."""
+class ReceiptCourier(models.Model):
+    """Model Receipt For Courier."""
 
-    order_id = models.AutoField(
+    receipt_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
     courier = models.ForeignKey(
         Courier, related_name='Bill_Courier', verbose_name="Courier",
         blank=True, null=True, on_delete=models.SET_NULL
     )
-    order_delivery = models.ForeignKey(
+    receipt_delivery = models.ForeignKey(
         'deliveries.Delivery', blank=True, null=True, on_delete=models.SET_NULL,
-        related_name='Order_Courier_Delivery', verbose_name="Delivery"
+        related_name='Receipt_Courier_Delivery', verbose_name="Delivery"
     )
-    order_reference = models.CharField(
+    receipt_reference = models.CharField(
         verbose_name="Reference",
         max_length=500, null=False,
         unique=True, editable=False
@@ -320,41 +313,32 @@ class OrderCourier(models.Model):
     created_at = models.IntegerField(default=0, editable=False, blank=True)
 
     def __str__(self):
-        # return str(self.order_id + ' - ' + self.order_reference)
-        return str(self.order_id)
+        # return str(self.receipt_id + ' - ' + self.receipt_reference)
+        return str(self.receipt_id)
 
     class Meta:
-        verbose_name = u'Order Courier',
-        verbose_name_plural = u'Orders Courier'
+        verbose_name = u'Receipt Courier',
+        verbose_name_plural = u'Receipts Courier'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.order_id:
+        if not self.receipt_id:
             self.created_at = int(format(datetime.now(), u'U'))
-            prefix = get_app_info('prefix_order_user', 'SNABB')
-            serie = get_app_info('serie_order_user', 'C')
+            prefix = get_app_info('prefix_receipt_user', 'SNABB')
+            serie = get_app_info('serie_receipt_user', 'C')
             year = str(datetime.now().year)
-            orders_count = OrderCourier.objects.all().count()
-            num = str(orders_count+1)
-            self.order_reference = prefix+'-'+year+'-'+serie+'-'+num
+            receipts_count = ReceiptCourier.objects.all().count()
+            num = str(receipts_count+1)
+            self.receipt_reference = prefix+'-'+year+'-'+serie+'-'+num
 
-            if self.order_delivery:
-                self.courier = self.order_delivery.courier
+            if self.receipt_delivery:
+                self.courier = self.receipt_delivery.courier
 
             if self.courier:
                 self.name = self.courier.name
                 self.phone = self.courier.phone
                 self.fee = self.courier.fee
-                # Campos por rellenar:
-                # self.nif = ''
-                # self.company = ''
-                # self.address = ''
-                # self.region = ''
-                # self.zipcode = ''
-                # self.country = ''
-                # self.city = ''
-                # self.tax = 0
 
             # Get Data from AppInfo
             self.snabb_nif = get_app_info('nif')
@@ -366,21 +350,23 @@ class OrderCourier(models.Model):
             self.snabb_zipcode = get_app_info('zipcode')
             self.snabb_country = get_app_info('country')
             self.snabb_city = get_app_info('city')
+            self.tax = get_app_info('tax')
+
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        super(OrderCourier, self).save(*args, **kwargs)
+        super(ReceiptCourier, self).save(*args, **kwargs)
 
 
-class LineOrderCourier(models.Model):
-    """Model LineOrder for Courier."""
+class LineReceiptCourier(models.Model):
+    """Model LineReceipt for Courier."""
 
-    line_order_courier_id = models.AutoField(
+    line_receipt_courier_id = models.AutoField(
         primary_key=True, blank=True, editable=False
     )
-    order_courier = models.ForeignKey(
-        OrderCourier, null=False,
-        related_name='OrderCourier', verbose_name="OrderCourier"
+    receipt_courier = models.ForeignKey(
+        ReceiptCourier, null=False,
+        related_name='ReceiptCourier', verbose_name="ReceiptCourier"
     )
     task = models.CharField(
         verbose_name=u'Task',
@@ -405,34 +391,34 @@ class LineOrderCourier(models.Model):
 
     def __str__(self):
         return str(
-            str(self.line_order_courier_id) + ' - ' +
-            str(self.order_courier.order_reference)
+            str(self.line_receipt_courier_id) + ' - ' +
+            str(self.receipt_courier.receipt_reference)
         )
 
     class Meta:
-        verbose_name = u'Line Order Courier',
-        verbose_name_plural = u'Lines Order Courier'
+        verbose_name = u'Line Receipt Courier',
+        verbose_name_plural = u'Lines Receipt Courier'
 
     def save(self, *args, **kwargs):
         self.updated_at = int(format(datetime.now(), u'U'))
 
-        if not self.line_order_courier_id:
+        if not self.line_receipt_courier_id:
             self.created_at = int(format(datetime.now(), u'U'))
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
 
-        super(LineOrderCourier, self).save(*args, **kwargs)
+        super(LineReceiptCourier, self).save(*args, **kwargs)
 
 
-@receiver(post_save, sender=OrderCourier)
-def create_lines_order_courier(sender, instance, **kwargs):
-    """Create lines for Order Courier when is created."""
-    order = instance
-    # Execute only when order is created
-    if order.created_at == order.updated_at and order.total==0:
-        delivery = order.order_delivery
-        line = LineOrderCourier()
-        line.order_courier = order
+@receiver(post_save, sender=ReceiptCourier)
+def create_lines_receipt_courier(sender, instance, **kwargs):
+    """Create lines for Receipt Courier when is created."""
+    receipt = instance
+    # Execute only when receipt is created
+    if receipt.created_at == receipt.updated_at and receipt.total==0:
+        delivery = receipt.receipt_delivery
+        line = LineReceiptCourier()
+        line.receipt_courier = receipt
         line.price = delivery.price
         line.description = 'Delivery #' + str(delivery.delivery_id)
         line.task = 'Task 1'
@@ -440,20 +426,20 @@ def create_lines_order_courier(sender, instance, **kwargs):
         line.discount = 0
         line.total = (line.price * line.quantity) - line.discount
         line.save()
-        order.updated_at += 1
-        order.total = line.total
-        order.save()
+        receipt.updated_at += 1
+        receipt.total = line.total
+        receipt.save()
 
 
-@receiver(post_save, sender=OrderUser)
-def create_lines_order_user(sender, instance, **kwargs):
-    """Create lines for Order User when is created."""
-    order = instance
-    # Execute only when order is created
-    if order.created_at == order.updated_at and order.total==0:
-        delivery = order.order_delivery
-        line = LineOrderUser()
-        line.order_user = order
+@receiver(post_save, sender=ReceiptUser)
+def create_lines_receipt_user(sender, instance, **kwargs):
+    """Create lines for Receipt User when is created."""
+    receipt = instance
+    # Execute only when receipt is created
+    if receipt.created_at == receipt.updated_at and receipt.total==0:
+        delivery = receipt.receipt_delivery
+        line = LineReceiptUser()
+        line.receipt_user = receipt
         line.price = delivery.price
         line.description = 'Delivery #' + str(delivery.delivery_id)
         line.task = 'Task 1'
@@ -461,6 +447,6 @@ def create_lines_order_user(sender, instance, **kwargs):
         line.discount = 0
         line.total = (line.price * line.quantity) - line.discount
         line.save()
-        order.updated_at += 1
-        order.total = line.total
-        order.save()
+        receipt.updated_at += 1
+        receipt.total = line.total
+        receipt.save()

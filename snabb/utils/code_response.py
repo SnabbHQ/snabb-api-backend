@@ -321,16 +321,16 @@ responses = {
     400501: {
         'data': {
             'code': 400501,
-            'message': 'Order User does not exist',
-            'key': 'INVALID_ORDER_USER'
+            'message': 'Receive User does not exist',
+            'key': 'INVALID_RECEIVE_USER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
     400502: {
         'data': {
             'code': 400502,
-            'message': 'Order Courier does not exist',
-            'key': 'INVALID_ORDER_COURIER'
+            'message': 'Receive Courier does not exist',
+            'key': 'INVALID_RECEIVE_COURIER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }
