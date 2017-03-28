@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
-from snabb.billing.models import OrderCourier, OrderUser
+from snabb.billing.models import ReceiptCourier, ReceiptUser
 '''
 new	New delivery
 processing	In process. This mean the delivery is being processed and is not yet assigned to a courier * If there are no couriers available at that moment, we will stay in processing for 30 min max.
@@ -67,18 +67,18 @@ class Delivery(models.Model):
         if not self.delivery_id:
             self.created_at = int(format(datetime.now(), u'U'))
         else:
-            # Generate Order when Status Change to completed
+            # Generate Receipt when Status Change to completed
             if self.status == 'completed':
                 delivery = Delivery.objects.get(pk=self.delivery_id)
                 if delivery.status != 'completed':
-                    order = OrderCourier()
-                    order.order_delivery = self
-                    order.save()
+                    receipt = ReceiptCourier()
+                    receipt.receipt_delivery = self
+                    receipt.save()
                     print ('NEW ORDER COURIER')
 
-                    order = OrderUser()
-                    order.order_delivery = self
-                    order.save()
+                    receipt = ReceiptUser()
+                    receipt.receipt_delivery = self
+                    receipt.save()
                     print ('NEW ORDER USER')
 
         super(Delivery, self).save(*args, **kwargs)

@@ -1,22 +1,22 @@
 from rest_framework import serializers
 from .models import (
-    OrderUser, LineOrderUser,
-    OrderCourier, LineOrderCourier
+    ReceiptUser, LineReceiptUser,
+    ReceiptCourier, LineReceiptCourier
 )
 
 
-class OrderUserSerializer(serializers.ModelSerializer):
+class ReceiptUserSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = OrderUser
+        model = ReceiptUser
         fields = (
-            'order_id', 'user', 'order_delivery', 'order_reference'
+            'receipt_id', 'user', 'receipt_delivery', 'receipt_reference'
         )
 
-class OrderCourierSerializer(serializers.ModelSerializer):
+class ReceiptCourierSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = OrderCourier
+        model = ReceiptCourier
         fields = (
-            'order_id', 'courier', 'order_delivery', 'order_reference'
+            'receipt_id', 'courier', 'receipt_delivery', 'receipt_reference'
         )
