@@ -321,16 +321,16 @@ responses = {
     400501: {
         'data': {
             'code': 400501,
-            'message': 'Receive User does not exist',
-            'key': 'INVALID_RECEIVE_USER'
+            'message': 'Receipt User does not exist',
+            'key': 'INVALID_RECEPT_USER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
     400502: {
         'data': {
             'code': 400502,
-            'message': 'Receive Courier does not exist',
-            'key': 'INVALID_RECEIVE_COURIER'
+            'message': 'Receipt Courier does not exist',
+            'key': 'INVALID_RECEIPT_COURIER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }
