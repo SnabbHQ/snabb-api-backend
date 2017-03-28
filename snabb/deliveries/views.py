@@ -7,6 +7,7 @@ from .models import Delivery
 from snabb.address.models import Address
 from snabb.location.models import City
 from snabb.contact.models import Contact
+from snabb.quote.models import Quote
 from .serializers import DeliverySerializer
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -15,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
 from snabb.utils.code_response import get_response
-from datetime import datetime, timedelta
+from datetime import datetime
 from django.utils.dateformat import format
 
 
@@ -37,4 +38,48 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         entries = Delivery.objects.filter(
             delivery_quote__quote_user=self.request.user)
         serializer = DeliverySerializer(entries, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        received = request.data
+
+        if not request.user.is_authenticated():  # Check if is authenticated
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        if 'quote_id' not in received:
+            response = get_response(400503)
+            return Response(data=response['data'], status=response['status'])
+        else:
+            try:
+                quote = Quote.objects.get(quote_id=received['quote_id'])
+            except Quote.DoesNotExist:
+                response = get_response(400506)
+                return Response(
+                    data=response['data'], status=response['status'])
+
+        if 'selected_package_size' not in received:
+            response = get_response(400504)
+            return Response(data=response['data'], status=response['status'])
+
+        now = int(format(datetime.now(), u'U'))
+
+        if quote.expire_at < now:
+            response = get_response(400507)
+            return Response(data=response['data'], status=response['status'])
+
+        new_delivery = Delivery()
+        new_delivery.delivery_quote = quote
+        new_delivery.status = 'new'
+
+        if received['selected_package_size'] == 'small':
+            new_delivery.price = quote.prices['small']['price']
+
+        if received['selected_package_size'] == 'medium':
+            new_delivery.price = quote.prices['medium']['price']
+
+        if received['selected_package_size'] == 'big':
+            new_delivery.price = quote.prices['big']['price']
+
+        new_delivery.save()
+        serializer = DeliverySerializer(new_delivery, many=False)
         return Response(serializer.data)

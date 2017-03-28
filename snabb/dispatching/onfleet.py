@@ -14,7 +14,7 @@ from snabb.utils.utils import get_app_info
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
-    radius = int(get_app_info('dispatching_radius', '6000'))
+    radius = get_app_info('dispatching_radius', '6000')
 
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
