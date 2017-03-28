@@ -322,7 +322,7 @@ responses = {
         'data': {
             'code': 400501,
             'message': 'Receipt User does not exist',
-            'key': 'INVALID_RECEPT_USER'
+            'key': 'INVALID_RECEIPT_USER'
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
