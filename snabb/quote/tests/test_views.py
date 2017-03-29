@@ -124,16 +124,15 @@ class QuoteTests(APITestCase):
         response = view(request)
 
         print (response)
-
         print('-------------------------')
         print(response.data)
         #print(response.data['code'])
         #print('-------------------------')
 
 
-        self.assertEqual(response.data['code'], 400300)
+        #self.assertEqual(response.data['code'], 400300)
 
 
 
 
-        #self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)

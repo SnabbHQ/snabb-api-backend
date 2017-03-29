@@ -20,12 +20,15 @@ class QuoteSerializer(serializers.ModelSerializer):
 
     def currency_info(self, obj):
         if obj.tasks:
-            task = obj.tasks.all().order_by('order')[:1][0]
-            country = task.task_place.place_address.address_city.city_region.region_country
-            currency = country.country_currency
+            try:
+                task = obj.tasks.all().order_by('order')[:1][0]
+                country = task.task_place.place_address.address_city.city_region.region_country
+                currency = country.country_currency
 
-            serializer = CurrencySerializer(
-                currency, many=False, read_only=True)
+                serializer = CurrencySerializer(
+                    currency, many=False, read_only=True)
+            except Exception as error:
+                return None
             return serializer.data
         else:
             return None
