@@ -8,18 +8,20 @@ from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+from snabb.utils.utils import get_app_info
 
 
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
+    radius = get_app_info('dispatching_radius', '6000')
 
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
         try:
             # Data to send
             url = self.api_root + "workers/location?longitude=" \
-                + lon + "&latitude=" + lat + "&radius=6000"
+                + lon + "&latitude=" + lat + "&radius=" + self.radius
             apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
             if apiCall.status_code == 200:
                 response = apiCall.json()
@@ -37,62 +39,9 @@ class Onfleet(object):
         ''' Create task '''
 
         '''
-        curl -X POST "https://onfleet.com/api/v2/tasks" \
-       -u "cd3b3de84cc1ee040bf06512d233719c:" \
-       -d '{"destination":{"address":{"unparsed":"2829 Vallejo St, SF, CA, USA"},
-       "notes":"Small green door by garage door has pin pad, enter *4821*"},
-       "recipients":[{"name":"Blas Silkovich","phone":"650-555-4481","notes":"Knows Neiman,
-       VIP status."}],"completeAfter":1455151071727,
-       "notes":"Order 332: 24oz Stumptown Finca res Leches","autoAssign":{"mode":"distance"}}'
-        '''
-        '''
-        destination / string or object
-        The ID of the task's destination or a valid Destination object.
-
-        recipients / string array or object array
-        An array containing zero or one IDs of the task's recipients or a valid
-        array of zero or one Recipient objects.
-
-        completeAfter / number
-        Optional. A timestamp for the earliest time the task should be
-        completed.
-
-        completeBefore / number
-        Optional. A timestamp for the latest time the task should be completed.
-
-        pickupTask / boolean
-        Optional. Whether the task is a pickup task.
-
-        dependencies / string array
-        Optional. One or more IDs of tasks which must be completed prior to
-        this task.
-
-        notes / string
-        Optional. Notes for the task.
-
-        autoAssign / object
-        Optional. The automatic assignment options for the newly created task.
-        You may not provide a container if using automatic assignment.
-
-        container / object
-        Optional. The container to which to append this task. Defaults to the
-        creator organization container.
-
-        quantity / number
-        Optional. The number of units to be dropped off while completing this
-        task, for route optimization purposes.
-
-        serviceTime / number
-        Optional. The number of minutes to be spent by the worker on arrival
-        at this task's destination, for route optimization purposes.
+        http://docs.onfleet.com/docs/tasks
         '''
 
-        '''
-        CONTAINER
-        type string TEAM or WORKER.
-        team string If type is TEAM, the ID of the target team.
-        worker string If type is WORKER, the ID of the target worker.
-        '''
         try:
             payload = {}
             if destination is not None:

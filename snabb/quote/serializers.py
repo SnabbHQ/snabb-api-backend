@@ -4,6 +4,7 @@ from snabb.address.serializers import AddressSerializer
 from snabb.contact.serializers import ContactSerializer
 from snabb.currency.serializers import CurrencySerializer
 
+
 class QuoteSerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField('tasks_info')
     currency = serializers.SerializerMethodField('currency_info')
@@ -47,6 +48,30 @@ class QuoteSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     place = serializers.SerializerMethodField('place_info')
     contact = serializers.SerializerMethodField('contact_info')
+    dispatching_meta = serializers.SerializerMethodField('get_task_details')
+
+    def get_task_details(self, obj):
+        if obj.task_onfleet_id:
+            details = obj.task_detail
+            response = {}
+
+            if 'trackingURL' in obj.task_detail:
+                response['trackingURL'] = obj.task_detail['trackingURL']
+            else:
+                response['trackingURL'] = None
+
+            if 'estimatedCompletionTime' in obj.task_detail:
+                response['estimatedCompletionTime'] = obj.task_detail['estimatedCompletionTime']
+            else:
+                response['estimatedCompletionTime'] = None
+
+            if 'state' in obj.task_detail:
+                response['state'] = obj.task_detail['state']
+            else:
+                response['state'] = None
+            return response
+        else:
+            return None
 
     def place_info(self, obj):
         if obj.task_place:
@@ -74,7 +99,8 @@ class TaskSerializer(serializers.ModelSerializer):
             'contact',
             'order',
             'comments',
-            'task_type'
+            'task_type',
+            'dispatching_meta'
         )
 
 

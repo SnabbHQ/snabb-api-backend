@@ -333,5 +333,37 @@ responses = {
             'key': 'INVALID_RECEIPT_COURIER'
         },
         'status': status.HTTP_400_BAD_REQUEST
+    },
+    400503: {
+        'data': {
+            'code': 400503,
+            'message': 'Quote ID required',
+            'key': 'QUOTE_ID_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400504: {
+        'data': {
+            'code': 400504,
+            'message': 'Package size required',
+            'key': 'PACKAGE_SIZE_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400506: {
+        'data': {
+            'code': 400506,
+            'message': 'Quote not exists',
+            'key': 'QUOTE_NOT_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400507: {
+        'data': {
+            'code': 400507,
+            'message': 'Expired quote',
+            'key': 'EXPIRED_QUOTE'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
     }
 }
