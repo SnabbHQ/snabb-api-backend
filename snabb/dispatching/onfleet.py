@@ -9,13 +9,19 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 from snabb.app_info.models import AppInfo
-from snabb.app_info.views import get_app_info
+#from snabb.app_info.views import get_app_info
 
 
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
-    radius = get_app_info('dispatching_radius', '6000')
+
+    try:
+        radius = AppInfo.objects.get(name='redius').content
+    except AppInfo.DoesNotExist:
+        radius = '6000'
+
+    # radius = get_app_info('dispatching_radius', '6000')
 
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
