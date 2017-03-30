@@ -8,13 +8,13 @@ from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-# from snabb.utils.utils import get_app_info
+from snabb.utils.utils import get_app_info
 
 
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
-    radius = '6000'  # get_app_info('dispatching_radius', '6000')
+    radius = get_app_info('dispatching_radius', '6000')
 
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
