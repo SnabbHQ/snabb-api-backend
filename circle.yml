@@ -55,7 +55,7 @@ deployment:
       - heroku scale web=0 --app snabb-api-backend-develop
       - git push git@heroku.com:snabb-api-backend-develop.git $CIRCLE_SHA1:refs/heads/master
       - heroku pg:backups:capture --app snabb-api-backend-develop
-      - heroku run python manage.py migrate --app snabb-api-backend-develop:
+      - heroku run python manage.py migrate --app snabb-api-backend-develop --no-input:
           timeout: 400 # if your deploys take a long time
       - heroku scale web=1 --app snabb-api-backend-develop
       - heroku maintenance:off --app snabb-api-backend-develop
@@ -77,7 +77,7 @@ deployment:
       - heroku scale web=0 --app snabb-api-backend
       - git push git@heroku.com:snabb-api-backend.git $CIRCLE_SHA1:refs/heads/master
       - heroku pg:backups:capture --app snabb-api-backend
-      - heroku run python manage.py migrate --app snabb-api-backend:
+      - heroku run python manage.py migrate --app snabb-api-backend --no-input:
           timeout: 400 # if your deploys take a long time
       - heroku scale web=1 --app snabb-api-backend
       - heroku maintenance:off --app snabb-api-backend
