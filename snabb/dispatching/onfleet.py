@@ -8,27 +8,20 @@ from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-from snabb.app_info.models import AppInfo
-#from snabb.app_info.views import get_app_info
+from snabb.utils.utils import get_app_info
 
 
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
 
-    try:
-        radius = AppInfo.objects.get(name='redius').content
-    except AppInfo.DoesNotExist:
-        radius = '6000'
-
-    # radius = get_app_info('dispatching_radius', '6000')
-
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
+        radius = get_app_info('dispatching_radius', '6000')
         try:
             # Data to send
             url = self.api_root + "workers/location?longitude=" \
-                + lon + "&latitude=" + lat + "&radius=" + self.radius
+                + lon + "&latitude=" + lat + "&radius=" + radius
             apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
             if apiCall.status_code == 200:
                 response = apiCall.json()
