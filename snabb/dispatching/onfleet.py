@@ -8,7 +8,8 @@ from django.conf import settings
 import requests
 from requests.auth import HTTPBasicAuth
 import json
-from snabb.utils.utils import get_app_info
+from snabb.app_info.models import AppInfo
+from snabb.app_info.views import get_app_info
 
 
 class Onfleet(object):
