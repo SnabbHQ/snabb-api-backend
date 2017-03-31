@@ -1,17 +1,10 @@
-from django.test import RequestFactory
-from test_plus.test import TestCase
-from django.core.urlresolvers import reverse, resolve
+import json
 from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from snabb.location.models import Zipcode, City, Country, Region
-from django.conf import settings
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient
 from snabb.users.models import Profile
-from rest_framework.authtoken.models import Token
 from snabb.quote.views import QuoteViewSet
-import json
-
+from snabb.quote.tests.json import test1, test2, test3, test4
 
 
 class QuoteTests(APITestCase):
@@ -51,88 +44,48 @@ class QuoteTests(APITestCase):
         )
         return city[0]
 
-    def test_create_quote(self):
-        """ Test create a quote """
-
-        # Init Data
-        country_es = self.create_country('Spain', 'ES', True)
+    def init_data_geo(self):
+        country = self.create_country('Spain', 'ES', True)
         region_valencia = self.create_region(
-            'Valencia', 'Comunidad Valenciana', country_es, True
-        )
+            'Valencia', 'Comunidad Valenciana', country, True)
         city = self.create_city(
-             'Albaida', 'Albaida', region_valencia, True
-        )
+             'Albaida', 'Albaida', region_valencia, True)
         zipcode = self.create_zipcode(46860, city, True)
 
-        user = self.create_profile()
-
-
-
-
-        #request = APIRequestFactory().post("")
-        #view = QuoteViewSet.as_view({'post': 'create'})
-
-        #print (user)
-        #print (user.profile_apiuser)
-
-
-        data = {
-            "tasks" : [
-            {
-              "type": "pickup",
-              "comments": "hay que enviarse urgentemente",
-              "place":{
-                "description" : "esto es un paquete super grande.",
-                "address": "Santa Ana 22, Albaida, 46860, Spain"
-              },
-              "contact":{
-                "first_name": "Jose Luís",
-                "last_name": "Camacho",
-                "company_name": "navilo",
-                "phone": 555555,
-                "email": "test@test.com"
-              }
-            },
-            {
-              "type": "dropoff",
-              "comments": "esto es un comentario de prueba",
-              "place":{
-                "description" : "esperando que llegue",
-                "address": "Santa Ana 22, Albaida, 46860, Spain"
-              },
-              "contact":{
-                "first_name": "Mariano",
-                "last_name": "Rajoy",
-                "company_name": "pp",
-                "phone": 666,
-                "email": "pp@pp.ppp"
-              }
-            }
-          ]
-        }
-
-
-        factory = RequestFactory()
+    def post_api(self, user, data):
+        factory = APIRequestFactory()
         request = factory.post(
             '/api/v1/deliveries/quote',
-            json.dumps(data),
-            content_type='application/json'
+            json.dumps(data), content_type='application/json'
         )
-
         force_authenticate(request, user=user.profile_apiuser)
         view = QuoteViewSet.as_view({'post': 'create'})
         response = view(request)
-
-        print (response)
-        print('-------------------------')
-        print(response.data)
-        #print(response.data['code'])
-        #print('-------------------------')
+        return response
 
 
-        #self.assertEqual(response.data['code'], 400300)
+    def test_create_quote(self):
+        """ Test create a quote """
+        # Init Data
+        self.init_data_geo()
+        user = self.create_profile()
 
-
-
-
+        # Test Cases
+        response = self.post_api(user, test1.data)
         self.assertEqual(response.status_code, 200)
+
+        response = self.post_api(user, {})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400300)
+
+        response = self.post_api(user, test2.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400305)
+
+        response = self.post_api(user, test3.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400407)
+
+        response = self.post_api(user, test4.data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['code'], 400311)
