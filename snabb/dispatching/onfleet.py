@@ -14,14 +14,14 @@ from snabb.utils.utils import get_app_info
 class Onfleet(object):
     api_root = settings.ONFLEET_API_ROOT
     api_key = settings.ONFLEET_API_KEY
-    radius = get_app_info('dispatching_radius', '6000')
 
     def _get_workers_by_location(self, lat, lon, *args, **kwargs):
         ''' Get Data from API '''
+        radius = get_app_info('dispatching_radius', '6000')
         try:
             # Data to send
             url = self.api_root + "workers/location?longitude=" \
-                + lon + "&latitude=" + lat + "&radius=" + self.radius
+                + lon + "&latitude=" + lat + "&radius=" + radius
             apiCall = requests.get(url, auth=HTTPBasicAuth(self.api_key, ''))
             if apiCall.status_code == 200:
                 response = apiCall.json()
