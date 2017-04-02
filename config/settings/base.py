@@ -52,7 +52,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
-    'background_task',
+    # 'background_task',
 ]
 
 # Apps specific for this project go here.
