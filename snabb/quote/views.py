@@ -155,6 +155,11 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
             try:  # Check type
                 task_type = task['type']
+                if task_type != 'pickup' and task_type != 'dropoff':
+                    cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                    response = get_response(400311)
+                    return Response(data=response['data'], status=response['status'])
+
             except Exception as error:
                 if task_type != 'pickup' and task_type != 'dropoff':
                     cancel_quote(task_list, place_list, address_list, contact_list, new_quote)

@@ -304,7 +304,9 @@ class Task(models.Model):
 
         # Create in onfleet. ONLY for testing purposes
         if not self.task_onfleet_id:
-            self.task_onfleet_id = self.send_dispatching['id']
+            created_task = self.send_dispatching
+            if created_task is not None:
+                self.task_onfleet_id = self.send_dispatching['id']
 
         super(Task, self).save(*args, **kwargs)
 
