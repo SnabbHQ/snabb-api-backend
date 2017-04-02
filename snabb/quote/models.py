@@ -19,15 +19,10 @@ import uuid
 
 
 class Quote(models.Model):
-    '''
-    quote_id = models.AutoField(
-        primary_key=True, blank=True, editable=False
+    quote_id = models.CharField(
+        primary_key=True, editable=False, max_length=300, null=False,
+        blank=False
     )
-    '''
-    quote_id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
-
     quote_user = models.ForeignKey(
         User, related_name='quote_user',
         null=True, blank=True
@@ -203,6 +198,7 @@ class Quote(models.Model):
 
         if not self.quote_id:
             self.created_at = int(format(datetime.now(), u'U'))
+            self.quote_id = "%s" % (uuid.uuid4(),)
             self.expire_at = int(
                 format(datetime.now() + timedelta(minutes=10), u'U'))
         else:

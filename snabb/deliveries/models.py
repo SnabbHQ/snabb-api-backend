@@ -19,11 +19,6 @@ class Delivery(models.Model):
         ('expired', 'expired'),
         ('cancelled', 'cancelled'),
     )
-    '''
-    delivery_id = models.AutoField(
-        primary_key=True, blank=True, editable=False
-    )
-    '''
     delivery_id = models.CharField(
         primary_key=True, editable=False, max_length=300, null=False,
         blank=False
