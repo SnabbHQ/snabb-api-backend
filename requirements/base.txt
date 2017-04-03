@@ -45,3 +45,6 @@ geopy==1.11.0
 
 # Requests
 requests==2.12.5
+
+# Background Tasks (For Deliveries Queue)
+django-background-tasks==1.1.6

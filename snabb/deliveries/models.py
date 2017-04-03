@@ -4,15 +4,7 @@ from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
 from snabb.billing.models import ReceiptCourier, ReceiptUser
-'''
-new	New delivery
-processing	In process. This mean the delivery is being processed and is not yet assigned to a courier * If there are no couriers available at that moment, we will stay in processing for 30 min max.
-assigned	The delivery has been assigned to a courier.
-in_progress	The courier is performing the delivery.
-completed	The courier has completed the delivery (we don't have a distinction yet if the delivery has been done correctly or not)
-expired	The delivery has expired after being 30 min in processing.
-cancelled	The delivery has been cancelled (independently if the delivery has been charged or not)
-'''
+import uuid
 
 
 class Delivery(models.Model):
@@ -27,8 +19,9 @@ class Delivery(models.Model):
         ('expired', 'expired'),
         ('cancelled', 'cancelled'),
     )
-    delivery_id = models.AutoField(
-        primary_key=True, blank=True, editable=False
+    delivery_id = models.CharField(
+        primary_key=True, editable=False, max_length=300, null=False,
+        blank=False
     )
     courier = models.ForeignKey(
         'couriers.Courier', related_name='delivery_courier',
@@ -59,13 +52,13 @@ class Delivery(models.Model):
         verbose_name = u'Delivery'
         verbose_name_plural = u'Deliveries'
 
-
     def save(self, *args, **kwargs):
         """Method called on Save Model."""
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.delivery_id:
             self.created_at = int(format(datetime.now(), u'U'))
+            self.delivery_id = "%s" % (uuid.uuid4(),)
         else:
             # Generate Receipt when Status Change to completed
             if self.status == 'completed':
