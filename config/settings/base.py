@@ -70,6 +70,7 @@ LOCAL_APPS = [
     'snabb.app_info.apps.AppInfoConfig',
     'snabb.deliveries.apps.DeliveriesConfig',
     'snabb.dispatching.apps.DispatchingConfig',
+    'snabb.payment.apps.PaymentConfig',
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
