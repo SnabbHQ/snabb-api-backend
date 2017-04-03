@@ -28,6 +28,7 @@ database:
   override:
     - createuser -s -d snabb
     - createdb snabb
+    - python3 manage.py makemigrations background_task
     - python3 manage.py migrate
 
 test:
@@ -81,4 +82,3 @@ deployment:
           timeout: 400 # if your deploys take a long time
       - heroku scale web=1 --app snabb-api-backend
       - heroku maintenance:off --app snabb-api-backend
-
