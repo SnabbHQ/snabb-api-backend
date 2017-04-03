@@ -52,6 +52,7 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
+    'pinax.stripe',
 ]
 
 # Apps specific for this project go here.
@@ -289,3 +290,6 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+PINAX_STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+PINAX_STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')

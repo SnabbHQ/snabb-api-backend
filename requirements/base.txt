@@ -45,3 +45,6 @@ geopy==1.11.0
 
 # Requests
 requests==2.12.5
+
+# Pinax stripe
+pinax-stripe==3.3.0
