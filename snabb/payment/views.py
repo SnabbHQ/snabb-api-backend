@@ -3,52 +3,44 @@ from __future__ import absolute_import, unicode_literals
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Payment
+from .models import Payment, Card as CardDjango
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404, HttpResponse
 from snabb.utils.code_response import get_response
-from .serializers import PaymentSerializer
+from .serializers import PaymentSerializer, CardSerializer
 from decimal import *
 
 from snabb.deliveries.models import Delivery
 
 # STRIPE
 from pinax.stripe.actions import (
-    charges, customers, sources, subscriptions, invoices
+    charges, customers, sources
 )
 from pinax.stripe.management.commands import sync_customers, init_customers
 from pinax.stripe.models import Card, Plan, Subscription, Invoice, Customer
 
-class PaymentViewSet(viewsets.ModelViewSet):
+
+class CardViewSet(viewsets.ModelViewSet):
 
     """
-    API endpoint that allows to create and get a quote
+        API endpoint that allows to create, list, and delete Cards
     """
 
-    serializer_class = PaymentSerializer
-    queryset = Payment.objects.all()
-    http_method_names = ['get', 'post', 'head']
+    serializer_class = CardSerializer
+    queryset = CardDjango.objects.all()
+    http_method_names = ['get', 'post', 'delete']
 
     def get_or_create_customer(self, user):
         '''
             Get or create a customer stripe from a user
         '''
-        # Create/Get Customer Stripe
         customer = customers.get_customer_for_user(user=user)
         if customer is None:
             customer = customers.create(user=user)
         return customer
-
-
-    def delete_all_cards(self, customer):
-        '''
-            Erases all cards from Customer
-        '''
-        for card in customer.stripe_customer.sources:
-            sources.delete_card(customer, card.id)
 
     def create_card(self, customer, token):
         '''
@@ -69,8 +61,111 @@ class PaymentViewSet(viewsets.ModelViewSet):
                     cont += 1
                     if cont > 1:
                         sources.delete_card(customer, card.id)
-        # Return Selected Card
-        return card_selected
+        return card_selected  # Return Selected Card
+
+    def sync_stripe_data(self, customer):
+        '''
+            Sync Data from Django to Stripe
+        '''
+        customers.sync_customer(customer)
+        charges.sync_charges_for_customer(customer)
+
+    def list(self, request):
+        '''
+            List all stripe cards of User.
+        '''
+        if not request.user.is_authenticated():
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        if request.user.is_superuser:
+            entries = self.queryset
+        else:
+            entries = CardDjango.objects.filter(user_id=self.request.user)
+        serializer = CardSerializer(entries, many=True)
+        return Response(serializer.data)
+
+    def set_default_source(self, customer, card_id):
+        '''
+            Set default Source to customer.
+        '''
+        customers.set_default_source(customer, card_id)
+        cards = CardDjango.objects.filter(
+            user_id=customer.user
+        )
+        for card in cards:
+            if card.card_info['id'] == card_id:
+                print ('ES IGUAL')
+                card.default_card = True
+            else:
+                card.default_card = False
+            card.save()
+
+        response = get_response(200209)
+        return Response(data=response['data'], status=response['status'])
+
+    def create(self, request):
+        '''
+            Create a stripe card.
+        '''
+        if not request.user.is_authenticated():
+            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        received = request.data
+
+        if 'token' not in received:
+            response = get_response(400600)
+            return Response(data=response['data'], status=response['status'])
+
+        token = received['token']
+        user = User.objects.get(pk=self.request.user.pk)
+
+        try: # Get/create Customer
+            customer = self.get_or_create_customer(user)
+        except Exception as error:
+            response = get_response(400603)
+            return Response(data=response['data'], status=response['status'])
+
+        self.set_default_source(customer,'card_1A5GSkLCS1tnVc47gENTdagl')
+        return Response('updated')
+        try: # Create Card
+            card_selected = self.create_card(customer, token)
+        except Exception as error:
+            response = get_response(400604)
+            return Response(data=response['data'], status=response['status'])
+
+        try: # Create Django Card
+            new_card = CardDjango.objects.get(
+                fingerprint=card_selected.fingerprint
+            )
+        except CardDjango.DoesNotExist:
+            new_card = CardDjango()
+            new_card.user_id = user
+            new_card.fingerprint = card_selected.fingerprint
+            new_card.save()
+
+        # Sync Data with Stripe
+        self.sync_stripe_data(customer)
+
+        response = get_response(200208)
+        return Response(data=response['data'], status=response['status'])
+
+class PaymentViewSet(viewsets.ModelViewSet):
+    '''
+        API endpoint that allows get all Payments from a user
+    '''
+
+    serializer_class = PaymentSerializer
+    queryset = Payment.objects.all()
+    http_method_names = ['get']
+
+
+    def delete_all_cards(self, customer):
+        '''
+            Erases all cards from Customer
+        '''
+        for card in customer.stripe_customer.sources:
+            sources.delete_card(customer, card.id)
+
 
     def create_charge(self, customer, card, amount, currency, description):
         '''
@@ -85,12 +180,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
                 description=description,
             )
 
-    def sync_stripe_data(self, customer):
-        '''
-            Sync Data from Django to Stripe
-        '''
-        customers.sync_customer(customer)
-        charges.sync_charges_for_customer(customer)
 
     def list(self, request):
 
@@ -112,7 +201,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
 
         # user = self.request.user
         # token = 'tok_1A5ECZLCS1tnVc47lWqocJZt'
-
         # Get User Data
         user = User.objects.get(pk=self.request.user)
 

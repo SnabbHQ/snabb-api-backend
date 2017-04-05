@@ -62,6 +62,22 @@ responses = {
         },
         'status': status.HTTP_200_OK
     },
+    200208: {
+        'data': {
+            'code': 200208,
+            'message': 'Card created',
+            'key': 'CARD_CREATED'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200209: {
+        'data': {
+            'code': 200209,
+            'message': 'Default card updated',
+            'key': 'DEFAULT_CARD_UPDATED'
+        },
+        'status': status.HTTP_200_OK
+    },
     400101: {
         'data': {
             'code': 400101,
