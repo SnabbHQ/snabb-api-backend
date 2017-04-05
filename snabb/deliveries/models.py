@@ -5,6 +5,7 @@ from django.utils.dateformat import format
 from django.db import models
 from snabb.billing.models import ReceiptCourier, ReceiptUser
 import uuid
+import time
 
 
 class Delivery(models.Model):
@@ -59,6 +60,12 @@ class Delivery(models.Model):
         if not self.delivery_id:
             self.created_at = int(format(datetime.now(), u'U'))
             self.delivery_id = "%s" % (uuid.uuid4(),)
+            # Generate new task
+            from .tasks import assign_delivery
+            now = int(format(datetime.now(), u'U'))
+            assign_delivery(self.delivery_id, schedule=30)
+            print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")
+            # first iteration in 30 seg.
         else:
             # Generate Receipt when Status Change to completed
             if self.status == 'completed':
