@@ -7,9 +7,6 @@ class PaymentSerializer(serializers.ModelSerializer):
         model = Payment
         fields = (
             'payment_id',
-            'payment_user',
-            'amount',
-            'status',
-            'created_at',
-            'updated_at'
+            'payment_delivery',
+            'created_at', 'updated_at'
         )

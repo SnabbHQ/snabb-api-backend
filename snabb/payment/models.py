@@ -4,6 +4,7 @@ from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
 from django.contrib.auth.models import User
+from snabb.deliveries.models import Delivery
 import uuid
 
 
@@ -20,10 +21,21 @@ class Payment(models.Model):
     )
     payment_user = models.ForeignKey(
         User, related_name='payment_user',
-        null=True, blank=True
+        null=False, blank=False
+    )
+    payment_delivery = models.ForeignKey(
+        Delivery, related_name='payment_delivery',
+        null=False, blank=False
     )
     amount = models.DecimalField(
         null=False, blank=False, decimal_places=2, default=0.00, max_digits=7
+    )
+    currency = models.CharField(
+        verbose_name="Currency",
+        max_length=20, null=False, blank=False, default='eur'
+    )
+    description = models.CharField(
+        verbose_name="Description", max_length=300, null=True, blank=True
     )
     status = models.CharField(
         verbose_name="Status", max_length=300, null=False, blank=False,
