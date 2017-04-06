@@ -22,42 +22,47 @@ def _get_eta(lat, lon):
 
     if workers is not None:
         for worker in workers['workers']:
-            worker_vehicle = worker['vehicle']['type']
-            worker_lon = worker['location'][0]
-            worker_lat = worker['location'][1]
+            if worker['vehicle'] is not None:
+                # Check if current worker have vehicle, if not, pass.
+                worker_vehicle = worker['vehicle']['type']
+                worker_lon = worker['location'][0]
+                worker_lat = worker['location'][1]
 
-            # Only workers onDuty without active task.
-            if worker['onDuty'] and worker['activeTask'] is None:
-                if worker_vehicle == 'BICYCLE':
-                    mode = 'bicycling'
-                else:
-                    mode = 'driving'
-                current_worker_eta = _get_real_eta(
-                    worker_lat,
-                    worker_lon,
-                    lat,
-                    lon,
-                    mode
-                )
-                if worker_vehicle in small_vehicles:
-                    if small_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        small_eta = current_worker_eta
-                if worker_vehicle in medium_vehicles:
-                    if medium_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        medium_eta = current_worker_eta
-                if worker_vehicle in big_vehicles:
-                    if big_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        big_eta = current_worker_eta
+                # Only workers onDuty without active task.
+                if worker['onDuty'] and worker['activeTask'] is None:
+                    if worker_vehicle == 'BICYCLE':
+                        mode = 'bicycling'
+                    else:
+                        mode = 'driving'
+                    current_worker_eta = _get_real_eta(
+                        worker_lat,
+                        worker_lon,
+                        lat,
+                        lon,
+                        mode
+                    )
+                    if worker_vehicle in small_vehicles:
+                        if small_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            small_eta = current_worker_eta
+                    if worker_vehicle in medium_vehicles:
+                        if medium_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            medium_eta = current_worker_eta
+                    if worker_vehicle in big_vehicles:
+                        if big_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            big_eta = current_worker_eta
 
-                if small_eta != "0" and medium_eta != "0" and big_eta != "0":
-                    # If we have the three ETAs, we dont need any more info.
-                    break
+                    if small_eta != "0" and medium_eta != "0" and big_eta != "0":
+                        # If we have the three ETAs, we dont need any more
+                        # info.
+                        break
+            else:
+                pass
 
     etas = {
         'small': small_eta,

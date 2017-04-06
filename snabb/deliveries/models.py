@@ -20,6 +20,12 @@ class Delivery(models.Model):
         ('expired', 'expired'),
         ('cancelled', 'cancelled'),
     )
+    sizeChoices = (
+        ('small', 'small'),
+        ('medium', 'medium'),
+        ('big', 'big'),
+    )
+
     delivery_id = models.CharField(
         primary_key=True, editable=False, max_length=300, null=False,
         blank=False
@@ -43,6 +49,14 @@ class Delivery(models.Model):
         choices=statusChoices,
         default='new'
     )
+    # For now, we need to save this for assignment purposes.
+    size = models.CharField(
+        verbose_name="Size",
+        max_length=300,
+        null=True,
+        blank=True,
+        choices=sizeChoices
+    )
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
@@ -63,7 +77,7 @@ class Delivery(models.Model):
             # Generate new task
             from snabb.tasks.tasks import assign_delivery
             now = int(format(datetime.now(), u'U'))
-            assign_delivery(self.delivery_id, schedule=30)
+            assign_delivery(self.delivery_id, schedule=10)
             print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")
             # first iteration in 30 seg.
         else:

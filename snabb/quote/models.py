@@ -97,7 +97,6 @@ class Quote(models.Model):
             if size_medium is not None:
                 price_medium = size_medium.size_price
 
-
             size_big = Size.objects.filter(
                 size='big',
                 size_city=task.task_place.place_address.address_city
@@ -262,14 +261,15 @@ class Task(models.Model):
 
     @property
     def task_detail(self):
-        "Returns team info from dispatching platform."
+        "Returns task info from dispatching platform."
         task_details = _get_task_detail(self.task_onfleet_id)
         return task_details
 
     @property
-    def send_dispatching(self):
+    def send_dispatching(self, task_id=None):
         '''
         Only for testing purposes
+        We may call this function from delivery tasks.
         '''
         if not self.task_onfleet_id:
             try:
@@ -317,20 +317,6 @@ class Task(models.Model):
             self.expire_at = self.created_at + 600
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
-
-            # Assign to worker_id ONLY for testing purposes
-            # This sould be at our assignment async worker.
-            assigned_task = _assign_task(
-                self.task_onfleet_id,
-                'bqHwe8jkWOUA*EtimgJkS4FQ'
-            )
-            print (assigned_task)
-
-        # Create in onfleet. ONLY for testing purposes
-        if not self.task_onfleet_id:
-            created_task = self.send_dispatching
-            if created_task is not None:
-                self.task_onfleet_id = self.send_dispatching['id']
 
         super(Task, self).save(*args, **kwargs)
 
