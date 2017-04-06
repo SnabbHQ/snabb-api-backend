@@ -71,14 +71,18 @@ class Delivery(models.Model):
             if self.status == 'completed':
                 delivery = Delivery.objects.get(pk=self.delivery_id)
                 if delivery.status != 'completed':
+                    # Receipt Courier
                     receipt = ReceiptCourier()
                     receipt.receipt_delivery = self
                     receipt.save()
-                    print ('NEW ORDER COURIER')
 
+                    # Receipt User
                     receipt = ReceiptUser()
                     receipt.receipt_delivery = self
                     receipt.save()
-                    print ('NEW ORDER USER')
+
+                    # Payment from User
+
+
 
         super(Delivery, self).save(*args, **kwargs)

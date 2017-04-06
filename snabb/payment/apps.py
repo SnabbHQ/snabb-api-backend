@@ -6,5 +6,4 @@ class PaymentConfig(AppConfig):
     verbose_name = 'Payment'
 
     def ready(self):
-        print('READY')
         pass
