@@ -1,10 +1,10 @@
-
+from snabb.payment.models import Payment, Card as CardDjango
 from snabb.utils.code_response import get_response
 from pinax.stripe.models import Card, Customer
 from pinax.stripe.actions import charges, customers, sources
 
 
-def get_or_create_customer(self, user):
+def get_or_create_customer(user):
     '''
         Get or create a customer stripe from a user
     '''
@@ -14,7 +14,7 @@ def get_or_create_customer(self, user):
     return customer
 
 
-def create_card(self, customer, token):
+def create_card(customer, token):
     '''
         Creates a new card and erases duplicate cards.
         Returns the selected card
@@ -35,6 +35,18 @@ def create_card(self, customer, token):
                     sources.delete_card(customer, card.id)
     return card_selected  # Return Selected Card
 
+def get_default_source(customer):
+    '''
+        Get default Source to customer.
+    '''
+    try:
+        card = CardDjango.objects.get(
+            user_id=customer.user,
+            default_card=True
+        )
+        return card
+    except CardDjango.DoesNotExist:
+        return None
 
 def set_default_source(self, customer, card_id):
     '''
@@ -63,19 +75,22 @@ def delete_all_cards(self, customer):
         sources.delete_card(customer, card.id)
 
 
-def create_charge(self, customer, card, amount, currency, description):
+def create_charge(self, data):
     '''
         Create a charge from customer and card
     '''
     if customers.can_charge:
-        charge = charges.create(
-            customer=customer,
-            source=card,
-            amount=Decimal(amount),
-            currency=currency,
-            description=description,
-        )
-        return True
+        try:
+            charge = charges.create(
+                customer=data['customer'],
+                source=data['card'],
+                amount=Decimal(data['card']),
+                currency=data['currency'],
+                description=data['description']
+            )
+            return True
+        except Exception as error:
+            return False
     return False
 
 
