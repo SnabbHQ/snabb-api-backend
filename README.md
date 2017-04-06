@@ -34,6 +34,24 @@ For convenience, you can keep your normal user logged in on Chrome and
 your superuser logged in on Firefox (or similar), so that you can see
 how the site behaves for both kinds of users.
 
+## Testing
+
+## Testing tools
+
+Testing is a really important thing to have in place in order to get code quality out of the door. For this reason we have
+setup a few testing utilities in order to facilitate the labour.
+
+### Watch and automatic runner
+
+In order to get the test runner working at all times (without having to run pytest everysingle time) we added a couple of
+tools which will facilitate automatically running the tests for you and only re-run the test in which you are working on
+(instead of the entire suite)
+
+Simply run the following command to fire the pytest continuous runner:
+```
+ptw --ignore snabb_env -- --testmon
+```
+
 ### Test coverage
 
 To run the tests, check your test coverage, and generate an HTML

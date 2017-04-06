@@ -12,6 +12,10 @@ from snabb.utils.code_response import get_response
 from snabb.location.models import Zipcode, Region, City, Country
 from django.conf import settings
 
+def _private():
+    return 1
+def not_private():
+    return _private();
 
 def _get_data_to_api_address(address):
     ''' Get Data from API '''
