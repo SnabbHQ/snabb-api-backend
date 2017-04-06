@@ -23,6 +23,46 @@ from pinax.stripe.management.commands import sync_customers, init_customers
 from pinax.stripe.models import Card, Plan, Subscription, Invoice, Customer
 
 
+class SetDefaultSourceCardViewSet(viewsets.ModelViewSet):
+
+    """
+        API endpoint that allows set default card to customer
+    """
+
+    serializer_class = CardSerializer
+    queryset = CardDjango.objects.all()
+    http_method_names = ['retrieve']
+
+    def set_default_source(self, customer, card_id):
+        '''
+            Set default Source to customer.
+        '''
+        customers.set_default_source(customer, card_id)
+        cards = CardDjango.objects.filter(
+            user_id=customer.user
+        )
+        for card in cards:
+            if card.card_info['id'] == card_id:
+                card.default_card = True
+            else:
+                card.default_card = False
+            card.save()
+
+    def retrieve(self, request, pk=None):
+        print (ok)
+        received = request.data
+
+        if 'token' not in received:
+            response = get_response(400600)
+            return Response(data=response['data'], status=response['status'])
+
+
+        response = get_response(200209)
+        return Response(data=response['data'], status=response['status'])
+
+
+
+
 class CardViewSet(viewsets.ModelViewSet):
 
     """

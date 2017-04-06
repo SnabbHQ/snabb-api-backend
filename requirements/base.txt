@@ -51,4 +51,3 @@ snabb-django-background-tasks==1.1.6.1
 
 # Pinax stripe
 pinax-stripe==3.3.0
-payment
