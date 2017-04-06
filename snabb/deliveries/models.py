@@ -61,7 +61,7 @@ class Delivery(models.Model):
             self.created_at = int(format(datetime.now(), u'U'))
             self.delivery_id = "%s" % (uuid.uuid4(),)
             # Generate new task
-            from .tasks import assign_delivery
+            from snabb.tasks.tasks import assign_delivery
             now = int(format(datetime.now(), u'U'))
             assign_delivery(self.delivery_id, schedule=30)
             print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")

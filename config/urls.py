@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api/v1/', include(router.urls)),
     url(r'^api/v1/oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r"^payments/", include("pinax.stripe.urls")),
 
     # Django Admin, use {% url 'admin:index' %}
     url(settings.ADMIN_URL, include(admin.site.urls)),
