@@ -58,6 +58,9 @@ class Quote(models.Model):
                 origin_longitude = current_longitude
         return distance
 
+    # TODO - This requires a big factory as currently we are doing the exact
+    # same operations for three different packeges instead of applying a function
+    # for each of the available package sizes.
     @property
     def prices(self):
         'Returns dictionary of size/prices'
@@ -78,19 +81,29 @@ class Quote(models.Model):
             Get origin info: currency, prices, lat/lon
             '''
             task = tasks[:1][0]  # Get only the origin task
+
             # Get price/meter by size/city of origin.
-            price_small += Size.objects.filter(
+            size_small = Size.objects.filter(
                 size='small',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
-            price_medium += Size.objects.filter(
+            ).first()
+            if size_small is not None:
+                price_small = size_small.size_price
+
+            size_medium = Size.objects.filter(
                 size='medium',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
-            price_big += Size.objects.filter(
+            ).first()
+            if size_medium is not None:
+                price_medium = size_medium.size_price
+
+
+            size_big = Size.objects.filter(
                 size='big',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
+            ).first()
+            if size_big is not None:
+                price_big = size_big.size_price
 
             # Get Minimum prices for this city.
             try:
@@ -111,6 +124,7 @@ class Quote(models.Model):
                 )
                 minimum_price_medium_meters = minimum_price_medium.price_meters
                 minimum_price_medium_value = minimum_price_medium.price_value
+                print(minimum_price_medium)
             except MinimumPrice.DoesNotExist:
                 minimum_price_medium_meters = None
                 minimum_price_medium_value = None
@@ -164,21 +178,28 @@ class Quote(models.Model):
             else:
                 price_big = price_big * distance
 
-            TWO_PLACES = decimal.Decimal("0.01")
-            data_prices = {
-                'small': {
-                    'price': price_small.quantize(TWO_PLACES),
+            # Finally add the calculated prices to the response object
+            ROUND_TO = decimal.Decimal("0.01")
+            data_prices = {}
+
+            if price_small != 0:
+                data_prices['small'] = {
+                    'price': price_small.quantize(ROUND_TO),
                     'eta': pickup_etas['small']
-                },
-                'medium': {
-                    'price': price_medium.quantize(TWO_PLACES),
+                }
+
+            if price_medium != 0:
+                data_prices['medium'] = {
+                    'price': price_medium.quantize(ROUND_TO),
                     'eta': pickup_etas['medium']
-                },
-                'big': {
-                    'price': price_big.quantize(TWO_PLACES),
+                }
+
+            if price_big != 0:
+                data_prices['big'] = {
+                    'price': price_big.quantize(ROUND_TO),
                     'eta': pickup_etas['big']
                 }
-            }
+
             return data_prices
         except Exception as error:
             print(error)
