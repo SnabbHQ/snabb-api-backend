@@ -57,6 +57,15 @@ class DeliveryViewSet(viewsets.ModelViewSet):
                 return Response(
                     data=response['data'], status=response['status'])
 
+        try:
+            delivery = Delivery.objects.get(
+                delivery_quote=received['quote_id'])
+            response = get_response(400605)
+            return Response(
+                data=response['data'], status=response['status'])
+        except Delivery.DoesNotExist:
+            pass
+
         if 'selected_package_size' not in received:
             response = get_response(400504)
             return Response(data=response['data'], status=response['status'])

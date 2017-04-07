@@ -429,5 +429,13 @@ responses = {
             'key': 'CARD_STRIPE_ERROR'
         },
         'status': status.HTTP_400_BAD_REQUEST
+    },
+    400605: {
+        'data': {
+            'code': 400605,
+            'message': 'Delivery for this quote already exists',
+            'key': 'DELIVERY_ALREADY_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
     }
 }

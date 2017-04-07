@@ -10,6 +10,7 @@ from snabb.dispatching.utils import (
     _create_task,
     _get_task_detail,
     _assign_task,
+    _get_available_workers_by_location
 )
 
 
@@ -28,11 +29,7 @@ def assign_delivery(delivery_id):
         ('expired', 'expired'),
         ('cancelled', 'cancelled'),
     '''
-
-    now = time.strftime("%c")
     print ('[TASK] Assign Delivery [/TASK]')
-    print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")
-
     try:  # Get Delivery
         delivery = Delivery.objects.get(delivery_id=delivery_id)
     except Exception as error:
@@ -47,9 +44,6 @@ def assign_delivery(delivery_id):
         delivery.status = 'processing'
         delivery.save()
 
-    print ('\t\t[ID] --> ' + str(delivery.delivery_id) +
-           ' ' + str(delivery.status) + ' <--[ID]')
-
     creation_time = delivery.created_at
     limit_time = datetime.datetime.now() - datetime.timedelta(minutes=30)
     limit_time = int(format(limit_time, u'U'))
@@ -59,35 +53,34 @@ def assign_delivery(delivery_id):
         delivery.save()
         return True
     else:
-        print('SEARCH FOR A VALID COURIER')
-        # For now, we assign to fixed courier.
-
         # Get all tasks for this delivery.
         delivery_tasks = delivery.delivery_quote.tasks.all().order_by('order')
+        # Get first task GEO info.
+        origin_task = delivery_tasks[:1][0]
+        lat = str(origin_task.task_place.place_address.latitude)
+        lon = str(origin_task.task_place.place_address.longitude)
+        size = delivery.size
+        # We need to get a courier for this delivery.
+        available_courier = _get_available_workers_by_location(lat, lon, size)
 
-        for task in delivery_tasks:
-            # Check if task is not currently in Onfleet
-            if not task.task_onfleet_id:
-                created_task = task.send_dispatching
-                print('CREATING TASK')
-                if created_task is not None:
-                    task.task_onfleet_id = task.send_dispatching['id']
-                    task.save()
-                    print('CREATE TASK')
+        if available_courier is not None:
+            # We have an available courier.
+            for task in delivery_tasks:
+                # Check if task is not currently in Onfleet
+                if not task.task_onfleet_id:
+                    created_task = task.send_dispatching
+                    if created_task is not None:
+                        task.task_onfleet_id = task.send_dispatching['id']
+                        task.save()
 
-            # We get task id to assign to a FIXED courier.
-            print('ASSSIGN TASK ' + str(task_onfleet_id))
+                # We get task id to assign to our selected courier.
+                assigned_task = _assign_task(
+                    task.task_onfleet_id,
+                    available_courier
+                )
 
-            assigned_task = _assign_task(
-                task.task_onfleet_id,
-                'bqHwe8jkWOUA*EtimgJkS4FQ'
-            )
-
-        return True
-
-        #   - SI NO HAN pasado 30 min.
-        #       -intento obtener courier
-        #           - Si existe courier, completo task.
-        #               - Obtengo las tasks de el quote actual, y las mando a Onfleet.
-
-        #           - SI NO hay courier, completo esta y creo otra en 30 seg ?
+            return True
+        else:
+            print('Any courier available')
+            # We need to launch a new task from here.
+            return True

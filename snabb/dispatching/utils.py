@@ -72,7 +72,38 @@ def _get_eta(lat, lon):
     return etas
 
 
+def _get_available_workers_by_location(lat, lon, package_size):
+    '''
+    This function gets a lat lon, and package_size.
+    And return the closest worker for this location
+    '''
+    available_vehicles = {}
+    available_vehicles['small'] = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
+    available_vehicles['medium'] = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
+    available_vehicles['big'] = ['CAR', 'TRUCK']
+
+    on = Onfleet()
+    workers = on._get_workers_by_location(lat, lon)
+    # Return only workers onDuty without active task and with vehicle.
+    if workers is not None:
+        for worker in workers['workers']:
+            if (worker['vehicle'] is not None and worker['onDuty']
+                    and worker['activeTask'] is None):
+                worker_vehicle = worker['vehicle']['type']
+                # Check if current worker vehicle is in our selected package
+                # size
+                if worker_vehicle in available_vehicles[package_size]:
+                    return worker['id']
+                else:
+                    pass
+            else:
+                pass
+    else:
+        return None
+
 # Team related functions
+
+
 def _create_team(team_name):
     on = Onfleet()
     new_team = on._create_team(team_name)
