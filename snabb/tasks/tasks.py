@@ -10,7 +10,8 @@ from snabb.dispatching.utils import (
     _create_task,
     _get_task_detail,
     _assign_task,
-    _get_available_workers_by_location
+    _get_available_workers_by_location,
+    _send_dispatching
 )
 
 
@@ -70,12 +71,18 @@ def assign_delivery(delivery_id):
             # Pending add at this point a dependencies task. TO keep the order
             # of completion
 
+            task_id = None
             for task in delivery_tasks:
                 # Check if task is not currently in Onfleet
                 if not task.task_onfleet_id:
-                    created_task = task.send_dispatching
+                    if task_id is not None:
+                        # Assign previous task as dependency
+                        created_task = _send_dispatching(task, task_id)
+                    else:
+                        created_task = _send_dispatching(task)
+
                     if created_task is not None:
-                        task.task_onfleet_id = task.send_dispatching['id']
+                        task.task_onfleet_id = created_task['id']
                         task.save()
 
                 # We get task id to assign to our selected courier.
@@ -83,6 +90,8 @@ def assign_delivery(delivery_id):
                     task.task_onfleet_id,
                     available_courier
                 )
+
+                task_id = task.task_onfleet_id
 
             return True
         else:

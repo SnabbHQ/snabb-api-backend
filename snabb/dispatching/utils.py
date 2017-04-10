@@ -166,10 +166,12 @@ def _get_all_workers():
 
 
 # Tasks related functions
-def _create_task(destination, recipients, notes, pickupTask=False,
-                 completeAfter=None, completeBefore=None, container=None):
+def _create_task(destination, recipients, notes, dependencies,
+                 pickupTask=False, completeAfter=None, completeBefore=None,
+                 container=None):
+
     on = Onfleet()
-    new_task = on._create_task(destination, recipients, notes,
+    new_task = on._create_task(destination, recipients, notes, dependencies,
                                pickupTask, completeAfter, completeBefore,
                                container)
     return new_task
@@ -191,3 +193,42 @@ def _delete_task(task_id):
     on = Onfleet()
     deleted_task = on._delete_task(task_id)
     return deleted_task
+
+
+def _send_dispatching(task, task_id=None):
+    "We use this function to create task in Onfleet, and link dependencies."
+    if not task.task_onfleet_id:
+        try:
+            destination = {
+                'address':
+                {"unparsed": task.task_place.place_address.address},
+                'notes': task.task_place.description
+            }
+            notes = task.comments
+            recipients = []
+            recipient = {"name": task.task_contact._get_full_name(),
+                         "phone": task.task_contact.phone,
+                         "notes": task.comments}
+            recipients.append(recipient)
+
+            if task.task_type == 'pickup':
+                pickupTask = True
+            else:
+                pickupTask = False
+
+            dependencies = []
+            if task_id is not None:
+                dependencies.append(task_id)
+
+            # Create task in onfleet.
+            new_task = _create_task(destination, recipients,
+                                    notes, dependencies, pickupTask)
+
+            return new_task
+        except Exception as error:
+            print(error)
+            return None
+    else:
+        # Already exists at onfleet
+        task_detail = _get_task_detail(task.task_onfleet_id)
+        return task_detail

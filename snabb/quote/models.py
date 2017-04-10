@@ -8,7 +8,6 @@ from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
 from snabb.dispatching.utils import (
     _get_eta,
-    _create_task,
     _get_task_detail,
     _assign_task,
     _delete_task
@@ -264,43 +263,6 @@ class Task(models.Model):
         "Returns task info from dispatching platform."
         task_details = _get_task_detail(self.task_onfleet_id)
         return task_details
-
-    @property
-    def send_dispatching(self, task_id=None):
-        '''
-        Only for testing purposes
-        We may call this function from delivery tasks.
-        '''
-        if not self.task_onfleet_id:
-            try:
-                destination = {
-                    'address':
-                    {"unparsed": self.task_place.place_address.address},
-                    'notes': self.task_place.description
-                }
-                notes = self.comments
-                recipients = []
-                recipient = {"name": self.task_contact._get_full_name(),
-                             "phone": self.task_contact.phone,
-                             "notes": self.comments}
-                recipients.append(recipient)
-
-                if self.task_type == 'pickup':
-                    pickupTask = True
-                else:
-                    pickupTask = False
-
-                # Create task in onfleet.
-                new_task = _create_task(destination, recipients,
-                                        notes, pickupTask)
-                return new_task
-            except Exception as error:
-                print(error)
-                return None
-        else:
-            # Already exists at onfleet
-            task_detail = _get_task_detail(self.task_onfleet_id)
-            return task_detail
 
     def __str__(self):
         return str(self.task_id)
