@@ -1,20 +1,15 @@
 from rest_framework import serializers
-from .models import Payment, Card
+from .models import Card
 
-class PaymentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Payment
-        fields = (
-            'payment_id',
-            'payment_delivery',
-            'created_at', 'updated_at'
-        )
 
 class CardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Card
+        read_only_fields = (
+            'card_id', 'user_id', 'fingerprint', 'card_info',
+            'created_at', 'updated_at'
+        )
         fields = (
             'card_id',
             'user_id',

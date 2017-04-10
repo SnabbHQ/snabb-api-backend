@@ -9,6 +9,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('profile_id', 'company_name', 'first_name', 'last_name',
                   'email', 'phone', 'verified', 'send_email_notifications',
-                  'send_sms_notifications', 'user_lang', 'created_at',
-                  'updated_at')
+                  'send_sms_notifications', 'user_lang', 'enterprise',
+                  'created_at', 'updated_at')
+                  
         read_only_fields = ('verified',)

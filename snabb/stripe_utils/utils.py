@@ -48,7 +48,7 @@ def get_default_source(customer):
     except CardDjango.DoesNotExist:
         return None
 
-def set_default_source(self, customer, card_id):
+def set_default_source(customer, card_id):
     '''
         Set default Source to customer.
     '''

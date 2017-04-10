@@ -68,7 +68,7 @@ class Payment(models.Model):
     statusChoices = (
         ('processing', 'processing'),
         ('completed', 'completed'),
-        ('cancelled', 'cancelled')
+        ('failed', 'failed')
     )
 
     payment_id = models.UUIDField(
