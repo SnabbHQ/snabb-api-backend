@@ -15,6 +15,7 @@ from snabb.address.views import ValidateAddress
 from snabb.quote.views import QuoteViewSet
 from snabb.billing.views import ReceiptUserViewSet, ReceiptCourierViewSet
 from snabb.deliveries.views import DeliveryViewSet
+from snabb.payment.views import CardViewSet
 
 
 router = HybridRouter(trailing_slash=False)
@@ -49,3 +50,6 @@ router.register(r'deliveries', DeliveryViewSet, 'Delivery')
 # Order Views
 router.register(r'billing/receiptUser', ReceiptUserViewSet, 'ReceiptUser')
 router.register(r'billing/receiptCourier', ReceiptCourierViewSet, 'ReceiptCourier')
+
+# Payment Views
+router.register(r'cards', CardViewSet, 'Cards')

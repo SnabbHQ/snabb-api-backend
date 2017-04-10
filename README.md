@@ -91,3 +91,9 @@ done, will be super fast!):
 ### Sync you local BBDD with Onfleet
 
     $docker-compose -f dev.yml run django python manage.py sync_onfleet
+
+### Enable task queue listener
+
+When we create a new delivery, we send a task to our queue list, and try to assign the created task to one courier. We retry this until task as expired, or assigned to a courier. For this, we user django_background_tasks. You can enable the worker with: 
+
+    $docker-compose -f docker-compose-local.yml run django python manage.py process_tasks

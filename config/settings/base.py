@@ -52,7 +52,8 @@ THIRD_PARTY_APPS = [
     'oauth2_provider',
     'rest_framework',
     'corsheaders',
-    # 'background_task',
+    'background_task',
+    'pinax.stripe'
 ]
 
 # Apps specific for this project go here.
@@ -70,6 +71,8 @@ LOCAL_APPS = [
     'snabb.app_info.apps.AppInfoConfig',
     'snabb.deliveries.apps.DeliveriesConfig',
     'snabb.dispatching.apps.DispatchingConfig',
+    'snabb.payment.apps.PaymentConfig',
+    'snabb.tasks'
 ]
 
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -291,3 +294,6 @@ ADMIN_URL = r'^admin/'
 
 # Your common stuff: Below this line define 3rd party library settings
 # ------------------------------------------------------------------------------
+
+PINAX_STRIPE_PUBLIC_KEY = env('STRIPE_PUBLIC_KEY')
+PINAX_STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')

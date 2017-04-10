@@ -54,6 +54,31 @@ responses = {
         },
         'status': status.HTTP_200_OK
     },
+    200207: {
+        'data': {
+            'code': 200207,
+            'message': 'Charge successful',
+            'key': 'CHARGE_OK'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200208: {
+        'data': {
+            'code': 200208,
+            'message': 'Card created',
+            'key': 'CARD_CREATED'
+        },
+        'status': status.HTTP_200_OK
+    },
+    200209: {
+        'data': {
+            'code': 200209,
+            'message': 'Default card updated',
+            'key': 'DEFAULT_CARD_UPDATED'
+        },
+        'status': status.HTTP_200_OK
+    },
+
     400101: {
         'data': {
             'code': 400101,
@@ -363,6 +388,62 @@ responses = {
             'code': 400507,
             'message': 'Expired quote',
             'key': 'EXPIRED_QUOTE'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400600: {
+        'data': {
+            'code': 400600,
+            'message': 'Token is required',
+            'key': 'TOKEN_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400601: {
+        'data': {
+            'code': 400601,
+            'message': 'Delivery_id is required',
+            'key': 'DELIVERY_ID_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400602: {
+        'data': {
+            'code': 400602,
+            'message': 'Delivery does not exists',
+            'key': 'DELIVERY_NOT_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400603: {
+        'data': {
+            'code': 400603,
+            'message': 'Error creating Customer Stripe',
+            'key': 'CUSTOMER_STRIPE_ERROR'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400604: {
+        'data': {
+            'code': 400604,
+            'message': 'Error creating Card Stripe',
+            'key': 'CARD_STRIPE_ERROR'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400605: {
+        'data': {
+            'code': 400605,
+            'message': 'Source ID is required',
+            'key': 'SOURCE_ID_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400606: {
+        'data': {
+            'code': 400606,
+            'message': 'Source ID does not exists',
+            'key': 'SOURCE_ID_NOT_EXISTS'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }

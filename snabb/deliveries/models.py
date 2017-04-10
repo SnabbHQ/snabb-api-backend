@@ -4,7 +4,11 @@ from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
 from snabb.billing.models import ReceiptCourier, ReceiptUser
+from snabb.payment.models import Payment
+from snabb.users.models import Profile
+from snabb.stripe_utils.utils import *
 import uuid
+import time
 
 
 class Delivery(models.Model):
@@ -59,19 +63,63 @@ class Delivery(models.Model):
         if not self.delivery_id:
             self.created_at = int(format(datetime.now(), u'U'))
             self.delivery_id = "%s" % (uuid.uuid4(),)
+            # Generate new task
+            from snabb.tasks.tasks import assign_delivery
+            now = int(format(datetime.now(), u'U'))
+            assign_delivery(self.delivery_id, schedule=30)
+            print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")
+            # first iteration in 30 seg.
         else:
             # Generate Receipt when Status Change to completed
             if self.status == 'completed':
                 delivery = Delivery.objects.get(pk=self.delivery_id)
                 if delivery.status != 'completed':
+                    # Receipt Courier
                     receipt = ReceiptCourier()
                     receipt.receipt_delivery = self
                     receipt.save()
-                    print ('NEW ORDER COURIER')
 
+                    # Receipt User
                     receipt = ReceiptUser()
                     receipt.receipt_delivery = self
                     receipt.save()
-                    print ('NEW ORDER USER')
+
+                    # Payment from User
+                    # Get Customer
+                    user = self.delivery_quote.quote_user
+                    profile = Profile.objects.get(profile_apiuser=user)
+                    if not profile.enterprise:
+                        customer = get_or_create_customer(user)
+                        # Get Default Card
+                        card = get_default_source(customer)
+                        if not card:
+                            print ('DEFAULT CARD NOT EXISTS')
+                        else:
+                            # Generate Django Payment
+                            payment = Payment()
+                            payment.payment_user = user
+                            payment.payment_delivery = self
+                            payment.amount = Decimal(self.price)
+                            payment.currency = 'eur'
+                            payment.description = str(self.delivery_id)
+                            payment.status = 'processing'
+                            payment.save()
+
+                            # Get Delivery price
+                            data_charge = {
+                                'customer': customer,
+                                'card': card,
+                                'amount': payment.amount,
+                                'currency': payment.currency,
+                                'description': payment.description
+                            }
+                            # Generate charge
+                            if create_charge(data_charge):
+                                print ('PAYMENT SUCCESSFUL')
+                                payment.status = 'completed'
+                            else:
+                                payment.status = 'failed'
+                            payment.save()
+
 
         super(Delivery, self).save(*args, **kwargs)
