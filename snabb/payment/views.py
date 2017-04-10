@@ -123,7 +123,6 @@ class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     http_method_names = ['get']
 
-
     def list(self, request):
 
         if not request.user.is_authenticated():
