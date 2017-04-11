@@ -30,6 +30,7 @@ class Profile(models.Model):
     password = models.CharField(
         max_length=800, null=True, blank=True
     )
+    enterprise = models.BooleanField(default=False, blank=True)
     active = models.BooleanField(default=True, blank=True)
     verified = models.BooleanField(default=False, blank=True)
     send_email_notifications = models.BooleanField(default=True, blank=True)

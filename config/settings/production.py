@@ -225,5 +225,3 @@ MAPS_API_PROVIDER = env('MAPS_API_PROVIDER')
 # ------------------------------------------------------------------------------
 CORS_ORIGIN_ALLOW_ALL = True
 FRONTEND_URL = env('FRONTEND_URL')
-
-

@@ -4,7 +4,6 @@ from datetime import datetime
 from django.utils.dateformat import format
 from django.db import models
 from django.contrib.auth.models import User
-from snabb.deliveries.models import Delivery
 import uuid
 from pinax.stripe.actions import sources, customers
 
@@ -69,7 +68,7 @@ class Payment(models.Model):
     statusChoices = (
         ('processing', 'processing'),
         ('completed', 'completed'),
-        ('cancelled', 'cancelled')
+        ('failed', 'failed')
     )
 
     payment_id = models.UUIDField(
@@ -80,7 +79,7 @@ class Payment(models.Model):
         null=False, blank=False
     )
     payment_delivery = models.ForeignKey(
-        Delivery, related_name='payment_delivery',
+        'deliveries.Delivery', related_name='payment_delivery',
         null=False, blank=False
     )
     amount = models.DecimalField(
