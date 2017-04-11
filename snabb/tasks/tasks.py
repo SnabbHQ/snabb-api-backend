@@ -67,10 +67,6 @@ def assign_delivery(delivery_id):
         if available_courier is not None:
             # We have an available courier.
 
-            # TO DO
-            # Pending add at this point a dependencies task. TO keep the order
-            # of completion
-
             task_id = None
             for task in delivery_tasks:
                 # Check if task is not currently in Onfleet
