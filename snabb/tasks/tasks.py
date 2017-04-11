@@ -92,13 +92,12 @@ def assign_delivery(delivery_id):
                 )
 
                 task_id = task.task_onfleet_id
-
+                delivery.status = 'assigned'
+                delivery.save()
             return True
         else:
-            print('Any courier available')
 
-            # TO DO
-            # Pending to add at this point. We need to create a new task to
-            # retry the assignment.
-
+            # We add new task to retry the assignment.
+            assign_delivery(delivery_id, schedule=30)
+            # Set current task as completed
             return True
