@@ -60,7 +60,7 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         try:
             delivery = Delivery.objects.get(
                 delivery_quote=received['quote_id'])
-            response = get_response(400605)
+            response = get_response(400607)
             return Response(
                 data=response['data'], status=response['status'])
         except Delivery.DoesNotExist:
