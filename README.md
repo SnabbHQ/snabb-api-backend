@@ -69,12 +69,7 @@ If you want to use pytest and coverage at the same time.
 
     $ pytest snabb --cov=snabb --cov-report html
 
-### Live reloading and Sass CSS compilation
-
-Moved to [Live reloading and SASS
-compilation](http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html).
-
-### Sentry
+## Sentry
 
 Sentry is an error logging aggregator service. You can sign up for a
 free account at <https://getsentry.com/signup/?code=cookiecutter> or
