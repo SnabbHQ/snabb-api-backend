@@ -1,9 +1,9 @@
 Snabb
 ====
 
-Snabb!
-
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg)](https://github.com/pydanny/cookiecutter-django/)
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/8fc0a33c7a90b116c22e)
 
 Install Instructions
 --------
