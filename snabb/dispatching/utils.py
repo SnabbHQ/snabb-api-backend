@@ -22,42 +22,47 @@ def _get_eta(lat, lon):
 
     if workers is not None:
         for worker in workers['workers']:
-            worker_vehicle = worker['vehicle']['type']
-            worker_lon = worker['location'][0]
-            worker_lat = worker['location'][1]
+            if worker['vehicle'] is not None:
+                # Check if current worker have vehicle, if not, pass.
+                worker_vehicle = worker['vehicle']['type']
+                worker_lon = worker['location'][0]
+                worker_lat = worker['location'][1]
 
-            # Only workers onDuty without active task.
-            if worker['onDuty'] and worker['activeTask'] is None:
-                if worker_vehicle == 'BICYCLE':
-                    mode = 'bicycling'
-                else:
-                    mode = 'driving'
-                current_worker_eta = _get_real_eta(
-                    worker_lat,
-                    worker_lon,
-                    lat,
-                    lon,
-                    mode
-                )
-                if worker_vehicle in small_vehicles:
-                    if small_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        small_eta = current_worker_eta
-                if worker_vehicle in medium_vehicles:
-                    if medium_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        medium_eta = current_worker_eta
-                if worker_vehicle in big_vehicles:
-                    if big_eta == "0":
-                        # Only save if we don't have a better eta for this
-                        # size.
-                        big_eta = current_worker_eta
+                # Only workers onDuty without active task.
+                if worker['onDuty'] and worker['activeTask'] is None:
+                    if worker_vehicle == 'BICYCLE':
+                        mode = 'bicycling'
+                    else:
+                        mode = 'driving'
+                    current_worker_eta = _get_real_eta(
+                        worker_lat,
+                        worker_lon,
+                        lat,
+                        lon,
+                        mode
+                    )
+                    if worker_vehicle in small_vehicles:
+                        if small_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            small_eta = current_worker_eta
+                    if worker_vehicle in medium_vehicles:
+                        if medium_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            medium_eta = current_worker_eta
+                    if worker_vehicle in big_vehicles:
+                        if big_eta == "0":
+                            # Only save if we don't have a better eta for this
+                            # size.
+                            big_eta = current_worker_eta
 
-                if small_eta != "0" and medium_eta != "0" and big_eta != "0":
-                    # If we have the three ETAs, we dont need any more info.
-                    break
+                    if small_eta != "0" and medium_eta != "0" and big_eta != "0":
+                        # If we have the three ETAs, we dont need any more
+                        # info.
+                        break
+            else:
+                pass
 
     etas = {
         'small': small_eta,
@@ -67,7 +72,38 @@ def _get_eta(lat, lon):
     return etas
 
 
+def _get_available_workers_by_location(lat, lon, package_size):
+    '''
+    This function gets a lat lon, and package_size.
+    And return the closest worker for this location
+    '''
+    available_vehicles = {}
+    available_vehicles['small'] = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
+    available_vehicles['medium'] = ['CAR', 'MOTORCYCLE', 'BICYCLE', 'TRUCK']
+    available_vehicles['big'] = ['CAR', 'TRUCK']
+
+    on = Onfleet()
+    workers = on._get_workers_by_location(lat, lon)
+    # Return only workers onDuty without active task and with vehicle.
+    if workers is not None:
+        for worker in workers['workers']:
+            if (worker['vehicle'] is not None and worker['onDuty']
+                    and worker['activeTask'] is None):
+                worker_vehicle = worker['vehicle']['type']
+                # Check if current worker vehicle is in our selected package
+                # size
+                if worker_vehicle in available_vehicles[package_size]:
+                    return worker['id']
+                else:
+                    pass
+            else:
+                pass
+    else:
+        return None
+
 # Team related functions
+
+
 def _create_team(team_name):
     on = Onfleet()
     new_team = on._create_team(team_name)
@@ -130,10 +166,12 @@ def _get_all_workers():
 
 
 # Tasks related functions
-def _create_task(destination, recipients, notes, pickupTask=False,
-                 completeAfter=None, completeBefore=None, container=None):
+def _create_task(destination, recipients, notes, dependencies,
+                 pickupTask=False, completeAfter=None, completeBefore=None,
+                 container=None):
+
     on = Onfleet()
-    new_task = on._create_task(destination, recipients, notes,
+    new_task = on._create_task(destination, recipients, notes, dependencies,
                                pickupTask, completeAfter, completeBefore,
                                container)
     return new_task
@@ -155,3 +193,42 @@ def _delete_task(task_id):
     on = Onfleet()
     deleted_task = on._delete_task(task_id)
     return deleted_task
+
+
+def _send_dispatching(task, task_id=None):
+    "We use this function to create task in Onfleet, and link dependencies."
+    if not task.task_onfleet_id:
+        try:
+            destination = {
+                'address':
+                {"unparsed": task.task_place.place_address.address},
+                'notes': task.task_place.description
+            }
+            notes = task.comments
+            recipients = []
+            recipient = {"name": task.task_contact._get_full_name(),
+                         "phone": task.task_contact.phone,
+                         "notes": task.comments}
+            recipients.append(recipient)
+
+            if task.task_type == 'pickup':
+                pickupTask = True
+            else:
+                pickupTask = False
+
+            dependencies = []
+            if task_id is not None:
+                dependencies.append(task_id)
+
+            # Create task in onfleet.
+            new_task = _create_task(destination, recipients,
+                                    notes, dependencies, pickupTask)
+
+            return new_task
+        except Exception as error:
+            print(error)
+            return None
+    else:
+        # Already exists at onfleet
+        task_detail = _get_task_detail(task.task_onfleet_id)
+        return task_detail

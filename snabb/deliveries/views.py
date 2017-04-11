@@ -57,9 +57,20 @@ class DeliveryViewSet(viewsets.ModelViewSet):
                 return Response(
                     data=response['data'], status=response['status'])
 
+        try:
+            delivery = Delivery.objects.get(
+                delivery_quote=received['quote_id'])
+            response = get_response(400607)
+            return Response(
+                data=response['data'], status=response['status'])
+        except Delivery.DoesNotExist:
+            pass
+
         if 'selected_package_size' not in received:
             response = get_response(400504)
             return Response(data=response['data'], status=response['status'])
+        else:
+            package_size = received['selected_package_size']
 
         now = int(format(datetime.now(), u'U'))
 
@@ -70,16 +81,9 @@ class DeliveryViewSet(viewsets.ModelViewSet):
         new_delivery = Delivery()
         new_delivery.delivery_quote = quote
         new_delivery.status = 'new'
-
-        if received['selected_package_size'] == 'small':
-            new_delivery.price = quote.prices['small']['price']
-
-        if received['selected_package_size'] == 'medium':
-            new_delivery.price = quote.prices['medium']['price']
-
-        if received['selected_package_size'] == 'big':
-            new_delivery.price = quote.prices['big']['price']
-
+        new_delivery.size = package_size
+        new_delivery.price = quote.prices[package_size]['price']
         new_delivery.save()
+
         serializer = DeliverySerializer(new_delivery, many=False)
         return Response(serializer.data)

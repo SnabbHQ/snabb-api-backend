@@ -33,9 +33,9 @@ class Onfleet(object):
             print (error)
         return None
 
-    def _create_task(self, destination, recipients, notes, pickupTask=False,
-                     completeAfter=None, completeBefore=None, container=None,
-                     *args, **kwargs):
+    def _create_task(self, destination, recipients, notes, dependencies,
+                     pickupTask=False, completeAfter=None, completeBefore=None,
+                     container=None, *args, **kwargs):
         ''' Create task '''
 
         '''
@@ -65,6 +65,7 @@ class Onfleet(object):
             if container is not None:
                 payload['container'] = container
 
+            payload['dependencies'] = dependencies
             url = self.api_root + "tasks"
             apiCall = requests.post(
                 url, data=json.dumps(payload),

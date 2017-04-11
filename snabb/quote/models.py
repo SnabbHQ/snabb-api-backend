@@ -8,7 +8,6 @@ from snabb.size.models import Size, MinimumPrice
 from snabb.geo_utils.utils import _check_distance_between_points
 from snabb.dispatching.utils import (
     _get_eta,
-    _create_task,
     _get_task_detail,
     _assign_task,
     _delete_task
@@ -58,6 +57,9 @@ class Quote(models.Model):
                 origin_longitude = current_longitude
         return distance
 
+    # TODO - This requires a big factory as currently we are doing the exact
+    # same operations for three different packeges instead of applying a function
+    # for each of the available package sizes.
     @property
     def prices(self):
         'Returns dictionary of size/prices'
@@ -78,19 +80,28 @@ class Quote(models.Model):
             Get origin info: currency, prices, lat/lon
             '''
             task = tasks[:1][0]  # Get only the origin task
+
             # Get price/meter by size/city of origin.
-            price_small += Size.objects.filter(
+            size_small = Size.objects.filter(
                 size='small',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
-            price_medium += Size.objects.filter(
+            ).first()
+            if size_small is not None:
+                price_small = size_small.size_price
+
+            size_medium = Size.objects.filter(
                 size='medium',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
-            price_big += Size.objects.filter(
+            ).first()
+            if size_medium is not None:
+                price_medium = size_medium.size_price
+
+            size_big = Size.objects.filter(
                 size='big',
                 size_city=task.task_place.place_address.address_city
-            ).first().size_price
+            ).first()
+            if size_big is not None:
+                price_big = size_big.size_price
 
             # Get Minimum prices for this city.
             try:
@@ -111,6 +122,7 @@ class Quote(models.Model):
                 )
                 minimum_price_medium_meters = minimum_price_medium.price_meters
                 minimum_price_medium_value = minimum_price_medium.price_value
+                print(minimum_price_medium)
             except MinimumPrice.DoesNotExist:
                 minimum_price_medium_meters = None
                 minimum_price_medium_value = None
@@ -164,21 +176,28 @@ class Quote(models.Model):
             else:
                 price_big = price_big * distance
 
-            TWO_PLACES = decimal.Decimal("0.01")
-            data_prices = {
-                'small': {
-                    'price': price_small.quantize(TWO_PLACES),
+            # Finally add the calculated prices to the response object
+            ROUND_TO = decimal.Decimal("0.01")
+            data_prices = {}
+
+            if price_small != 0:
+                data_prices['small'] = {
+                    'price': price_small.quantize(ROUND_TO),
                     'eta': pickup_etas['small']
-                },
-                'medium': {
-                    'price': price_medium.quantize(TWO_PLACES),
+                }
+
+            if price_medium != 0:
+                data_prices['medium'] = {
+                    'price': price_medium.quantize(ROUND_TO),
                     'eta': pickup_etas['medium']
-                },
-                'big': {
-                    'price': price_big.quantize(TWO_PLACES),
+                }
+
+            if price_big != 0:
+                data_prices['big'] = {
+                    'price': price_big.quantize(ROUND_TO),
                     'eta': pickup_etas['big']
                 }
-            }
+
             return data_prices
         except Exception as error:
             print(error)
@@ -241,45 +260,9 @@ class Task(models.Model):
 
     @property
     def task_detail(self):
-        "Returns team info from dispatching platform."
+        "Returns task info from dispatching platform."
         task_details = _get_task_detail(self.task_onfleet_id)
         return task_details
-
-    @property
-    def send_dispatching(self):
-        '''
-        Only for testing purposes
-        '''
-        if not self.task_onfleet_id:
-            try:
-                destination = {
-                    'address':
-                    {"unparsed": self.task_place.place_address.address},
-                    'notes': self.task_place.description
-                }
-                notes = self.comments
-                recipients = []
-                recipient = {"name": self.task_contact._get_full_name(),
-                             "phone": self.task_contact.phone,
-                             "notes": self.comments}
-                recipients.append(recipient)
-
-                if self.task_type == 'pickup':
-                    pickupTask = True
-                else:
-                    pickupTask = False
-
-                # Create task in onfleet.
-                new_task = _create_task(destination, recipients,
-                                        notes, pickupTask)
-                return new_task
-            except Exception as error:
-                print(error)
-                return None
-        else:
-            # Already exists at onfleet
-            task_detail = _get_task_detail(self.task_onfleet_id)
-            return task_detail
 
     def __str__(self):
         return str(self.task_id)
@@ -296,20 +279,6 @@ class Task(models.Model):
             self.expire_at = self.created_at + 600
         else:
             self.updated_at = int(format(datetime.now(), u'U'))
-
-            # Assign to worker_id ONLY for testing purposes
-            # This sould be at our assignment async worker.
-            assigned_task = _assign_task(
-                self.task_onfleet_id,
-                'bqHwe8jkWOUA*EtimgJkS4FQ'
-            )
-            print (assigned_task)
-
-        # Create in onfleet. ONLY for testing purposes
-        if not self.task_onfleet_id:
-            created_task = self.send_dispatching
-            if created_task is not None:
-                self.task_onfleet_id = self.send_dispatching['id']
 
         super(Task, self).save(*args, **kwargs)
 
