@@ -64,6 +64,21 @@ class ReceiptUserViewSet(viewsets.ModelViewSet):
         }
         return render(self.request, 'receiptUser.html', data)
 
+    def list(self, request):
+
+        if not self.request.user.is_authenticated():
+            return HttpResponseForbidden()
+
+        # Filter By Delivery
+        if request.GET.get('delivery_id',''):
+            entries = ReceiptUserModel.objects.filter(
+                receipt_delivery=request.GET.get('delivery_id','')
+            )
+        else:
+            entries = ReceiptUserModel.objects.all()
+
+        serializer = ReceiptUserSerializer(entries, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         if not self.request.user.is_authenticated():
@@ -84,7 +99,6 @@ class ReceiptCourierViewSet(viewsets.ModelViewSet):
     pagination_class = LargeResultsSetPagination
 
     def retrieve(self, request, *args, **kwargs):
-        print('------------------------------receive')
         if not request.user.is_authenticated():
             return HttpResponseForbidden()
 
@@ -135,6 +149,22 @@ class ReceiptCourierViewSet(viewsets.ModelViewSet):
             'total': total
         }
         return render(self.request, 'receiptCourier.html', data)
+
+    def list(self, request):
+
+        if not self.request.user.is_authenticated():
+            return HttpResponseForbidden()
+
+        # Filter By Delivery
+        if request.GET.get('delivery_id',''):
+            entries = ReceiptCourierModel.objects.filter(
+                receipt_delivery=request.GET.get('delivery_id','')
+            )
+        else:
+            entries = ReceiptCourierModel.objects.all()
+
+        serializer = ReceiptCourierSerializer(entries, many=True)
+        return Response(serializer.data)
 
     def get_queryset(self):
         if not self.request.user.is_authenticated():
