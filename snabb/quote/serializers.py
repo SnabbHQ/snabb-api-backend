@@ -54,7 +54,7 @@ class TaskSerializer(serializers.ModelSerializer):
     dispatching_meta = serializers.SerializerMethodField('get_task_details')
 
     def get_task_details(self, obj):
-        if obj.task_onfleet_id:
+        if obj.task_onfleet_id and obj.task_detail is not None:
             details = obj.task_detail
             response = {}
 
