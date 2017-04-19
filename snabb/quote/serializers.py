@@ -54,27 +54,31 @@ class TaskSerializer(serializers.ModelSerializer):
     dispatching_meta = serializers.SerializerMethodField('get_task_details')
 
     def get_task_details(self, obj):
-        if obj.task_onfleet_id:
-            details = obj.task_detail
-            response = {}
-
-            if 'trackingURL' in obj.task_detail:
-                response['trackingURL'] = obj.task_detail['trackingURL']
-            else:
-                response['trackingURL'] = None
-
-            if 'estimatedCompletionTime' in obj.task_detail:
-                response['estimatedCompletionTime'] = obj.task_detail['estimatedCompletionTime']
-            else:
-                response['estimatedCompletionTime'] = None
-
-            if 'state' in obj.task_detail:
-                response['state'] = obj.task_detail['state']
-            else:
-                response['state'] = None
-            return response
-        else:
+        if (self.context and 'action' in self.context and
+                self.context['action'] == 'list'):
             return None
+        else:
+            if obj.task_onfleet_id and obj.task_detail is not None:
+                details = obj.task_detail
+                response = {}
+
+                if 'trackingURL' in obj.task_detail:
+                    response['trackingURL'] = obj.task_detail['trackingURL']
+                else:
+                    response['trackingURL'] = None
+
+                if 'estimatedCompletionTime' in obj.task_detail:
+                    response['estimatedCompletionTime'] = obj.task_detail['estimatedCompletionTime']
+                else:
+                    response['estimatedCompletionTime'] = None
+
+                if 'state' in obj.task_detail:
+                    response['state'] = obj.task_detail['state']
+                else:
+                    response['state'] = None
+                return response
+            else:
+                return None
 
     def place_info(self, obj):
         if obj.task_place:

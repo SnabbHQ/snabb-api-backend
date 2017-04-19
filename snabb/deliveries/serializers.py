@@ -4,45 +4,22 @@ from snabb.quote.serializers import QuoteSerializer, TaskSerializer
 from snabb.address.serializers import AddressSerializer
 from snabb.contact.serializers import ContactSerializer
 from snabb.currency.serializers import CurrencySerializer
+from snabb.billing.serializers import ReceiptUserSerializer
 from .models import Delivery
-'''
-Fields to return in serializer.
-- delivery_id
-- courier (courier object)
-    "id": "ZxK8Ygbpr1sfYgDaNURPjXKa",
-    "name": "Michael Knight",
-    "phone": "+34661518132",
-    "onDuty": false,
-    "timeLastSeen": 1486407209054,
-    "imageUrl": "https://d15p8tr8p0vffz.cloudfront.net/294.png",
-    "location": [
-      -0.3754607,
-      39.4667116
-    ],
-    "vehicle": {
-      "id": "h3OUAyCxLrUIdIOk8930sNMf",
-      "type": "BICYCLE",
-      "description": null,
-      "licensePlate": null,
-      "color": null,
-      "timeLastModified": 1482423618129
-    }
-- order_reference_id (reference from order)
-- quote_id (Only PK)
-- tasks (tasks array fromn)
-'''
 
 
 class DeliverySerializer(serializers.ModelSerializer):
     tasks = serializers.SerializerMethodField('tasks_info')
     currency = serializers.SerializerMethodField('currency_info')
     courier = serializers.SerializerMethodField('courier_info')
-    # order_reference_id = serializers.SerializerMethodField('order_info')
-    # Pending to add quote and order relation.
+    delivery_receipt_id = serializers.SerializerMethodField('receipt')
 
     def courier_info(self, obj):
         if obj.courier:
-            response = obj.courier.courier_details
+            if self.context['action'] == 'list':
+                response = obj.courier.name
+            else:
+                response = obj.courier.courier_details
             return response
         else:
             return None
@@ -52,7 +29,7 @@ class DeliverySerializer(serializers.ModelSerializer):
             if obj.delivery_quote.tasks:
                 items = obj.delivery_quote.tasks
                 serializer = TaskSerializer(
-                    items, many=True, read_only=True)
+                    items, many=True, read_only=True, context=self.context)
                 return serializer.data
             else:
                 return None
@@ -74,6 +51,15 @@ class DeliverySerializer(serializers.ModelSerializer):
             return None
         return serializer.data
 
+    def receipt(self, obj):
+        if hasattr(obj, 'delivery_receipt'):
+            items = obj.delivery_receipt
+            serializer = ReceiptUserSerializer(
+                items, many=False, read_only=True)
+            return serializer.data
+        else:
+            return None
+
     class Meta:
         model = Delivery
         fields = (
@@ -83,6 +69,7 @@ class DeliverySerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'status',
+            'courier',
             'tasks',
-            'courier'
+            'delivery_receipt_id'
         )

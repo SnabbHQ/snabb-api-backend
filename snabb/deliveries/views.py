@@ -18,6 +18,9 @@ from django.http import Http404, HttpResponse
 from snabb.utils.code_response import get_response
 from datetime import datetime
 from django.utils.dateformat import format
+from snabb.utils.utils import LargeResultsSetPagination
+from snabb.billing.models import ReceiptUser
+from django.db.models import Prefetch
 
 
 class DeliveryViewSet(viewsets.ModelViewSet):
@@ -28,17 +31,28 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
     serializer_class = DeliverySerializer
     queryset = Delivery.objects.all()
+    pagination_class = LargeResultsSetPagination
+
+    def get_serializer_context(self):
+        """
+        We send the action(retrieve, list,etc..) to our serializer, to check
+        if we need to make a call to Onfleet.
+        """
+        return {
+            'action': self.action
+        }
 
     def get_queryset(self):
-        queryset = Delivery.objects.filter(
-            delivery_quote__quote_user=self.request.user)
-        return queryset
+        query = self.request.query_params
 
-    def list(self, request):
-        entries = Delivery.objects.filter(
-            delivery_quote__quote_user=self.request.user)
-        serializer = DeliverySerializer(entries, many=True)
-        return Response(serializer.data)
+        queryset = Delivery.objects.filter(
+            delivery_quote__quote_user=self.request.user).select_related(
+                'delivery_quote',
+                'courier'
+        ).prefetch_related('Receipt_User_Delivery')
+        if 'status' in query.keys():
+            queryset = queryset.filter(status=query['status'])
+        return queryset.order_by('-created_at')
 
     def create(self, request):
         received = request.data

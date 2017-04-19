@@ -18,6 +18,7 @@ from snabb.utils.code_response import get_response
 from snabb.geo_utils.utils import (
     _check_api_address, _get_location_info
 )
+from snabb.utils.utils import LargeResultsSetPagination
 
 
 def cancel_quote(task_list, place_list, address_list, contact_list, quote):
@@ -51,6 +52,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
     serializer_class = QuoteSerializer
     queryset = Quote.objects.all()
+    pagination_class = LargeResultsSetPagination
 
     def get_queryset(self):
         queryset = Quote.objects.filter(quote_user=self.request.user)
@@ -112,7 +114,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 try:  # Check Address email
                     task_contact_email = task['contact']['email']
                 except Exception as error:
-                    cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                    cancel_quote(task_list, place_list,
+                                 address_list, contact_list, new_quote)
                     response = get_response(400305)
                     return Response(data=response['data'], status=response['status'])
 
@@ -121,7 +124,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 check_address = _check_api_address(str(task_address_address))
 
                 if check_address['data']['code'] != 200206:
-                    cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                    cancel_quote(task_list, place_list,
+                                 address_list, contact_list, new_quote)
                     response = get_response(check_address['data']['code'])
                     return Response(data=response['data'], status=response['status'])
 
@@ -133,13 +137,15 @@ class QuoteViewSet(viewsets.ModelViewSet):
                     api_longitude = location_info['longitude']
 
                     if not api_latitude or not api_longitude:
-                            cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
-                            response = get_response(400306)
-                            return Response(data=response['data'], status=response['status'])
+                        cancel_quote(task_list, place_list,
+                                     address_list, contact_list, new_quote)
+                        response = get_response(400306)
+                        return Response(data=response['data'], status=response['status'])
 
             except Exception as error:
                 print(error)
-                cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                cancel_quote(task_list, place_list, address_list,
+                             contact_list, new_quote)
                 response = get_response(400306)
                 return Response(data=response['data'], status=response['status'])
 
@@ -156,13 +162,15 @@ class QuoteViewSet(viewsets.ModelViewSet):
             try:  # Check type
                 task_type = task['type']
                 if task_type != 'pickup' and task_type != 'dropoff':
-                    cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                    cancel_quote(task_list, place_list,
+                                 address_list, contact_list, new_quote)
                     response = get_response(400311)
                     return Response(data=response['data'], status=response['status'])
 
             except Exception as error:
                 if task_type != 'pickup' and task_type != 'dropoff':
-                    cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                    cancel_quote(task_list, place_list,
+                                 address_list, contact_list, new_quote)
                     response = get_response(400311)
                     return Response(data=response['data'], status=response['status'])
             # Validate Zipcode/city
@@ -177,7 +185,8 @@ class QuoteViewSet(viewsets.ModelViewSet):
                     active=True,
                 )
             except Exception as error:
-                cancel_quote(task_list, place_list, address_list, contact_list, new_quote)
+                cancel_quote(task_list, place_list, address_list,
+                             contact_list, new_quote)
                 print(error)
                 response = get_response(400407)
                 return Response(data=response['data'], status=response['status'])
