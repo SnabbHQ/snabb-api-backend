@@ -3,21 +3,14 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from snabb.users.models import Profile
 from snabb.billing.views import ReceiptUserViewSet, ReceiptCourierViewSet
+from snabb.utils.setup_tests import create_profile
 
 
 class ReceiptsUserTests(APITestCase):
 
-    def create_profile(self):
-        profile = Profile.objects.get_or_create(
-            company_name='My Company S.L.', email='email@example.com',
-            password='123456', phone='+34123456789', user_lang='es'
-        )
-        return profile[0]
-
-
     def test_get_receipts(self):
         """ Test get receipts from a user """
-        user = self.create_profile()
+        user = create_profile()
 
         factory = APIRequestFactory()
         request = factory.get('/api/v1/billing/receiptsUser/')
@@ -37,22 +30,13 @@ class ReceiptsUserTests(APITestCase):
 
 class ReceiptsCourierTests(APITestCase):
 
-    def create_profile(self):
-        profile = Profile.objects.get_or_create(
-            company_name='My Company S.L.', email='email@example.com',
-            password='123456', phone='+34123456789', user_lang='es'
-        )
-        return profile[0]
-
-
     def test_get_receipts(self):
         """ Test get receipts from a user """
-        user = self.create_profile()
+        user = create_profile()
 
         factory = APIRequestFactory()
         request = factory.get('/api/v1/billing/receiptsCourier/')
         view = ReceiptCourierViewSet.as_view({'get': 'list'})
-
 
         '''
         # Without Auth -- Courier
