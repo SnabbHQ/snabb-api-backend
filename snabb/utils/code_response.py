@@ -97,7 +97,7 @@ responses = {
     },
     400103: {
         'data': {
-            'code': 400101,
+            'code': 400103,
             'message': 'Email already exists',
             'key': 'EMAIL_ALREADY_EXISTS'
         },
@@ -446,7 +446,7 @@ responses = {
             'key': 'SOURCE_ID_NOT_EXISTS'
         },
         'status': status.HTTP_400_BAD_REQUEST
-    },  
+    },
     400607: {
         'data': {
             'code': 400607,
@@ -454,5 +454,5 @@ responses = {
             'key': 'DELIVERY_ALREADY_EXISTS'
         },
         'status': status.HTTP_400_BAD_REQUEST
-    }  
+    }
 }
