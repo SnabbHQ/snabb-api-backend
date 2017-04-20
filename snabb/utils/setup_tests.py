@@ -1,6 +1,12 @@
+import json
 from snabb.users.models import Profile
 from snabb.location.models import Zipcode, City, Country, Region
 from snabb.deliveries.models import Delivery
+from rest_framework.test import (
+    APIRequestFactory,
+    force_authenticate
+)
+
 """
 We use this library to setup all object creation, to use them accross our tests
 """
@@ -59,3 +65,15 @@ def update_delivery_status(pk, status):
     delivery.status = status
     delivery.save()
     return delivery
+
+
+def post_api(user, data, url, view):
+    factory = APIRequestFactory()
+    request = factory.post(
+        url,
+        json.dumps(data), content_type='application/json'
+    )
+    force_authenticate(request, user=user.profile_apiuser)
+    view = view.as_view({'post': 'create'})
+    response = view(request)
+    return response
