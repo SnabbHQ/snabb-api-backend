@@ -1,6 +1,6 @@
 from snabb.users.models import Profile
 from snabb.location.models import Zipcode, City, Country, Region
-
+from snabb.deliveries.models import Delivery
 """
 We use this library to setup all object creation, to use them accross our tests
 """
@@ -51,3 +51,11 @@ def init_data_geo():
     city = create_city(
         'Albaida', 'Albaida', region_valencia, True)
     zipcode = create_zipcode(46860, city, True)
+
+
+def update_delivery_status(pk, status):
+    "Change delivery status for testing purposes"
+    delivery = Delivery.objects.get(pk=pk)
+    delivery.status = status
+    delivery.save()
+    return delivery
