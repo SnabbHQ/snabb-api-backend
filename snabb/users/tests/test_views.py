@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory
 from snabb.users.models import Profile
 from django.conf import settings
+from snabb.utils.setup_tests import create_profile
 
 
 class BaseUserTestCase(TestCase):
@@ -15,14 +16,6 @@ class BaseUserTestCase(TestCase):
 
 
 class ProfileTests(APITestCase):
-    def create_profile(self):
-        profile = Profile.objects.get_or_create(company_name='My Company S.L.',
-                                                email='email@example.com',
-                                                password='123456',
-                                                phone='+34123456789',
-                                                user_lang='es'
-                                                )
-        return profile[0]
 
     def test_create_profile(self):
         """
@@ -73,7 +66,7 @@ class ProfileTests(APITestCase):
         """
         url = reverse('verify_user')
 
-        profile = self.create_profile()
+        profile = create_profile()
 
         # Without hash
         data = {}
@@ -106,7 +99,7 @@ class ProfileTests(APITestCase):
         url = reverse('send_verify_email')
         url_verify = reverse('verify_user')
 
-        profile = self.create_profile()
+        profile = create_profile()
 
         # Without email
         data = {}
@@ -141,7 +134,7 @@ class ProfileTests(APITestCase):
         Ensure we can send email to user with a reset_password hash.
         """
         url = reverse('forgot_password')
-        profile = self.create_profile()
+        profile = create_profile()
 
         # Without email
         data = {}
@@ -167,7 +160,7 @@ class ProfileTests(APITestCase):
         """
         url = reverse('reset_password')
 
-        profile = self.create_profile()
+        profile = create_profile()
 
         # Without hash
         data = {"password": "p4ssw0rd"}

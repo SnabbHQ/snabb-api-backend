@@ -69,6 +69,10 @@ If you want to use pytest and coverage at the same time.
 
     $ pytest snabb --cov=snabb --cov-report html
 
+If you want to use pytest and coverage at the same time inside of the Docker container.
+    $ docker-compose -f docker-compose-local.yml run django pytest snabb --cov=snabb --cov-report html
+
+
 ## Sentry
 
 Sentry is an error logging aggregator service. You can sign up for a
