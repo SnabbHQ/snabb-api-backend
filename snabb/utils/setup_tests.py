@@ -1,7 +1,9 @@
 import json
+from django.conf import settings
 from snabb.users.models import Profile
 from snabb.location.models import Zipcode, City, Country, Region
 from snabb.deliveries.models import Delivery
+import stripe
 from rest_framework.test import (
     APIRequestFactory,
     force_authenticate
@@ -77,3 +79,20 @@ def post_api(user, data, url, view):
     view = view.as_view({'post': 'create'})
     response = view(request)
     return response
+
+def patch_api(user, data, url, view):
+    factory = APIRequestFactory()
+    request = factory.patch(
+        url,
+        json.dumps(data), content_type='application/json'
+    )
+    force_authenticate(request, user=user.profile_apiuser)
+    view = view.as_view({'patch': 'partial_update'})
+    response = view(request)
+    return response
+
+def create_token_card(data_card):
+    "Generate a token to create a card"
+    stripe.api_key = settings.PINAX_STRIPE_SECRET_KEY
+    card = stripe.Token.create(card=data_card,)
+    return card['id']
