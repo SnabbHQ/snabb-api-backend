@@ -67,7 +67,7 @@ def set_default_source(customer, card_id):
     return get_response(200209)
 
 
-def delete_all_cards(self, customer):
+def delete_all_cards(customer):
     '''
         Erases all cards from Customer
     '''
@@ -75,7 +75,7 @@ def delete_all_cards(self, customer):
         sources.delete_card(customer, card.id)
 
 
-def create_charge(self, data):
+def create_charge(data):
     '''
         Create a charge from customer and card
     '''
@@ -94,7 +94,7 @@ def create_charge(self, data):
     return False
 
 
-def sync_stripe_data(self, customer):
+def sync_stripe_data(customer):
     '''
         Sync Data from Django to Stripe
     '''
