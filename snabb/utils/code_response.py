@@ -454,5 +454,13 @@ responses = {
             'key': 'DELIVERY_ALREADY_EXISTS'
         },
         'status': status.HTTP_400_BAD_REQUEST
+    },
+    400608: {
+        'data': {
+            'code': 400608,
+            'message': 'Default card is required',
+            'key': 'DEFAULT_CARD_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
     }
 }

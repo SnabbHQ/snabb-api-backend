@@ -30,20 +30,24 @@ class CardViewSet(viewsets.ModelViewSet):
         if not request.user.is_authenticated():
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-        card = CardDjango.objects.get(pk=pk)
+        received = request.data
 
-        if not pk:
-            response = get_response(400605)
+        if(received['default_card'] == True):
+            if not pk:
+                response = get_response(400605)
+                return Response(data=response['data'], status=response['status'])
+            card = CardDjango.objects.get(pk=pk)
+            customer = customers.get_customer_for_user(user=request.user)
+            if not customer:
+                response = get_response(400603)
+                return Response(data=response['data'], status=response['status'])
+
+
+            response = set_default_source(customer,card.card_info['id'])
             return Response(data=response['data'], status=response['status'])
-
-        customer = customers.get_customer_for_user(user=request.user)
-        if not customer:
-            response = get_response(400603)
+        else:
+            response = get_response(400608)
             return Response(data=response['data'], status=response['status'])
-
-
-        response = set_default_source(customer,card.card_info['id'])
-        return Response(data=response['data'], status=response['status'])
 
 
     def list(self, request):
