@@ -5,7 +5,8 @@ from snabb.utils.setup_tests import (
     create_country,
     create_region,
     create_city,
-    create_zipcode
+    create_zipcode,
+    create_currency
 )
 
 
@@ -17,9 +18,10 @@ class ProfileTests(APITestCase):
         url = reverse('validateAddress')
 
         # Create Country
-        country_es = create_country('Spain', 'ES', True)
-        country_ita = create_country('Italia', 'ITA', False)
-        country_pa = create_country('Panama', 'PA', True)
+        currency = create_currency('Euro', '€', 'EUR', True)
+        country_es = create_country('Spain', 'ES', True, currency)
+        country_ita = create_country('Italia', 'ITA', False, currency)
+        country_pa = create_country('Panama', 'PA', True, currency)
 
         # Create Region
         region_valencia = create_region(

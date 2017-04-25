@@ -2,11 +2,13 @@ import json
 from snabb.users.models import Profile
 from snabb.location.models import Zipcode, City, Country, Region
 from snabb.deliveries.models import Delivery
+from snabb.currency.models import Currency
 from rest_framework.test import (
     APIRequestFactory,
     force_authenticate
 )
-
+from snabb.quote.tests.json import test1
+from snabb.quote.views import QuoteViewSet
 """
 We use this library to setup all object creation, to use them accross our tests
 """
@@ -20,9 +22,9 @@ def create_profile():
     return profile[0]
 
 
-def create_country(name, iso_code, active):
+def create_country(name, iso_code, active, currency):
     country = Country.objects.get_or_create(
-        name=name, iso_code=iso_code, active=active
+        name=name, iso_code=iso_code, active=active, country_currency=currency
     )
     return country[0]
 
@@ -44,14 +46,21 @@ def create_zipcode(code, city, active):
 
 def create_city(name, google_short_name, region, active):
     city = City.objects.get_or_create(
-        name=name, active=active,
-        google_short_name=google_short_name,
+        name=name, active=active, google_short_name=google_short_name
     )
     return city[0]
 
 
+def create_currency(currency, symbol, iso_code, active):
+    currency = Currency.objects.get_or_create(
+        currency='Euro', symbol='€', iso_code='EUR', active=active
+    )
+    return currency[0]
+
+
 def init_data_geo():
-    country = create_country('Spain', 'ES', True)
+    currency = create_currency('Euro', '€', 'EUR', True)
+    country = create_country('Spain', 'ES', True, currency)
     region_valencia = create_region(
         'Valencia', 'Comunidad Valenciana', country, True)
     city = create_city(
@@ -76,4 +85,16 @@ def post_api(user, data, url, view):
     force_authenticate(request, user=user.profile_apiuser)
     view = view.as_view({'post': 'create'})
     response = view(request)
+    return response
+
+
+def create_quote(user):
+    """ Create a quote for testing purposes."""
+
+    # Init Data
+    init_data_geo()
+
+    # Test Cases
+    response = post_api(
+        user, test1.data, '/api/v1/deliveries/quote', QuoteViewSet)
     return response
