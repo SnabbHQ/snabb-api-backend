@@ -80,8 +80,14 @@ class Quote(models.Model):
         data_prices['big'] = data_prices_return_dict
 
         # GET ETAs
-        origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
-        origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
+        try:
+            origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
+            origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
+        except Exception as error:
+            print(error)
+            origin_lat = 0
+            origin_lon = 0
+
         pickup_etas = _get_eta(origin_lat, origin_lon)
         try:
             '''

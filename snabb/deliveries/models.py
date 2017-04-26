@@ -6,7 +6,9 @@ from django.db import models
 from snabb.billing.models import ReceiptCourier, ReceiptUser
 from snabb.payment.models import Payment
 from snabb.users.models import Profile
+from snabb.utils.utils import get_app_info
 from snabb.stripe_utils.utils import *
+from snabb.payment.utils import create_payment
 import uuid
 import time
 
@@ -76,15 +78,43 @@ class Delivery(models.Model):
         self.updated_at = int(format(datetime.now(), u'U'))
 
         if not self.delivery_id:
-            self.created_at = int(format(datetime.now(), u'U'))
+            self.created_at = self.updated_at
             self.delivery_id = "%s" % (uuid.uuid4(),)
             # Generate new task
             from snabb.tasks.tasks import assign_delivery
-            now = int(format(datetime.now(), u'U'))
+            now = self.updated_at
             assign_delivery(self.delivery_id, schedule=10)
-            print ("\t[DATE] --> " + time.strftime("%c") + " <--[DATE]")
-            # first iteration in 30 seg.
         else:
+            # Update assigned_at when status is changed to assigned
+            if self.status == 'assigned':
+                old_Delivery = Delivery.objects.get(pk=self.pk)
+                # Status changed processing -> assigned
+                if old_Delivery.status == 'processing':
+                    self.assigned_at = self.updated_at
+
+            # Check if status is changed to cancelled
+            if self.status == 'cancelled':
+                user = self.delivery_quote.quote_user
+                profile = Profile.objects.get(profile_apiuser=user)
+                # Generate Payment only if not is Enterprise
+                if not profile.enterprise:
+                    old_Delivery = Delivery.objects.get(pk=self.pk)
+                    if old_Delivery.status != 'cancelled':
+                        # Check 2min to status assigned
+                        delay = self.updated_at - self.assigned_at
+                        time_before_payment = float(
+                            get_app_info('time_before_payment', 120))
+                        if delay >= time_before_payment:
+                            try: # Get Percentage from city
+                                price_canc = self.delivery_quote.tasks.all()\
+                                    [:1][0].task_place.place_address.\
+                                    address_city.price_canceled
+                                price_canc = self.price * price_canc / 100
+                            except Exception as error:
+                                price_canc = self.price
+                            # Generate Payment when is cancelled
+                            create_payment(self, price_canc)
+
             # Generate Receipt when Status Change to completed
             if self.status == 'completed':
                 delivery = Delivery.objects.get(pk=self.delivery_id)
@@ -99,44 +129,8 @@ class Delivery(models.Model):
                     receipt.receipt_delivery = self
                     receipt.save()
 
-                    # Payment from User
-                    # Get Customer
-                    user = self.delivery_quote.quote_user
-                    profile = Profile.objects.get(profile_apiuser=user)
-
                     # Generate Payment only if not is Enterprise
                     if not profile.enterprise:
-                        customer = get_or_create_customer(user)
-                        # Get Default Card
-                        card = get_default_source(customer)
-                        if not card:
-                            print ('DEFAULT CARD NOT EXISTS')
-                        else:
-                            # Generate Django Payment
-                            payment = Payment()
-                            payment.payment_user = user
-                            payment.payment_delivery = self
-                            payment.amount = Decimal(self.price)
-                            payment.currency = 'eur'
-                            payment.description = str(self.delivery_id)
-                            payment.status = 'processing'
-                            payment.save()
-
-                            # Get Delivery price
-                            data_charge = {
-                                'customer': customer,
-                                'card': card,
-                                'amount': payment.amount,
-                                'currency': payment.currency,
-                                'description': payment.description
-                            }
-                            # Generate charge
-                            if create_charge(data_charge):
-                                print ('PAYMENT SUCCESSFUL')
-                                payment.status = 'completed'
-                            else:
-                                payment.status = 'failed'
-                            payment.save()
-
+                        create_payment(self, self.price)
 
         super(Delivery, self).save(*args, **kwargs)
