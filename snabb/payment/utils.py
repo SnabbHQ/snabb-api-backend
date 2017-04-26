@@ -23,7 +23,17 @@ def create_payment(delivery, price):
             payment.payment_user = user
             payment.payment_delivery = delivery
             payment.amount = decimal.Decimal(delivery.price)
-            payment.currency = 'eur'
+
+            try:
+                currency = self.delivery_quote.tasks.all()\
+                    [:1][0].task_place.place_address.\
+                    address_city.city_region.region_country.\
+                    country_currency.currency
+            except Exception as error:
+                print(error)
+                currency = 'eur'
+
+            payment.currency = currency
             payment.description = str(delivery.delivery_id)
             payment.status = 'processing'
             payment.save()
