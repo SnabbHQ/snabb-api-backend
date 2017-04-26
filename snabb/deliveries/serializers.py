@@ -69,6 +69,7 @@ class DeliverySerializer(serializers.ModelSerializer):
             'delivery_id',
             'currency',
             'price',
+            'assigned_at',
             'created_at',
             'updated_at',
             'status',

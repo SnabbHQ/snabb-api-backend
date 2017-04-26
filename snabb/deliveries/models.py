@@ -60,6 +60,7 @@ class Delivery(models.Model):
         blank=True,
         choices=sizeChoices
     )
+    assigned_at = models.IntegerField(default=0, editable=False, blank=True)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
 
@@ -102,6 +103,8 @@ class Delivery(models.Model):
                     # Get Customer
                     user = self.delivery_quote.quote_user
                     profile = Profile.objects.get(profile_apiuser=user)
+
+                    # Generate Payment only if not is Enterprise
                     if not profile.enterprise:
                         customer = get_or_create_customer(user)
                         # Get Default Card
