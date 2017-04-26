@@ -71,6 +71,14 @@ class Quote(models.Model):
         eta_medium = 0
         eta_big = 0
         data_prices = {}
+        data_prices_return_dict = {
+            'price': 0,
+            'eta': 0
+        }
+        data_prices['small'] = data_prices_return_dict
+        data_prices['medium'] = data_prices_return_dict
+        data_prices['big'] = data_prices_return_dict
+
         # GET ETAs
         origin_lat = str(tasks[:1][0].task_place.place_address.latitude)
         origin_lon = str(tasks[:1][0].task_place.place_address.longitude)
@@ -178,7 +186,6 @@ class Quote(models.Model):
 
             # Finally add the calculated prices to the response object
             ROUND_TO = decimal.Decimal("0.01")
-            data_prices = {}
 
             if price_small != 0:
                 data_prices['small'] = {

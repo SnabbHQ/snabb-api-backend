@@ -40,11 +40,14 @@ class DeliverySerializer(serializers.ModelSerializer):
         if obj.delivery_quote:
             if obj.delivery_quote.tasks:
                 task = obj.delivery_quote.tasks.all().order_by('order')[:1][0]
-                country = task.task_place.place_address.address_city.city_region.region_country
-                currency = country.country_currency
-                serializer = CurrencySerializer(
-                    currency, many=False, read_only=True)
-                return serializer.data
+                if task.task_place.place_address.address_city.city_region is not None:
+                    country = task.task_place.place_address.address_city.city_region.region_country
+                    currency = country.country_currency
+                    serializer = CurrencySerializer(
+                        currency, many=False, read_only=True)
+                    return serializer.data
+                else:
+                    return None
             else:
                 return None
         else:
