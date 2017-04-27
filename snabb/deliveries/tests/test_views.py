@@ -2,7 +2,7 @@ import json
 from rest_framework import status
 from rest_framework.test import APITestCase, APIRequestFactory, force_authenticate
 from snabb.users.models import Profile
-from snabb.deliveries.views import DeliveryViewSet
+from snabb.deliveries.views import DeliveryViewSet, CancelDeliveryViewSet
 from snabb.utils.setup_tests import create_profile, create_quote, post_api, init_data_geo
 from snabb.deliveries.models import Delivery
 
@@ -59,3 +59,28 @@ class DeliveryTests(APITestCase):
         response = view(request)
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.status_code, 200)
+
+
+    def test_cancel_delivery(self):
+        # Test Cancel Delivery
+        user = create_profile()
+        new_quote = create_quote(user)
+        delivery_1 = self.create_delivery(user, new_quote)
+        delivery = Delivery.objects.all()[0]
+        factory = APIRequestFactory()
+        request = factory.get(
+            '/api/v1/cancelDelivery/'+str(delivery.delivery_id)
+        )
+        force_authenticate(request, user=user.profile_apiuser)
+        view = CancelDeliveryViewSet.as_view({'get': 'retrieve'})
+        response = view(request, pk=delivery.pk)
+        self.assertEqual(response.data['code'], 200210)
+        self.assertEqual(response.status_code, 200)
+
+        response = view(request, pk=delivery.pk)
+        self.assertEqual(response.data['code'], 400610)
+        self.assertEqual(response.status_code, 400)
+
+        response = view(request, pk='fake')
+        self.assertEqual(response.data['code'], 400609)
+        self.assertEqual(response.status_code, 400)

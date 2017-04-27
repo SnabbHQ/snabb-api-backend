@@ -133,6 +133,7 @@ class CancelDeliveryViewSet(viewsets.ModelViewSet):
                 response = get_response(400610)
                 return Response(data=response['data'], status=response['status'])
         except Exception as error:
+            print(error)
             response = get_response(400609)
             return Response(data=response['data'], status=response['status'])
 

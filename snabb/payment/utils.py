@@ -13,8 +13,13 @@ def create_payment(delivery, price):
     # Generate Payment only if not is Enterprise
     if not profile.enterprise:
         customer = get_or_create_customer(user)
-        card = get_default_source(customer)  # Get Default Card
-        print(card.card_info['id'])
+        try:
+            card = get_default_source(customer)  # Get Default Card
+            print(card.card_info['id'])
+        except Exception as error:
+            print (error)
+            print ('DEFAULT CARD NOT EXISTS')
+            return
         if not card:
             print ('DEFAULT CARD NOT EXISTS')
         else:
