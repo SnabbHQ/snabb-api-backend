@@ -21,6 +21,7 @@ from django.utils.dateformat import format
 from snabb.utils.utils import LargeResultsSetPagination
 from snabb.billing.models import ReceiptUser
 from django.db.models import Prefetch
+from django.http import HttpResponseForbidden, HttpResponseBadRequest
 
 
 class DeliveryViewSet(viewsets.ModelViewSet):
@@ -101,3 +102,46 @@ class DeliveryViewSet(viewsets.ModelViewSet):
 
         serializer = DeliverySerializer(new_delivery, many=False)
         return Response(serializer.data)
+
+
+class CancelDeliveryViewSet(viewsets.ModelViewSet):
+
+    """
+        API endpoint that allows cancel a Delivery
+    """
+
+    queryset = Delivery.objects.all()
+    serializer_class = DeliverySerializer
+    http_method_names = ['get']
+
+
+    def retrieve(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseForbidden()
+        try:
+            delivery = Delivery.objects.get(
+                pk=self.kwargs['pk'], delivery_quote__quote_user=request.user)
+            statusAllowedCancelled = [
+                'new', 'processing', 'assigned', 'in_progress'
+            ]
+            if delivery.status in statusAllowedCancelled:
+                delivery.status = 'cancelled'
+                delivery.save()
+                response = get_response(200210)
+                return Response(data=response['data'], status=response['status'])
+            else:
+                response = get_response(400610)
+                return Response(data=response['data'], status=response['status'])
+        except Exception as error:
+            print(error)
+            response = get_response(400609)
+            return Response(data=response['data'], status=response['status'])
+
+    def list(self, request):
+        return HttpResponseBadRequest()
+
+    def create(self, request):
+        return HttpResponseBadRequest()
+
+    def get_queryset(self):
+        return HttpResponseBadRequest()

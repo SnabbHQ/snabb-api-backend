@@ -2,6 +2,7 @@ from snabb.payment.models import Payment, Card as CardDjango
 from snabb.utils.code_response import get_response
 from pinax.stripe.models import Card, Customer
 from pinax.stripe.actions import charges, customers, sources
+import decimal
 
 
 def get_or_create_customer(user):
@@ -84,12 +85,13 @@ def create_charge(data):
             charge = charges.create(
                 customer=data['customer'],
                 source=data['card'],
-                amount=Decimal(data['card']),
+                amount=decimal.Decimal(data['amount']),
                 currency=data['currency'],
                 description=data['description']
             )
             return True
         except Exception as error:
+            print(error)
             return False
     return False
 

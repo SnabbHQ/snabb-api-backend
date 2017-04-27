@@ -59,6 +59,9 @@ class City(models.Model):
         'location.Region', related_name='city_region',
         null=True, blank=True
     )
+    price_canceled = models.DecimalField(
+        null=False, blank=False, decimal_places=2, default=100.00, max_digits=5
+    )
     active = models.BooleanField(default=False)
     created_at = models.IntegerField(default=0, editable=False, blank=True)
     updated_at = models.IntegerField(default=0, editable=False)
