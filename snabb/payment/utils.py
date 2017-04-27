@@ -25,7 +25,7 @@ def create_payment(delivery, price):
             payment.amount = decimal.Decimal(delivery.price)
 
             try:
-                currency = self.delivery_quote.tasks.all()\
+                currency = delivery.delivery_quote.tasks.all()\
                     [:1][0].task_place.place_address.\
                     address_city.city_region.region_country.\
                     country_currency.currency

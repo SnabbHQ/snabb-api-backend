@@ -78,7 +78,14 @@ responses = {
         },
         'status': status.HTTP_200_OK
     },
-
+    200210: {
+        'data': {
+            'code': 200210,
+            'message': 'Delivery Cancelled',
+            'key': 'DELIVERY_CANCELLED'
+        },
+        'status': status.HTTP_200_OK
+    },
     400101: {
         'data': {
             'code': 400101,
@@ -460,6 +467,22 @@ responses = {
             'code': 400608,
             'message': 'Default card is required',
             'key': 'DEFAULT_CARD_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400609: {
+        'data': {
+            'code': 400609,
+            'message': 'Delivery does not exists',
+            'key': 'DELIVERY_NOT_EXISTS'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
+    400610: {
+        'data': {
+            'code': 400610,
+            'message': 'In this status it is not allowed to cancel',
+            'key': 'CANCEL_NOT_ALLOWED'
         },
         'status': status.HTTP_400_BAD_REQUEST
     }

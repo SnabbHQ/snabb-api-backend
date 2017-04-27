@@ -14,7 +14,7 @@ from snabb.users.views import (
 from snabb.address.views import ValidateAddress
 from snabb.quote.views import QuoteViewSet
 from snabb.billing.views import ReceiptUserViewSet, ReceiptCourierViewSet
-from snabb.deliveries.views import DeliveryViewSet
+from snabb.deliveries.views import DeliveryViewSet, CancelDeliveryViewSet
 from snabb.payment.views import CardViewSet
 
 
@@ -45,6 +45,7 @@ router.register(r'deliveries/quote', QuoteViewSet, 'Quote')
 
 # Delivery Views
 router.register(r'deliveries', DeliveryViewSet, 'Delivery')
+router.register(r'cancelDelivery', CancelDeliveryViewSet, 'CancelDelivery')
 
 
 # Order Views
