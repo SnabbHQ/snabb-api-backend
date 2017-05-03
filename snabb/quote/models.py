@@ -240,6 +240,13 @@ class Quote(models.Model):
 
 
 class Task(models.Model):
+    TaskStatusChoices = (
+        ('new', 'new'),
+        ('assigned', 'assigned'),
+        ('in_progress', 'in_progress'),
+        ('completed', 'completed'),
+        ('failed', 'failed'),
+    )
     TaskTypeChoices = (
         ('pickup', 'Pickup'),
         ('dropoff', 'Dropoff')
@@ -263,7 +270,11 @@ class Task(models.Model):
     )
     task_type = models.CharField(
         verbose_name="Task Type", max_length=300, null=True, blank=True,
-        choices=TaskTypeChoices
+        choices=TaskTypeChoices, default="new"
+    )
+    task_status = models.CharField(
+        verbose_name="Task Status", max_length=300, null=True, blank=True,
+        choices=TaskStatusChoices
     )
     active = models.BooleanField(default=True)
     task_onfleet_id = models.CharField(
