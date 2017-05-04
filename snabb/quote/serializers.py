@@ -51,34 +51,6 @@ class QuoteSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     place = serializers.SerializerMethodField('place_info')
     contact = serializers.SerializerMethodField('contact_info')
-    dispatching_meta = serializers.SerializerMethodField('get_task_details')
-
-    def get_task_details(self, obj):
-        if (self.context and 'action' in self.context and
-                self.context['action'] == 'list'):
-            return None
-        else:
-            if obj.task_onfleet_id and obj.task_detail is not None:
-                details = obj.task_detail
-                response = {}
-
-                if 'trackingURL' in obj.task_detail:
-                    response['trackingURL'] = obj.task_detail['trackingURL']
-                else:
-                    response['trackingURL'] = None
-
-                if 'estimatedCompletionTime' in obj.task_detail:
-                    response['estimatedCompletionTime'] = obj.task_detail['estimatedCompletionTime']
-                else:
-                    response['estimatedCompletionTime'] = None
-
-                if 'state' in obj.task_detail:
-                    response['state'] = obj.task_detail['state']
-                else:
-                    response['state'] = None
-                return response
-            else:
-                return None
 
     def place_info(self, obj):
         if obj.task_place:
@@ -107,7 +79,8 @@ class TaskSerializer(serializers.ModelSerializer):
             'order',
             'comments',
             'task_type',
-            'dispatching_meta'
+            'tracking_url',
+            'task_status'
         )
 
 

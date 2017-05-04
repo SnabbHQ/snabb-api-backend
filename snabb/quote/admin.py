@@ -12,8 +12,9 @@ class QuoteAdmin(admin.ModelAdmin):
 
 class TaskAdmin(admin.ModelAdmin):
     model = Task
-    list_display = ['task_id', 'task_type', 'active']
-    list_filter = ['active']
+    list_display = ['task_id', 'task_type', 'task_status',
+                    'tracking_url', 'active']
+    list_filter = ['active', 'task_status']
     readonly_fields = ['task_detail']
 
 

@@ -33,7 +33,6 @@ def webhookTask(request):
             9: 'assigned',
         }
         data = json.loads(request.body.decode('utf-8'))
-
         current_trigger = data['triggerId']
         task_id = data['taskId']
         try:
@@ -42,6 +41,10 @@ def webhookTask(request):
             task.save()
 
             if current_trigger == 0:
+                # Add trackUrl to task.
+                tracking_url = data['data']['task']['trackingURL']
+                task.tracking_url = tracking_url
+                task.save()
                 # Update Delivery status to in_progress
                 delivery = get_delivery_from_task(task)
                 if delivery is not None:
