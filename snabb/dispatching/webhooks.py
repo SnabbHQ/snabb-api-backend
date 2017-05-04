@@ -33,7 +33,6 @@ def webhookTask(request):
             9: 'assigned',
         }
         data = json.loads(request.body.decode('utf-8'))
-        print(data)
         current_trigger = data['triggerId']
         task_id = data['taskId']
         try:
