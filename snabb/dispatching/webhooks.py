@@ -5,6 +5,7 @@ from rest_framework import status
 from django.http import Http404, HttpResponse
 from snabb.quote.models import Task
 import json
+from snabb.utils.utils import get_delivery_from_task
 
 
 @csrf_exempt
@@ -32,13 +33,37 @@ def webhookTask(request):
             9: 'assigned',
         }
         data = json.loads(request.body.decode('utf-8'))
-
         current_trigger = data['triggerId']
         task_id = data['taskId']
         try:
             task = Task.objects.get(task_onfleet_id=task_id)
             task.task_status = statuses[current_trigger]
             task.save()
+
+            if current_trigger == 0:
+                # Add trackUrl to task.
+                tracking_url = data['data']['task']['trackingURL']
+                task.tracking_url = tracking_url
+                task.save()
+                # Update Delivery status to in_progress
+                delivery = get_delivery_from_task(task)
+                if delivery is not None:
+                    delivery.status = 'in_progress'
+                    delivery.save()
+                else:
+                    print ('Delivery not exists')
+            if current_trigger == 3:
+
+                # Update Delivery status to in_progress
+                delivery = get_delivery_from_task(task)
+                if delivery is not None:
+                    delivery_tasks = delivery.delivery_quote.tasks.all().order_by('order')
+                    last_task = delivery_tasks.reverse()[0]
+                    if last_task.task_status == 'completed':
+                        delivery.status = 'completed'
+                        delivery.save()
+                else:
+                    print ('Delivery not exists')
 
         except Task.DoesNotExist:
             return HttpResponse(status=status.HTTP_400_BAD_REQUEST)

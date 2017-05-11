@@ -276,6 +276,9 @@ class Task(models.Model):
         verbose_name="Task Status", max_length=300, null=True, blank=True,
         choices=TaskStatusChoices
     )
+    tracking_url = models.CharField(
+        verbose_name="Tracking URL", max_length=500, null=True, blank=True
+    )
     active = models.BooleanField(default=True)
     task_onfleet_id = models.CharField(
         verbose_name="Onfleet ID", max_length=500, null=True, blank=True)
