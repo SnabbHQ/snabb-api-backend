@@ -4,6 +4,8 @@ from background_task import background
 from django.utils.dateformat import format
 from snabb.deliveries.models import Delivery
 from snabb.quote.models import Task
+from snabb.couriers.models import Courier
+
 import time
 import datetime
 from snabb.dispatching.utils import (
@@ -88,8 +90,12 @@ def assign_delivery(delivery_id):
                 )
 
                 task_id = task.task_onfleet_id
-                delivery.status = 'assigned'
-                delivery.save()
+
+            # Assign Courier
+            courier = Courier.objects.get(courier_onfleet_id=available_courier)
+            delivery.courier = courier
+            delivery.status = 'assigned'
+            delivery.save()
             return True
         else:
 

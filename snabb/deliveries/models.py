@@ -99,9 +99,8 @@ class Delivery(models.Model):
                     time_before_payment = float(
                         get_app_info('time_before_payment', 120))
                     if delay >= time_before_payment:
-                        try: # Get Percentage from city
-                            price_canc = self.delivery_quote.tasks.all()\
-                                [:1][0].task_place.place_address.\
+                        try:  # Get Percentage from city
+                            price_canc = self.delivery_quote.tasks.all()[:1][0].task_place.place_address.\
                                 address_city.price_canceled
                             price_canc = self.price * price_canc / 100
                         except Exception as error:
@@ -110,13 +109,15 @@ class Delivery(models.Model):
 
             # Generate Receipt when Status change to Completed
             if self.status == 'completed' and old_delivery.status != 'completed':
-                receipt = ReceiptCourier() # Receipt Courier
+                receipt = ReceiptCourier()  # Receipt Courier
                 receipt.receipt_delivery = self
                 receipt.save()
-                receipt = ReceiptUser() # Receipt User
+                receipt = ReceiptUser()  # Receipt User
                 receipt.receipt_delivery = self
                 receipt.save()
 
+                user = self.delivery_quote.quote_user
+                profile = Profile.objects.get(profile_apiuser=user)
                 if not profile.enterprise:
                     create_payment(self, self.price)
 
