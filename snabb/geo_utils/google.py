@@ -12,10 +12,14 @@ from snabb.utils.code_response import get_response
 from snabb.location.models import Zipcode, Region, City, Country
 from django.conf import settings
 
+
 def _private():
     return 1
+
+
 def not_private():
-    return _private();
+    return _private()
+
 
 def _get_data_to_api_address(address):
     ''' Get Data from API '''
@@ -65,6 +69,9 @@ def _get_location_info(address):
                     info['route'] = comp['short_name']
                 if address_type == 'postal_town':
                     info['city'] = comp['short_name']
+                if address_type == 'street_number':
+                    info['street_number'] = comp['short_name']
+
         try:
             geometry = respJSON['results'][0]['geometry']
             info['latitude'] = geometry['location']['lat']
@@ -126,14 +133,15 @@ def _check_api_address(address):
 
     return get_response(200206)
 
-def _get_real_eta(origin_lat,origin_lon,destination_lat,destination_lon,mode):
+
+def _get_real_eta(origin_lat, origin_lon, destination_lat, destination_lon, mode):
     ''' Get Data from API '''
     try:
         # Data to send
         api_key = settings.MAPS_API_KEY
         webURL = urllib.request.urlopen(
             "https://maps.googleapis.com/maps/api/directions/json?origin=" +
-            str(origin_lat) + "," + str(origin_lon) + "&destination=" +  str(destination_lat) + "," + str(destination_lon) +
+            str(origin_lat) + "," + str(origin_lon) + "&destination=" + str(destination_lat) + "," + str(destination_lon) +
             "&key=" + api_key + "&mode=" + mode
         )
         webURLdata = webURL.read()

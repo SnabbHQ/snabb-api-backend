@@ -350,6 +350,14 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
+    400408: {
+        'data': {
+            'code': 400408,
+            'message': 'Contact Required',
+            'key': 'CONTACT_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
     400501: {
         'data': {
             'code': 400501,

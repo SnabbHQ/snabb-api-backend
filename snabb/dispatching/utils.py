@@ -5,7 +5,7 @@
 '''
 from django.conf import settings
 from snabb.dispatching.onfleet import Onfleet
-from snabb.geo_utils.utils import _get_real_eta
+from snabb.geo_utils.utils import _get_real_eta, _get_location_info
 
 
 def _get_eta(lat, lon):
@@ -199,16 +199,35 @@ def _send_dispatching(task, task_id=None):
     "We use this function to create task in Onfleet, and link dependencies."
     if not task.task_onfleet_id:
         try:
+            location_info = _get_location_info(
+                task.task_place.place_address.address)
+
+            address = {}
+            address['number'] = location_info['street_number']
+            address['street'] = location_info['route']
+            address['city'] = location_info['city']
+            address['state'] = location_info['region']
+            address['country'] = location_info['country']
             destination = {
-                'address':
-                {"unparsed": task.task_place.place_address.address},
+                'address': address,
+                # {"unparsed": task.task_place.place_address.address},
                 'notes': task.task_place.description
             }
             notes = task.comments
             recipients = []
-            recipient = {"name": task.task_contact._get_full_name(),
+            # If contact doesn't have name, we use company_name
+            if task.task_contact.first_name and task.task_contact.last_name:
+                name = task.task_contact._get_full_name()
+                if task.task_contact.company_name:
+                    comments = task.comments + ' ' + task.task_contact.company_name
+                else:
+                    comments = task.comments
+            else:
+                name = task.task_contact.company_name
+                comments = task.comments
+            recipient = {"name": name,
                          "phone": task.task_contact.phone,
-                         "notes": task.comments}
+                         "notes": comments}
             recipients.append(recipient)
 
             if task.task_type == 'pickup':

@@ -227,6 +227,11 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 new_task_contact.contact_user = user
                 new_task_contact.save()
                 contact_list.append(new_task_contact)
+            else:
+                cancel_quote(task_list, place_list, address_list,
+                             contact_list, new_quote)
+                response = get_response(400408)
+                return Response(data=response['data'], status=response['status'])
 
             # Create place
             new_task_place = Place()
