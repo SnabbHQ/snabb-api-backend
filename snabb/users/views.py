@@ -17,6 +17,7 @@ import re
 from snabb.email_utils.views import send_mail_template
 from django.conf import settings
 from snabb.utils.code_response import get_response
+from snabb.utils.utils import get_app_info
 
 
 def _check_email(email):
@@ -83,9 +84,15 @@ class RegisterUser(APIView):
 
                 # Substitutions for Sendgrid mail
                 substitutions = {}
-                substitutions['%user_link%'] = settings.FRONTEND_URL+'activate/' + user.profile_activation_key
+                substitutions['%user_link%'] = settings.FRONTEND_URL + \
+                    'activate/' + user.profile_activation_key
                 substitutions['%name%'] = user.company_name
-                template = '55345630-06db-4987-863d-9189b0e97b57'
+                if 'user_lang' in received.keys():
+                    template = get_app_info(
+                        'verify_' + received['user_lang'], '55345630-06db-4987-863d-9189b0e97b57')
+                else:
+                    template = get_app_info(
+                        'time_before_payment', '55345630-06db-4987-863d-9189b0e97b57')
 
                 # Send email welcome with activation link
                 send_mail_template(user, template, substitutions)
@@ -168,9 +175,14 @@ class SendVerifyEmail(APIView):
             return Response(data=response['data'], status=response['status'])
         else:
             substitutions = {}
-            substitutions['%user_link%'] = settings.FRONTEND_URL+'activate/' + user.profile_activation_key
+            substitutions['%user_link%'] = settings.FRONTEND_URL + \
+                'activate/' + user.profile_activation_key
             substitutions['%name%'] = user.company_name
-            template = '55345630-06db-4987-863d-9189b0e97b57'
+            if user.user_lang:
+                template = get_app_info(
+                    'verify_' + user.user_lang, '55345630-06db-4987-863d-9189b0e97b57')
+            else:
+                template = '55345630-06db-4987-863d-9189b0e97b57'
 
             # Send email welcome with activation link
             send_mail_template(user, template, substitutions)
@@ -235,15 +247,20 @@ class ForgotPassword(APIView):
             response = get_response(400110)
             return Response(data=response['data'], status=response['status'])
 
-        #Create new hash for user:
+        # Create new hash for user:
         user.reset_password_key = "%s" % (uuid.uuid4(),)
         user.save()
 
         substitutions = {}
-        substitutions['%user_link%'] = settings.FRONTEND_URL+'resetPassword/' + user.reset_password_key
+        substitutions['%user_link%'] = settings.FRONTEND_URL + \
+            'resetPassword/' + user.reset_password_key
         substitutions['%name%'] = user.company_name
-        template = '50f0db97-ee40-4b23-859d-9e33f460eefd'
-        # print(substitutions['%user_link%'])
+        if user.user_lang:
+            template = get_app_info(
+                'reset_' + user.user_lang, '50f0db97-ee40-4b23-859d-9e33f460eefd')
+        else:
+            template = '50f0db97-ee40-4b23-859d-9e33f460eefd'
+
         send_mail_template(user, template, substitutions)
         response = get_response(200102)
         return Response(data=response['data'], status=response['status'])
