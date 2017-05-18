@@ -33,11 +33,6 @@ class QuoteTests(APITestCase):
         self.assertEqual(response.data['code'], 400300)
 
         response = post_api(
-            user, test2.data, '/api/v1/deliveries/quote', QuoteViewSet)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['code'], 400305)
-
-        response = post_api(
             user, test3.data, '/api/v1/deliveries/quote', QuoteViewSet)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['code'], 400407)
