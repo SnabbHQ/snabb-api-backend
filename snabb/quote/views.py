@@ -111,6 +111,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
                 if 'email' in contact_data:
                     task_contact_email = contact_data['email']
 
+                '''
                 try:  # Check Address email
                     task_contact_email = task['contact']['email']
                 except Exception as error:
@@ -118,6 +119,7 @@ class QuoteViewSet(viewsets.ModelViewSet):
                                  address_list, contact_list, new_quote)
                     response = get_response(400305)
                     return Response(data=response['data'], status=response['status'])
+                '''
 
             try:  # Check Address address
                 task_address_address = task['place']['address']
