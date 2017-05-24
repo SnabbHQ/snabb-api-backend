@@ -294,6 +294,14 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
+    400312: {
+        'data': {
+            'code': 400312,
+            'message': 'Phone required in any contact',
+            'key': 'PHONE_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
     400401: {
         'data': {
             'code': 400401,

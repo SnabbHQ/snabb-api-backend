@@ -213,6 +213,7 @@ def _send_dispatching(task, task_id=None):
                 # {"unparsed": task.task_place.place_address.address},
                 'notes': task.task_place.description
             }
+
             notes = task.comments
             recipients = []
             # If contact doesn't have name, we use company_name
@@ -225,9 +226,16 @@ def _send_dispatching(task, task_id=None):
             else:
                 name = task.task_contact.company_name
                 comments = task.comments
-            recipient = {"name": name,
-                         "phone": task.task_contact.phone,
-                         "notes": comments}
+
+            recipient = {}
+            recipient['name'] = name
+            if task.task_contact.phone:
+                recipient['phone'] = task.task_contact.phone
+            if task.task_contact.email:
+                recipient['email'] = task.task_contact.email
+            if comments:
+                recipient['notes'] = comments
+
             recipients.append(recipient)
 
             if task.task_type == 'pickup':

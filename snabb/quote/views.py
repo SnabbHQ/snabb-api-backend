@@ -107,6 +107,11 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
                 if 'phone' in contact_data:
                     task_contact_phone = contact_data['phone']
+                else:
+                    cancel_quote(task_list, place_list,
+                                 address_list, contact_list, new_quote)
+                    response = get_response(400312)
+                    return Response(data=response['data'], status=response['status'])
 
                 if 'email' in contact_data:
                     task_contact_email = contact_data['email']
