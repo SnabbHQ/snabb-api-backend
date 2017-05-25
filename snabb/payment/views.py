@@ -42,13 +42,11 @@ class CardViewSet(viewsets.ModelViewSet):
                 response = get_response(400603)
                 return Response(data=response['data'], status=response['status'])
 
-
-            response = set_default_source(customer,card.card_info['id'])
+            response = set_default_source(customer, card.card_info['id'])
             return Response(data=response['data'], status=response['status'])
         else:
             response = get_response(400608)
             return Response(data=response['data'], status=response['status'])
-
 
     def list(self, request):
         '''
@@ -63,8 +61,6 @@ class CardViewSet(viewsets.ModelViewSet):
             entries = CardDjango.objects.filter(user_id=self.request.user)
         serializer = CardSerializer(entries, many=True)
         return Response(serializer.data)
-
-
 
     def create(self, request):
         '''
@@ -82,24 +78,27 @@ class CardViewSet(viewsets.ModelViewSet):
         token = received['token']
         user = User.objects.get(pk=self.request.user.pk)
 
-        try: # Get/create Customer
+        try:  # Get/create Customer
             customer = get_or_create_customer(user)
         except Exception as error:
             response = get_response(400603)
             return Response(data=response['data'], status=response['status'])
 
-        try: # Create Card
+        try:  # Create Card
             card_selected = create_card(customer, token)
         except Exception as error:
             response = get_response(400604)
             return Response(data=response['data'], status=response['status'])
 
-        try: # Create Django Card
+        try:  # Create Django Card
             new_card = CardDjango.objects.get(
                 fingerprint=card_selected.fingerprint
             )
         except CardDjango.DoesNotExist:
+            # Check if the first card of this user.
             new_card = CardDjango()
+            if CardDjango.objects.filter(user_id=user).count() == 0:
+                new_card.default_card = True
             new_card.user_id = user
             new_card.fingerprint = card_selected.fingerprint
             new_card.save()

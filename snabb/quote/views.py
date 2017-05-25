@@ -19,6 +19,8 @@ from snabb.geo_utils.utils import (
     _check_api_address, _get_location_info
 )
 from snabb.utils.utils import LargeResultsSetPagination
+from snabb.payment.models import Card
+from snabb.users.models import Profile
 
 
 def cancel_quote(task_list, place_list, address_list, contact_list, quote):
@@ -71,6 +73,12 @@ class QuoteViewSet(viewsets.ModelViewSet):
 
         # Data to create a quote
         user = self.request.user
+        user_profile = Profile.objects.get(profile_apiuser=user)
+        if user_profile.enterprise is False:
+            # Check if user have credit card assigned.
+            if Card.objects.filter(user_id=user).count() == 0:
+                response = get_response(400313)
+                return Response(data=response['data'], status=response['status'])
 
         try:  # Check Task first_name
             print (len(received['tasks']))

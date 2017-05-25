@@ -30,10 +30,9 @@ def create_payment(delivery, price):
             payment.amount = decimal.Decimal(delivery.price)
 
             try:
-                currency = delivery.delivery_quote.tasks.all()\
-                    [:1][0].task_place.place_address.\
+                currency = delivery.delivery_quote.tasks.all()[:1][0].task_place.place_address.\
                     address_city.city_region.region_country.\
-                    country_currency.currency
+                    country_currency.iso_code.lower()
             except Exception as error:
                 print(error)
                 currency = 'eur'

@@ -6,7 +6,7 @@ class DeliveryAdmin(admin.ModelAdmin):
     model = Delivery
     list_display = [
         'delivery_id', 'courier', 'delivery_quote', 'price',
-        'status'
+        'status', 'created_at', 'updated_at'
     ]
 
     list_filter = ['status']

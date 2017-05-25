@@ -302,6 +302,14 @@ responses = {
         },
         'status': status.HTTP_400_BAD_REQUEST
     },
+    400313: {
+        'data': {
+            'code': 400313,
+            'message': 'Credit Card required',
+            'key': 'CREDIT_CARD_REQUIRED'
+        },
+        'status': status.HTTP_400_BAD_REQUEST
+    },
     400401: {
         'data': {
             'code': 400401,
