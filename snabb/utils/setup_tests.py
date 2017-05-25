@@ -19,7 +19,7 @@ We use this library to setup all object creation, to use them accross our tests
 def create_profile():
     profile = Profile.objects.get_or_create(
         company_name='My Company S.L.', email='email@example.com',
-        password='123456', phone='+34123456789', user_lang='es'
+        password='123456', phone='+34123456789', user_lang='es', enterprise=True
     )
     return profile[0]
 
